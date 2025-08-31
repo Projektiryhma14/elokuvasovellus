@@ -1,0 +1,1 @@
+Modelsit hoitavat tietokannan logiikan.

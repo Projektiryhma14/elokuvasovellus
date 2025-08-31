@@ -1,0 +1,4 @@
+Controllerit ottavat vastaan HTTP-pyynnöt ja välittävät ne oikeille palveluille 
+tai malleille(models) eli get, post, put jne..
+
+Lukevat query-parametrit, url-parametrit, request bodyn ja hoitavat datan validoinnin.
