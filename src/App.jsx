@@ -122,7 +122,7 @@ function App() {
 
     const searchShowtimes = () => {
         const theatreId = selectedTheatre
-        const eventId = selectedMovie
+        const eventId = selectedFinnkinoMovie
         const dt = selectedDate
         const numberOfDays = 1
         const base_url = "https://www.finnkino.fi/xml/Schedule/"
@@ -362,7 +362,7 @@ function App() {
             <div id="finnkino-search">
                 <h3>Näytösaikojen haku</h3>
                 <form onSubmit={e => { e.preventDefault(); searchShowtimes(); }}>
-                    <select value={selectedMovie} onChange={(e) => {setSelectedMovie(e.target.value); console.log(e.target.value)}}>
+                    <select value={selectedFinnkinoMovie} onChange={(e) => {setSelectedFinnkinoMovie(e.target.value); console.log(e.target.value)}}>
                         <option className="search_criteria" value="">Choose movie</option>
                         {
                             finnkinoMovies.map(m => (
