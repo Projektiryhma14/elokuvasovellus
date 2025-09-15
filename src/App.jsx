@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import './App.css'
 import axios from 'axios'
+import placeholder from './pics/movie_poster_not_available.png'
+import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+
+
 
 
 function App() {
@@ -30,8 +34,10 @@ function App() {
     const currentMovies = popularMovies.slice(startIndex, endIndex);
 
     const [movieDetails, setMovieDetails] = useState([]);
+    const [selectedMovie, setSelectedMovie] = useState("")
 
 
+    // MOVIE SEARCH OSIO !!!!!
     // Suoritetaan kun käyttäjä painaa "Search" (form on submit)
     const searchMovie = async () => {
         try {
@@ -39,7 +45,7 @@ function App() {
                 params: {
                     api_key: import.meta.env.VITE_API_KEY,        // v3 API key
                     include_adult: false,
-                    language: "fi-FI",      // UI-teksti suomeksi, jos on saatavilla
+                    language: "en-US",      // UI-teksti suomeksi, jos on saatavilla
                     with_original_language: language || undefined,
                     with_genres: genre || undefined,
                     primary_release_year: year || undefined,
@@ -54,26 +60,6 @@ function App() {
             console.error(err);
         }
     }
-
-    const showMovieDetails = async () => {
-        try {
-            //console.log(movieId)
-            const details = await axios.get(
-                "https://api.themoviedb.org/3/movie", {
-                params: {
-                    api_key: import.meta.env.VITE_API_KEY,
-                    movie_id: movieId || undefined
-                }
-            }
-            )
-            setMovieDetails(details.data.results || [])
-            setPlot(movieDetails.overview)
-        }
-        catch (error) {
-            console.error("Elokuvan tietojen haku epäonnistui: ", error)
-        }
-    }
-
 
     // Käytetään useEfectiä, eli haetaan vain kerran, kun komponentti ladataan
     // Ladataan popular movies listaan
@@ -99,12 +85,72 @@ function App() {
         noudaPopular();     // kutsutaan heti
     }, []);                 // Ei uudelleen hae state-muutoksissa
 
+
+    //Funktio jolla muutetaan TMDB- vote_average tähdiksi
+    function NaytaTahdet({ vote_average, maxStars = 5 }) {
+        const rating = (vote_average / 10) * maxStars;
+        const filledStars = Math.floor(rating);
+        const hasHalfStar = rating - filledStars >= 0.5;
+
+        return (
+            <div className='vote_stars'>
+                {[...Array(maxStars)].map((_, i) => {
+                    if (i < filledStars) {
+                        return <FaStar key={i} color="gold" />
+                    } else if (i === filledStars && hasHalfStar) {
+                        return <FaStarHalfAlt key={i} color="gold" />
+                    } else {
+                        return <FaRegStar key={i} color="gold" />
+                    }
+                })}
+            </div>
+        )
+    }
+
+    // FINKINO OSIO !!!!
+    {/* 
+    const [areas, setAreas] = useState([])
+
+    const getFinnkinoTheatres = (xml) => {
+        const parser = new DOMParser()
+        const xmlDoc = parser.parseFromString(xml, 'application/xml')
+        const root = xmlDoc.children
+        const theatres = root[0].children
+        const tempAreas = []
+        for (let i = 0; i < theatres.length; i++) {
+            //console.log(theatres[i].children[0].innerHTML)
+            // console.log(theatres[i].children[1].innerHTML)
+            tempAreas.push(
+                {
+                    "id": theatres[i].children[0].innerHTML,
+                    "name": theatres[i].children[1].innerHTML
+                }
+            )
+        }
+        setAreas(tempAreas)
+
+    }
+
+    
+    
+    useEffect(() => {
+        fetch('https://www.finnkino.fi/xml/TheatreAreas/')
+            .then(response => response.text())
+            .then(xml => {
+                //console.log(xml)
+                getFinnkinoTheatres(xml)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+    }, [])
+*/}
+
+
+
     return (
 
-
-
-
-        <div id='container'>
+        <div className='container_movieSearch'>
 
             <div id="search-box">
                 {/* form: Enter painaminenkin lähettää haun; e.preventDefault() ettei selain lataa sivua */}
@@ -178,7 +224,7 @@ function App() {
                     {currentMovies.map((m) => {
                         const year = m.release_date?.slice(0, 4) || "—";
                         return (
-                            <li key={m.id} onClick={e => { console.log(m.id/*e.target*/)/*showMovieDetails(m.id)*/ }}>
+                            <li key={m.id} onClick={e => { setSelectedMovie(m) }}>
                                 {m.title} ({year})
                             </li>
                         );
@@ -199,19 +245,63 @@ function App() {
 
 
             </div>
-            <div id="movieResult-box">
+            <div className="movieResult-box">
                 <h3>Selected movie</h3>
+                <div>
+                    {selectedMovie.title}
+                </div>
+
+                <div>
+
+                    <img
+                        className="poster"
+                        src={
+                            selectedMovie.poster_path
+                                ? `https://image.tmdb.org/t/p/w342${selectedMovie.poster_path}`
+                                : placeholder
+                        }
+                        alt={selectedMovie.title}
+                    />
+                </div>
+                <div className='vote_stars'>
+                    <NaytaTahdet vote_average={selectedMovie.vote_average} />
+                </div>
             </div>
+
             <div id="overview-box">
                 <h3>Overview</h3>
-                <p>{plot}</p>
+                {selectedMovie.overview}
             </div>
 
 
+            {/*
+            <div className='container_finkino'>
+                <div>
+                    <h1>Finnkino</h1>
+                </div>
+                <div>
+                    <select>
+                        {
+                            areas.map(area => (
+                                <option key={area.id}>{area.name}</option>
+                            ))
+                        }
+                    </select>
+                </div>
+
+
+            </div>
+            */}
         </div>
 
 
-    );
+
+
+
+
+
+
+    ); // end of return
 }
 
 export default App

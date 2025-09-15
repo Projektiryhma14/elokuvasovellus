@@ -4,10 +4,19 @@
     box-sizing: border-box;
 }
 
-#container {
-    display: flex;
+.container_movieSearch {
+   display: flex;
+   justify-content: center;
+   justify-content: space-around;
+   flex-wrap: wrap;
 }
 
+/*
+.container_finkino {
+    flex-basis: 100%;
+    margin-top: 100px; 
+}
+*/
 
 .select-div {
   /*display: inline-block;*/
@@ -87,14 +96,38 @@ li:last-child {
     height: 500px;
 }
 
-#movieResult-box {
-    border: 1px solid black;
-    width: 500px;
-    height: 500px;
+.movieResult-box {
+    text-align: center;
+    margin: 1rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+    width: 300px;
 }
 
 #overview-box {
     border: 1px solid black;
     width: 500px;
     height: 500px;
+}
+
+/* sama tyyli posterille ja placeholderille */
+.poster {
+  width: 150px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.vote_stars {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+    gap: 5px;
+}
+
+.vote_stars svg {
+    width: 30px;
+    height: 30px;
 }
