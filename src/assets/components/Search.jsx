@@ -1,13 +1,12 @@
+//import React from 'react'
 import { useEffect, useState } from 'react'
-import './App.css'
 import axios from 'axios'
-import placeholder from './pics/movie_poster_not_available.png'
+import placeholder from '../../pics/movie_poster_not_available.png'
 import { FaStar, FaStarHalfAlt, FaRegStar } from "react-icons/fa";
+import './Search.css'
 
 
-
-
-function App() {
+export default function Search() {
 
     const [query, setQuery] = useState("")                  // ei käytössä
     const [output, setOutput] = useState("")                // Näytetään <pre>-tagissä. APIN raaka-data (debug)
@@ -193,46 +192,6 @@ function App() {
         )
     }
 
-    // FINKINO OSIO !!!!
-    {/* 
-    const [areas, setAreas] = useState([])
-
-    const getFinnkinoTheatres = (xml) => {
-        const parser = new DOMParser()
-        const xmlDoc = parser.parseFromString(xml, 'application/xml')
-        const root = xmlDoc.children
-        const theatres = root[0].children
-        const tempAreas = []
-        for (let i = 0; i < theatres.length; i++) {
-            //console.log(theatres[i].children[0].innerHTML)
-            // console.log(theatres[i].children[1].innerHTML)
-            tempAreas.push(
-                {
-                    "id": theatres[i].children[0].innerHTML,
-                    "name": theatres[i].children[1].innerHTML
-                }
-            )
-        }
-        setAreas(tempAreas)
-
-    }
-
-    
-    
-    useEffect(() => {
-        fetch('https://www.finnkino.fi/xml/TheatreAreas/')
-            .then(response => response.text())
-            .then(xml => {
-                //console.log(xml)
-                getFinnkinoTheatres(xml)
-            })
-            .catch(error => {
-                console.log(error)
-            })
-    }, [])
-*/}
-
-
 
     return (
 
@@ -408,26 +367,6 @@ function App() {
                     }
                 </ul>
             </div>
-
-
-            {/*
-            <div className='container_finkino'>
-                <div>
-                    <h1>Finnkino</h1>
-                </div>
-                <div>
-                    <select>
-                        {
-                            areas.map(area => (
-                                <option key={area.id}>{area.name}</option>
-                            ))
-                        }
-                    </select>
-                </div>
-
-
-            </div>
-            */}
         </div>
 
 
@@ -438,6 +377,5 @@ function App() {
 
 
     ); // end of return
+  
 }
-
-export default App
