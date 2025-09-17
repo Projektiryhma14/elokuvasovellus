@@ -7,6 +7,6 @@ import SignIn from './screens/SignIn.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <SignIn />
+    <SignUp />
   </StrictMode>,
 )

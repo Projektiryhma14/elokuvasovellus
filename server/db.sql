@@ -12,7 +12,7 @@ user_name VARCHAR(20) NOT NULL UNIQUE,
 email VARCHAR(50) NOT NULL UNIQUE,
 password_hash VARCHAR(255) NOT NULL,
 /*groupID INT REFERENCES groups(group_id),*/
-HasActiveGroupRequest BOOLEAN NOT NULL
+HasActiveGroupRequest BOOLEAN DEFAULT false
 ); 
 
 create table reviews ( 
@@ -64,3 +64,5 @@ ALTER TABLE sharedMovies ADD group_id INT NOT NULL REFERENCES groups(group_id);
 ALTER TABLE sharedMovies ADD sharer_id INT NOT NULL REFERENCES users(user_id);
 ALTER TABLE sharedShowtimes ADD group_id INT NOT NULL REFERENCES groups(group_id);
 ALTER TABLE sharedShowtimes ADD sharer_id INT NOT NULL REFERENCES users(user_id);
+
+ALTER TABLE users ALTER HasActiveGroupRequest SET DEFAULT FALSE;
