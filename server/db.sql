@@ -12,7 +12,7 @@ user_name VARCHAR(20) NOT NULL UNIQUE,
 email VARCHAR(50) NOT NULL UNIQUE,
 password_hash VARCHAR(255) NOT NULL,
 /*groupID INT REFERENCES groups(group_id),*/
-HasActiveGroupRequest BOOLEAN NOT NULL
+HasActiveGroupRequest BOOLEAN DEFAULT false
 ); 
 
 create table reviews ( 
