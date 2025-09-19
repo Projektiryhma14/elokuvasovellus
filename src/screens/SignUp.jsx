@@ -20,13 +20,14 @@ function SignUp() {
         //axios.post(url, {user})
         axios.post(url, user)
             .then(response => {
-                console.log(`Rekisteröityminen onnistui. Luodun käyttäjän id: ${response.id}, ja email: ${response.email}`)
+                console.log(`Rekisteröityminen onnistui. Luodun käyttäjän id: ${response.data.id}, ja email: ${response.data.email}`)
                 setStatusMessage('Rekisteröityminen onnistui')
                 //tähän vielä formin input kenttien tyhjennys (jos rekisteröityminen onnistuu)
                 //setUser({...user, email: ''})
                 //setUser({...user, username: ''})
                 //setUser({...user, password: ''})
                 e.target.reset()
+                //automaattinen siirtyminen signIn sivulle, kun rekisteröityminen onnistuu
 
             })
             .catch(err => {
