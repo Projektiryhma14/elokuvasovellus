@@ -194,177 +194,184 @@ export default function Search() {
 
 
     return (
+        <>
+            {/* MOVIE SEARCH -OSIO */}
+            <section id="search" className={styles.container_movieSearch}>
+                <span className={styles.headline}><h2>Movie Search</h2></span>
+                <div id="tmdb-container">
 
-        <div className={styles.container_movieSearch}>
-            <div id="search-box">
-                <form onSubmit={e => { e.preventDefault(); searchMovie(); }}>
-                    <div className={styles['select-div']}>
-                        <select value={genre} onChange={(e) => { setGenre(e.target.value); console.log(e.target.value) }}>
-                            <option className={styles.search_criteria} value="">Choose genre</option>
-                            <option value="28">Action</option>
-                            <option value="12">Adventure</option>
-                            <option value="16">Animation</option>
-                            <option value="35">Comedy</option>
-                            <option value="80">Crime</option>
-                            <option value="99">Documentary</option>
-                            <option value="18">Drama</option>
-                            <option value="10751">Family</option>
-                            <option value="14">Fantasy</option>
-                            <option value="36">History</option>
-                            <option value="27">Horror</option>
-                            <option value="10402">Music</option>
-                            <option value="9648">Mystery</option>
-                            <option value="10749">Romance</option>
-                            <option value="878">Science Fiction</option>
-                            <option value="10770">TV Movie</option>
-                            <option value="53">Thriller</option>
-                            <option value="10752">War</option>
-                            <option value="37">Western</option>
-                        </select>
-                    </div>
+                    {/* Suodattimet ja haku */}
+                    <aside id="search-box">
+                        <form onSubmit={e => { e.preventDefault(); searchMovie(); }}>
+                            <div className={styles['select-div']}>
+                                <select value={genre} onChange={(e) => { setGenre(e.target.value); console.log(e.target.value) }}>
+                                    <option className={styles.search_criteria} value="">Choose genre</option>
+                                    <option value="28">Action</option>
+                                    <option value="12">Adventure</option>
+                                    <option value="16">Animation</option>
+                                    <option value="35">Comedy</option>
+                                    <option value="80">Crime</option>
+                                    <option value="99">Documentary</option>
+                                    <option value="18">Drama</option>
+                                    <option value="10751">Family</option>
+                                    <option value="14">Fantasy</option>
+                                    <option value="36">History</option>
+                                    <option value="27">Horror</option>
+                                    <option value="10402">Music</option>
+                                    <option value="9648">Mystery</option>
+                                    <option value="10749">Romance</option>
+                                    <option value="878">Science Fiction</option>
+                                    <option value="10770">TV Movie</option>
+                                    <option value="53">Thriller</option>
+                                    <option value="10752">War</option>
+                                    <option value="37">Western</option>
+                                </select>
+                            </div>
 
-                    <div className={styles['select-div']}>
-                        <select value={year} onChange={(e) => { setYear(e.target.value); console.log(e.target.value) }}>
-                            <option className={styles.search_criteria} value="">Choose year</option>
-                            {Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i) => {
-                                const y = new Date().getFullYear() - i;
+                            <div className={styles['select-div']}>
+                                <select value={year} onChange={(e) => { setYear(e.target.value); console.log(e.target.value) }}>
+                                    <option className={styles.search_criteria} value="">Choose year</option>
+                                    {Array.from({ length: new Date().getFullYear() - 1900 + 1 }, (_, i) => {
+                                        const y = new Date().getFullYear() - i;
+                                        return <option key={y} value={y}>{y}</option>;
+                                    })}
+                                </select>
+                            </div>
+
+                            <div className={styles['select-div']}>
+                                <select value={language} onChange={(e) => { setLanguage(e.target.value); console.log(e.target.value) }}>
+                                    <option className={styles.search_criteria} value="">Choose language</option>
+                                    <option value="en">English</option>
+                                    <option value="fi">Finnish</option>
+                                    <option value="sv">Swedish</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="fr">French</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="de">German</option>
+                                </select>
+                            </div>
+
+                            <br />
+                            <button type="submit" id="movieSearch_button">Search</button>
+                        </form>
+                    </aside>
+
+                    {/* Lista & sivutus (EI sivuston navigaatio → section) */}
+                    <section id="popular-box" aria-labelledby="results-heading">
+                        <h3 id="results-heading">
+                            {movies.length > 0 ? "Search Results" : "Popular Movies Today"}
+                        </h3>
+
+                        <ul>
+                            {currentMovies.map((m) => {
+                                const year = m.release_date?.slice(0, 4) || "—";
                                 return (
-                                    <option key={y} value={y}>
-                                        {y}
-                                    </option>
+                                    <li key={m.id} onClick={() => setSelectedMovie(m)}>
+                                        {m.title} ({year})
+                                    </li>
                                 );
                             })}
-                        </select>
-                    </div>
+                        </ul>
 
-                    <div className={styles['select-div']}>
-                        <select value={language} onChange={(e) => { setLanguage(e.target.value); console.log(e.target.value) }}>
-                            <option className={styles.search_criteria} value="">Choose language</option>
-                            <option value="en">English</option>
-                            <option value="fi">Finnish</option>
-                            <option value="sv">Swedish</option>
-                            <option value="ja">Japanese</option>
-                            <option value="fr">French</option>
-                            <option value="es">Spanish</option>
-                            <option value="de">German</option>
-                        </select>
-                    </div>
-                    <br />
-                    <button type='submit' id="movieSearch_button">Search</button>
-                </form>
-            </div >
+                        <div className={styles.next_prev}>
+                            <button
+                                type="button"
+                                id="prev_button"
+                                onClick={() => setPage(page - 1)}
+                                disabled={page === 1}
+                            >
+                                Edelliset
+                            </button>
 
-            <div id="popular-box">
-                <h3>{movies.length > 0 ? "Search Results" : "Popular Movies Today"}</h3>
-                <ul>
-                    {currentMovies.map((m) => {
-                        const year = m.release_date?.slice(0, 4) || "—";
-                        return (
-                            <li key={m.id} onClick={e => { setSelectedMovie(m) }}>
-                                {m.title} ({year})
-                            </li>
-                        );
-                    })}
-                </ul>
+                            <button
+                                type="button"
+                                id="next_button"
+                                onClick={() => setPage(page + 1)}
+                                disabled={endIndex >= popularMovies.length}
+                            >
+                                Seuraavat
+                            </button>
+                        </div>
+                    </section>
 
-                <div className={styles.next_prev}>
-                    <button id="prev_button"
-                        onClick={() => setPage(page - 1)}
-                        disabled={page === 1}
-                    >Edelliset</button>
+                    {/* Valittu elokuva */}
+                    <article className={styles['movieResult-box']} aria-labelledby="selected-movie-heading">
+                        <h3 id="selected-movie-heading">Selected movie</h3>
+                        <div>{selectedMovie.title}</div>
 
-                    <button id="next_button"
-                        onClick={() => setPage(page + 1)}
-                        disabled={endIndex >= popularMovies.length}
-                    >Seuraavat</button>
+                        <div>
+                            <img
+                                className={styles.poster}
+                                src={
+                                    selectedMovie.poster_path
+                                        ? `https://image.tmdb.org/t/p/w342${selectedMovie.poster_path}`
+                                        : placeholder
+                                }
+                                alt={selectedMovie.title}
+                            />
+                        </div>
+
+                        <div className={styles.vote_stars}>
+                            <NaytaTahdet vote_average={selectedMovie.vote_average} />
+                        </div>
+                    </article>
+
+                    {/* Kuvaus */}
+                    <section id="overview-box" aria-labelledby="overview-heading">
+                        <h3 id="overview-heading">Overview</h3>
+                        {selectedMovie.overview}
+                    </section>
                 </div>
-            </div>
+            </section>
 
-            <div className={styles['movieResult-box']}>
-                <h3>Selected movie</h3>
-                <div>
-                    {selectedMovie.title}
-                </div>
+            {/* FINNKINO SHOWTIMES -OSIO */}
+            <section id="finnkino">
+                <div id="finnkino-search">
+                    <h3>Näytösaikojen haku</h3>
 
-                <div>
-                    <img
-                        className={styles.poster}
-                        src={
-                            selectedMovie.poster_path
-                                ? `https://image.tmdb.org/t/p/w342${selectedMovie.poster_path}`
-                                : placeholder
-                        }
-                        alt={selectedMovie.title}
-                    />
-                </div>
-                <div className={styles.vote_stars}>
-                    <NaytaTahdet vote_average={selectedMovie.vote_average} />
-                </div>
-            </div>
-
-            <div id="overview-box">
-                <h3>Overview</h3>
-                {selectedMovie.overview}
-            </div>
-
-            <div id="finnkino-search">
-                <h3>Näytösaikojen haku</h3>
-                <form onSubmit={e => { e.preventDefault(); searchShowtimes(); }}>
-                    <select value={selectedFinnkinoMovie} onChange={(e) => { setSelectedFinnkinoMovie(e.target.value); console.log(e.target.value) }}>
-                        <option className={styles.search_criteria} value="">Choose movie</option>
-                        {
-                            finnkinoMovies.map(m => (
+                    <form onSubmit={e => { e.preventDefault(); searchShowtimes(); }}>
+                        <select value={selectedFinnkinoMovie} onChange={(e) => { setSelectedFinnkinoMovie(e.target.value); console.log(e.target.value) }}>
+                            <option className={styles.search_criteria} value="">Choose movie</option>
+                            {finnkinoMovies.map(m => (
                                 <option key={m.id} value={m.id}>{m.name}</option>
-                            ))
-                        }
-                    </select>
-                    <select value={selectedTheatre} onChange={(e) => { setSelectedTheatre(e.target.value); console.log(e.target.value) }}>
-                        <option className={styles.search_criteria} value="">Choose theatre</option>
-                        {
-                            finnkinoTheatres.map(theatre => (
+                            ))}
+                        </select>
+
+                        <select value={selectedTheatre} onChange={(e) => { setSelectedTheatre(e.target.value); console.log(e.target.value) }}>
+                            <option className={styles.search_criteria} value="">Choose theatre</option>
+                            {finnkinoTheatres.map(theatre => (
                                 <option key={theatre.id} value={theatre.id}>{theatre.name}</option>
-                            ))
-                        }
-                    </select>
-                    <select value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); console.log(e.target.value) }}>
-                        <option className={styles.search_criteria} value="">Choose date</option>
-                        {
-                            Array.from({ length: 14 }, (_, i) => {
-                                const date = new Date()
-                                const options = { month: "2-digit", day: "2-digit", year: "numeric" }
-                                date.setDate(date.getDate() + i)
-                                const dateString = date.toLocaleDateString(undefined, options)
-                                return (
-                                    <option key={dateString} value={dateString}>{dateString}</option>
-                                )
-                            })
-                        }
-                    </select>
-                    <button type="submit" id="finnkinoSearch_button">Search</button>
-                </form>
-            </div>
+                            ))}
+                        </select>
 
-            <div id="showtimes">
-                <h3>Showtimes</h3>
-                <ul>
-                    {
-                        finnkinoShowtimes.map(showtime => {
-                            const datetime = new Date(showtime)
-                            return (
-                                <li key={showtime}>{datetime.toLocaleString("en-US")}</li>
-                            )
-                        })
-                    }
-                </ul>
-            </div>
-        </div>
+                        <select value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); console.log(e.target.value) }}>
+                            <option className={styles.search_criteria} value="">Choose date</option>
+                            {Array.from({ length: 14 }, (_, i) => {
+                                const date = new Date();
+                                const options = { month: "2-digit", day: "2-digit", year: "numeric" };
+                                date.setDate(date.getDate() + i);
+                                const dateString = date.toLocaleDateString(undefined, options);
+                                return <option key={dateString} value={dateString}>{dateString}</option>;
+                            })}
+                        </select>
 
+                        <button type="submit" id="finnkinoSearch_button">Search</button>
+                    </form>
 
+                    {/* Näytösajat */}
+                    <section id="showtimes" aria-labelledby="showtimes-heading">
+                        <h3 id="showtimes-heading">Showtimes</h3>
+                        <ul>
+                            {finnkinoShowtimes.map(showtime => {
+                                const datetime = new Date(showtime);
+                                return <li key={showtime}>{datetime.toLocaleString("en-US")}</li>;
+                            })}
+                        </ul>
+                    </section>
+                </div>
+            </section>
+        </>
+    );
 
-
-
-
-
-    ); // end of return
 
 }

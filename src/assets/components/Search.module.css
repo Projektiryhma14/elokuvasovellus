@@ -5,12 +5,36 @@
   box-sizing: border-box;
 }
 
-/* KOKO KOMPONENTIN WRAPPER */
-.container_movieSearch {
+.headline {
+  text-align: center;
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 16px;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* KOKO KOMPONENTIN WRAPPER */
+
+
+.container_movieSearch {
+  min-height: 100vh;
+  padding: 1rem;
+  box-sizing: border-box;
+  background-color: yellow;
+}
+
+:global(#tmdb-container) {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
   flex-wrap: wrap;
 }
+
+
 
 /* LISTAT – rajataan vain tämän komponentin sisään */
 .container_movieSearch ul {
