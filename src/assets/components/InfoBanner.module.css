@@ -1,0 +1,16 @@
+.info_banner {
+    background: #eef6ff;
+    border: 1px solid #cfe3ff;
+    padding: 10px 14px;
+    margin: 8px 16px;
+    border-radius: 8px;
+    text-align: center;
+    color: #000;
+
+    opacity: 1;
+   transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-out {
+    opacity: 0;
+}
