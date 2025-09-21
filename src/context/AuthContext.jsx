@@ -48,6 +48,7 @@ export default function AuthProvider({ children }) {
         }
 
         try {
+            
             const res = await axios.post(`${API_BASE_URL}/signin`, {
                 username,
                 password,
@@ -92,6 +93,7 @@ export default function AuthProvider({ children }) {
         sessionStorage.removeItem("email");
         sessionStorage.removeItem("user_id");
         sessionStorage.removeItem("returnTo");
+        //ylläolevat voisi (ehkä) korvata rivillä: sessionStorage.clear()
         setUser(null);
         setStatus("GUEST");
         setAuthError(null);

@@ -40,8 +40,8 @@ export default function SignIn() {
         if (result.ok) {
             // Tyhjennetään returnTo, jos sellainen oli
             sessionStorage.removeItem("returnTo");
-            // Ohjataan takaisin haluttuun reittiin tai etusivulle
-            navigate(returnTo || "/", { replace: true });
+            // Ohjataan takaisin etusivulle
+            navigate("/", { replace: true });
         } else {
             // Näytetään virhe (backendista tai verkosta)
             // authError tulee Contextista, mutta pidetään myös localError, jos haluat erottaa validointivirheen

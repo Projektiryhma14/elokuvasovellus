@@ -100,6 +100,33 @@ app.post('/signin', (req, res, next) => {
     })
 })
 
+
+app.delete('/deleteuser/:id', (req, res, next) => {
+    /*
+    const pool = openDb()
+    */
+    const pool = openDb()
+    const userId = req.params.id
+    console.log(req.params.id)
+    //console.log(req.params)
+    //(salasanan vahvistusta tms?)
+
+    pool.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [userId], (err, result) => {
+        if (err) return res.status(500).json({error: err.message})
+        
+        if(result.length === 0) {
+            console.log('Tiliä ei löydy')
+            return res.status(404).json({error: `Tiliä ei löytynyt id:llä ${userId}`})
+        }
+        console.log(`Poistettu tili jonka id on ${userId}`)
+        return res.status(200).json(result.rows[0])
+    })
+    
+
+    
+})
+
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
 })
