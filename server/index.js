@@ -62,15 +62,19 @@ app.post('/signup', (req, res, next) => {
     })
 })
 
+
+
+
 app.post('/signin', (req, res, next) => {
     const pool = openDb()
-    const user = req.body
-    if (!user || !user.username || !user.password) {
+    //const user = req.body
+    const { username, password } = req.body
+    if (!username || !password) {
         const error = new Error('Username & password are required')
         error.status = 400
         return next(error)
     }
-    pool.query('SELECT * FROM users WHERE user_name = $1', [user.username], (err, result) => {
+    pool.query('SELECT * FROM users WHERE user_name = $1', [username], (err, result) => {
         if (err) return next(err)
 
         if (result.rows.length === 0) {
@@ -81,7 +85,7 @@ app.post('/signin', (req, res, next) => {
 
         const dbUser = result.rows[0]
 
-        compare(user.password, dbUser.password, (err, isMatch) => {
+        compare(password, dbUser.password, (err, isMatch) => {
             if (err) return next(err)
 
             if (!isMatch) {
@@ -95,6 +99,7 @@ app.post('/signin', (req, res, next) => {
         res.status(200).json({
             id: dbUser.user_id,
             email: dbUser.email,
+            username: dbUser.user_name,
             token
         })
     })
@@ -112,18 +117,18 @@ app.delete('/deleteuser/:id', (req, res, next) => {
     //(salasanan vahvistusta tms?)
 
     pool.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [userId], (err, result) => {
-        if (err) return res.status(500).json({error: err.message})
-        
-        if(result.length === 0) {
+        if (err) return res.status(500).json({ error: err.message })
+
+        if (result.length === 0) {
             console.log('Tiliä ei löydy')
-            return res.status(404).json({error: `Tiliä ei löytynyt id:llä ${userId}`})
+            return res.status(404).json({ error: `Tiliä ei löytynyt id:llä ${userId}` })
         }
         console.log(`Poistettu tili jonka id on ${userId}`)
         return res.status(200).json(result.rows[0])
     })
-    
 
-    
+
+
 })
 
 
