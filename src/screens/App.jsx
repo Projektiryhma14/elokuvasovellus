@@ -15,6 +15,8 @@ import Search from '../assets/components/Search.jsx'
 import SignIn from '../screens/SignIn.jsx'
 import SignUp from '../screens/SignUp.jsx'
 
+import Reviews from './Reviews.jsx'
+
 
 
 
@@ -39,6 +41,7 @@ function App() {
                 {/*Julkiset linkit*/}
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/reviews" element={<Reviews />} />
 
 
                 {/* Suojatut linkit */}
