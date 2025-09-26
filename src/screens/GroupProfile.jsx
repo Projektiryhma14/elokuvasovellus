@@ -113,6 +113,10 @@ export default function GroupProfile() {
   const isMember = !isOwner && group && group.members.some(m => String(m.member_id) === userid && m.hasactivegrouprequest === false)
   const isGuest = !isOwner && !isMember
 
+  if (!group) {
+  return <p>Ladataan ryhmän tiedot...</p>
+}
+
   return (
     <div>
       <h1>{group.group_name}</h1>
