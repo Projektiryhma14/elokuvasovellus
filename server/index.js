@@ -450,7 +450,7 @@ app.post('/group/', async (req, res, next) => {
 
         
         // Otetaan datasta talteen käyttäjän groupID
-        const currentGroupId = ownerGroupId.rows[0]?.groupID
+        const currentGroupId = ownerGroupId.rows[0]?.groupid
 
         console.log(currentGroupId)
         console.log(ownerGroupId.rows[0]?.groupID)
