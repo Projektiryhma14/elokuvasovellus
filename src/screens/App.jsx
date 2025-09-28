@@ -11,10 +11,15 @@ import TmdbSearch from '../assets/components/TmdbSearch.jsx'
 import FinnkinoSearch from '../assets/components/FinnkinoSearch.jsx';
 import MyProfile from "../screens/MyProfile.jsx"
 import Group from "../screens/Group.jsx"
+import CreateGroup from "../screens/CreateGroup.jsx"
 
 import SignIn from '../screens/SignIn.jsx'
 import SignUp from '../screens/SignUp.jsx'
+
 import ReviewForm from './ReviewForm.jsx';
+
+import GroupProfile from './GroupProfile.jsx';
+
 
 import TestAuthStatus from './TestAuthStatus.jsx';
 
@@ -45,7 +50,7 @@ function App() {
                 {/*Julkiset linkit*/}
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
-
+                
 
                 {/* Suojatut linkit */}
                 <Route
@@ -69,6 +74,24 @@ function App() {
                     element={
                         <ProtectedRoute returnTo="/reviewform">
                             <ReviewForm />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/group/create"
+                    element={
+                        <ProtectedRoute returnTo="/group/create">
+                            <CreateGroup />
+                        </ProtectedRoute>
+                    }
+                />
+
+                                <Route
+                    path="/group/:id"
+                    element={
+                        <ProtectedRoute returnTo="/group/:id">
+                            <GroupProfile />
                         </ProtectedRoute>
                     }
                 />
