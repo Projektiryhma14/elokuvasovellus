@@ -127,8 +127,61 @@ app.delete('/deleteuser/:id', (req, res, next) => {
         return res.status(200).json(result.rows[0])
     })
 
+})
 
+//HAETAAN KÄYTTÄJÄN SUOSIKIT
+app.get('/favourites', (req, res) => {
+    
+  const pool = openDb()
+  const { user_id } = req.query
 
+  if (!user_id) 
+    return res.status(400).json({ error: 'User_id:tä ei löytynyt' })
+  
+  pool.query('SELECT * FROM favourites WHERE user_id = $1', [user_id], (err, result) => {
+    if (err) {
+        return res.status(500).json({ error: err.message })
+    }
+    res.status(200).json(result.rows)
+  })
+})
+
+//LISÄÄ UUSI SUOSIKKI
+app.post('/favourites/create', (req, res) => {
+
+  const pool = openDb()
+  const { movie_name, user_id } = req.body
+
+  if (!movie_name) {
+    return res.status(400).json({ error: 'Elokuvan nimi puuttuu' })
+  }
+
+  pool.query(
+    'INSERT INTO favourites (movie_name, user_id) VALUES ($1, $2) RETURNING *', [movie_name, user_id], (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: err.message })
+      }
+      res.status(201).json(result.rows[0])
+    })
+})
+
+//POISTA SUOSIKKI
+app.delete('/favourites/delete/:id', (req, res) => {
+
+  const pool = openDb()
+  const favId = req.params.id
+    console.log(req.params.id)
+    const { user_id } = req.query
+
+  pool.query('DELETE FROM favourites WHERE favourites_id = $1 AND user_id = $2 RETURNING*', [favId, user_id], (err, result) => {
+      if (err) return res.status(500).json({ error: err.message })
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: `Suosikkia ei löytynyt id:llä ${favId}` })
+      }
+      res.status(200).json(result.rows[0])
+    }
+  )
 })
 
 

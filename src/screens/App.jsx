@@ -9,6 +9,7 @@ import Header from '../assets/components/Header.jsx';
 
 
 import MyProfile from "../screens/MyProfile.jsx"
+import ProfileSettings from "../screens/ProfileSettings.jsx"
 import Group from "../screens/Group.jsx"
 
 import Search from '../assets/components/Search.jsx'
@@ -47,6 +48,14 @@ function App() {
                     element={
                         <ProtectedRoute returnTo="/profile">
                             <MyProfile />
+                        </ProtectedRoute>
+                    }
+                    />
+                <Route
+                    path="/profileSettings"
+                    element={
+                        <ProtectedRoute returnTo="/profileSettings">
+                            <ProfileSettings />
                         </ProtectedRoute>
                     }
                 />

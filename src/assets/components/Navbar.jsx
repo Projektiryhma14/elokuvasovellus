@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom'
 import { HashLink } from 'react-router-hash-link';
 import { useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../pics/logo2.png'
+import SettingsLogo from '../../pics/SettingsLogo.png'
 import styles from "./Navbar.module.css"
 import { useAuth } from '../../context/AuthContext.jsx'
 
@@ -93,6 +94,19 @@ export default function Navbar() {
                                 }
                             >
                                 My Profile
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
+                                to="/profileSettings"
+                                className={({ isActive }) =>
+                                    `${styles.link} ${isActive ? styles.active : ""}`
+                                }
+                            >
+                                My Profile Settings
+
+                                {/*to="/profileSettings" className={styles.brand}>
+                                <img src={SettingsLogo} alt="SettingsLogo.png" className={styles.logo} />*/}
                             </NavLink>
                         </li>
                         <li>
