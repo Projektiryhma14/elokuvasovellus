@@ -52,6 +52,9 @@ export default function Navbar() {
                         Jotain muuta
                     </HashLink>
                 </li>
+                <li>
+                    <NavLink to="/reviews" className={styles.link}>Reviews</NavLink>
+                </li>
             </ul>
 
             {/* Oikea laita: auth-linkit riippuvat statuksesta */}

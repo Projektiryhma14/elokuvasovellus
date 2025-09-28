@@ -316,6 +316,46 @@ app.delete('/deleteuser/:id', (req, res, next) => {
     })
 })
 
+app.get('/reviews', (req, res) => {
+    const pool = openDb()
+
+    pool.query(
+        `
+        SELECT reviews.review_id, 
+        reviews.movie_name,
+        reviews.movie_id,
+        reviews.movie_rating,
+        reviews.movie_review,
+        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH:MI') AS created_at,
+        users.email FROM reviews 
+        JOIN users ON reviews.user_id = users.user_id;
+        `,
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: err.message })
+            }
+            res.status(200).json(result.rows)
+
+        })
+})
+
+/*
+app.get('/users/:id', (req, res) => {
+    const pool = openDb()
+    const userId = req.params.id
+
+    pool.query('SELECT * FROM users WHERE user_id = $1', [userId], (err, result) => {
+        if (err) return res.status(500).json({error: err.message})
+        
+        if (result.length === 0) {
+            console.log('Tiliä ei löydy')
+            return res.status(404).json({ error: `Tiliä ei löytynyt id:llä ${userId}` })
+        }
+
+        return res.status(200).json(result.rows[0])
+    })
+})
+*/
 
 
 app.post("/reviews", authenticateToken, async (req, res) => {

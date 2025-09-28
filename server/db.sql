@@ -1,3 +1,13 @@
+/* poista foreign key relaatiot taulujen väliltä ennen taulujen poistamista */
+ALTER TABLE IF EXISTS reviews DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS favourites DROP COLUMN IF EXISTS user_id;
+ALTER TABLE IF EXISTS sharedMovies DROP COLUMN IF EXISTS group_id;
+ALTER TABLE IF EXISTS sharedMovies DROP COLUMN IF EXISTS sharer_id;
+ALTER TABLE IF EXISTS sharedShowtimes DROP COLUMN IF EXISTS group_id;
+ALTER TABLE IF EXISTS sharedShowtimes DROP COLUMN IF EXISTS sharer_id;
+ALTER TABLE IF EXISTS users DROP COLUMN IF EXISTS groupID;
+ALTER TABLE IF EXISTS groups DROP COLUMN IF EXISTS owner_id;
+
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS reviews;
 DROP TABLE IF EXISTS favourites;
@@ -19,6 +29,7 @@ create table reviews (
 review_id SERIAL PRIMARY KEY, 
 /*user_id INT NOT NULL REFERENCES users(user_id),*/
 movie_name VARCHAR(50) NOT NULL,
+movie_id INT NOT NULL,
 movie_rating INT NOT NULL CHECK(movie_rating BETWEEN 1 AND 5),
 movie_review VARCHAR(255) NOT NULL,
 created_at TIMESTAMP DEFAULT NOW()
@@ -64,3 +75,6 @@ ALTER TABLE sharedMovies ADD group_id INT NOT NULL REFERENCES groups(group_id);
 ALTER TABLE sharedMovies ADD sharer_id INT NOT NULL REFERENCES users(user_id);
 ALTER TABLE sharedShowtimes ADD group_id INT NOT NULL REFERENCES groups(group_id);
 ALTER TABLE sharedShowtimes ADD sharer_id INT NOT NULL REFERENCES users(user_id);
+
+/* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaoleva rivi pgAdminissa */
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
