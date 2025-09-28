@@ -2,13 +2,21 @@
 import "./SignIn.css";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+// Link = React Routerin linkki (korvaa <a href>)
+// useNavigate = ohjelmallinen siirtyminen toiseen reittiin
+
 import { useAuth } from "../context/AuthContext";
+// Oma hook (AuthContextista), jolla käytetään signIn, status, authError jne.
 
 export default function SignIn() {
     const navigate = useNavigate();
+
+
+    // Haetaan contextista kirjautumisfunktio, auth-tila ja viimeisin virhe
     const { signIn, status, authError } = useAuth();
 
-    // Paluuosoite ProtectedRoute-portilta
+    // Paluuosoite ProtectedRoute-portilta (jos käyttäjä yritti suojattuun sivuun)
     const [returnTo, setReturnTo] = useState(null);
 
     // Lomakekenttien tila
@@ -16,38 +24,45 @@ export default function SignIn() {
     const [password, setPassword] = useState("");
 
     // UI-tila
-    const [loading, setLoading] = useState(false);
-    const [localError, setLocalError] = useState(null);
+    const [loading, setLoading] = useState(false);          // näytetäänkö "Signing in..."
+    const [localError, setLocalError] = useState(null);     // lomakevalidoinnin virheet
 
+    // Kun komponentti latautuu → haetaan mahdollinen returnTo sessionStoragesta
     useEffect(() => {
         const r = sessionStorage.getItem("returnTo");
         if (r) setReturnTo(r);
     }, []);
 
+    // Lomakkeen submit-käsittelijä
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setLocalError(null);
+        e.preventDefault();                                 // estetään sivun uudelleenlataus
+        setLocalError(null);                                // nollataan vanha virhe
 
+        // Jos kentät tyhjiä → näytetään virhe
         if (!username || !password) {
             setLocalError("Please enter both username and password.");
             return;
         }
 
+        // Ladataan: estetään painike ja näytetään "Signing in..."
         setLoading(true);
         const result = await signIn({ username, password, returnTo });
         setLoading(false);
 
+
         if (result.ok) {
-            // Tyhjennetään returnTo, jos sellainen oli
-            sessionStorage.removeItem("returnTo");
-            // Ohjataan takaisin etusivulle
-            navigate("/", { replace: true });
+            // Jos login onnistui:
+            sessionStorage.removeItem("returnTo");      // poistetaan paluuosoite
+            navigate("/", { replace: true });           // Ohjataan takaisin etusivulle
         } else {
-            // Näytetään virhe (backendista tai verkosta)
-            // authError tulee Contextista, mutta pidetään myös localError, jos haluat erottaa validointivirheen
+            // Jos login epäonnistui: näytetään virhe
+            // authError tulee Contextista (esim. backendistä), 
+            // localError on omalle validoinnille
             if (result.error) setLocalError(result.error);
         }
     };
+
+
 
     return (
         <div className="wrapper">
@@ -63,7 +78,7 @@ export default function SignIn() {
 
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
-                            disabled={loading}
+                            disabled={loading}                               // estetään syöttö kun login on käynnissä
                         />
                     </div>
 
