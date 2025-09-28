@@ -8,7 +8,13 @@ export default function MyProfile() {
 
     const navigate = useNavigate()
 
+
+
+
+    //const user = sessionStorage.getItem("user_name")
+
     const { user, status, signOut } = useAuth();
+
 
     const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
@@ -34,8 +40,12 @@ export default function MyProfile() {
             <div>
 
                 <p>My profile</p>
+
+      {/*<p>Käyttäjä: {user}</p>*/}
+
                 <p>Käyttäjä: {user?.username}</p>
                 <p>Email: {user?.email}</p>
+
             </div>
             <button type="button" id="delete_account" onClick={() => deleteUser()}>Delete account</button>
         </div>

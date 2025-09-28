@@ -10,10 +10,12 @@ import Header from '../assets/components/Header.jsx';
 
 import MyProfile from "../screens/MyProfile.jsx"
 import Group from "../screens/Group.jsx"
+import CreateGroup from "../screens/CreateGroup.jsx"
 
 import Search from '../assets/components/Search.jsx'
 import SignIn from '../screens/SignIn.jsx'
 import SignUp from '../screens/SignUp.jsx'
+import GroupProfile from './GroupProfile.jsx';
 
 
 
@@ -39,7 +41,7 @@ function App() {
                 {/*Julkiset linkit*/}
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
-
+                
 
                 {/* Suojatut linkit */}
                 <Route
@@ -55,6 +57,24 @@ function App() {
                     element={
                         <ProtectedRoute returnTo="/group">
                             <Group />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/group/create"
+                    element={
+                        <ProtectedRoute returnTo="/group/create">
+                            <CreateGroup />
+                        </ProtectedRoute>
+                    }
+                />
+
+                                <Route
+                    path="/group/:id"
+                    element={
+                        <ProtectedRoute returnTo="/group/:id">
+                            <GroupProfile />
                         </ProtectedRoute>
                     }
                 />
