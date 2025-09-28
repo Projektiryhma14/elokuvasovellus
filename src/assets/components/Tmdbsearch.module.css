@@ -1,0 +1,334 @@
+/* ===== Vakiot (säädä tarpeen mukaan) */
+:root{
+ --nav-h: 96px;         /* Vaihda navbarin korkeus */
+  --content-max: 1280px; /* maksimileveys */
+  --gap: 40px;
+}
+
+
+
+/* ===== Kehys ja 100vh-osio */
+.wrapper{
+ min-height: calc(100vh - var(--nav-h));
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.headline {
+  margin-bottom: 60px;  /* enemmän tilaa otsikon jälkeen */
+  margin-top: 60px;
+  text-align: center;
+}
+
+.container_movieSearch {
+  flex: 1;
+  max-width: var(--content-max);        /* säädä vielä */
+  display: flex;
+  flex-direction: column;    /* ensin otsikko ylös */
+  gap: var(--gap);
+  min-height: calc(100vh - var(--nav-h));
+  scroll-margin-top: 92px;
+}
+
+.container_movieSearch ul {
+  list-style: none;
+  margin: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+}
+
+.container_movieSearch li {
+  padding: 0.2rem 0.1rem;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+}
+
+.container_movieSearch li:hover {
+  background-color: #f5f5f5;
+}
+
+.container_movieSearch li:last-child {
+  border-bottom: none;
+}
+
+
+.tmdb_container {
+  flex: 1;                   /* vie kaikki jäljellä oleva tila */
+  display: flex;             /* vaakasuunta */
+  gap: var(--gap);
+  min-height: 0;          /* mahdollistaa sisäiset scrolit */
+  
+}
+
+/* ===== Vasen suodattimet ===== */
+
+.search_box{
+  /*background:#fff;*/
+  /*border:1px solid #ddd;*/
+  flex:0 0 20%;
+  border-radius:12px;
+  padding:16px;
+  height: 400px;
+}
+
+.search_form {
+  display: flex;
+  flex-direction: column;   /* elementit pinoon */
+  gap: 12px;                /* tasainen väli jokaisen elementin väliin */
+  border:none;
+}
+
+.select_div {
+  display: flex;
+}
+
+.search_form select {
+  width: 250px;
+  background:#fcfcfd;
+  /*border:1px solid #d9d9d9;*/
+  border-radius:5px;
+  padding: 10px;
+  font-size:0.95rem;
+  line-height:1.25;
+  color:#1f1f1f;
+  transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  /*border-radius: 4px;*/
+
+  
+}
+
+/* Hover & focus */
+.search_form select:hover{ background:#f9f9fb; border-color:#cfcfcf; }
+.search_form select:focus{
+  border-color:#2a7be4;
+  box-shadow:0 0 0 4px rgba(42,123,228,.12);
+  outline:none;
+}
+
+.search_button,
+.movieSearch_button{
+  display:inline-flex;
+  justify-content:center;
+  align-items:center;
+  gap:8px;
+  padding:10px 14px;
+  border:none;
+  border-radius:10px;
+  background:#2a7be4;
+  color:#fff;
+  font-weight:600;
+  cursor:pointer;
+  transition:background-color .15s ease, transform .05s ease, box-shadow .15s ease;
+  box-shadow:0 6px 16px rgba(42,123,228,.25);
+}
+.search_button:hover,
+.movieSearch_button:hover{ background:#246bca; }
+.search_button:active,
+.movieSearch_button:active{ transform:translateY(1px); }
+.search_button:disabled,
+.movieSearch_button:disabled{ opacity:.6; cursor:not-allowed; box-shadow:none; }
+
+/* ===== Keskiosa (tulokset) ===== */
+.popular_box {
+  flex: 1 1 35%;                 /* joustaa eniten */
+  display: flex;
+  flex-direction: column;
+  /*min-height: 0;*/
+  height: 400px;
+}
+
+
+
+.popular_box ul {
+  flex: 1 1 auto;
+  
+  overflow-y: auto;          /* lista rullaa tarvittaessa */
+  margin: 0;
+  padding: 0;
+}
+
+/* ===== Oikea reuna ===== */
+.rightColumn {
+  flex: 0 0 45%;            /* kiinteä leveysosuus */
+  display: flex;
+  flex-direction: column;
+ gap: var(--gap);
+  min-height: 0;
+  
+}
+
+.movieResult_box {
+   display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Posteri */
+.poster{
+  display: block;
+  margin-inline: auto;
+  width: 150px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.vote_stars{
+  margin-top: 8px;
+  display: grid;
+  place-items: center;
+}
+
+/* Overview: tekstille oma rulla */
+.overview_box {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-width: 70%;    /* rajoita leveys esim. 80% palstasta */
+  margin: 0 auto;    /* keskittää kuvan alle */
+}
+.overview_box h3{ margin: 0 0 8px 0; }
+.overview_box h3 + *{
+  flex: 1 1 auto;
+  overflow-y: auto;        /* overview-teksti rullaa */
+  min-height: 0;
+}
+
+
+
+
+
+/*
+:global(#tmdb-container) {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+*/
+
+
+/* LISTAT – rajataan vain tämän komponentin sisään 
+.container_movieSearch ul {
+  list-style: none;
+  margin: 1rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+}
+
+.container_movieSearch li {
+  padding: 0.2rem 0.1rem;
+  border-bottom: 1px solid #e0e0e0;
+  cursor: pointer;
+}
+
+.container_movieSearch li:hover {
+  background-color: #f5f5f5;
+}
+
+.container_movieSearch li:last-child {
+  border-bottom: none;
+}
+  */
+
+/* SELECT-ryhmät 
+.select-div {
+  margin-bottom: 0.5rem;
+}
+
+.select-div select {
+  padding: 0.3rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 200px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+  */
+
+/* Option-luokka jota käytät JSX:ssä (ei pakollisia tyylejä nyt) */
+/*.search_criteria {}*/
+
+/* NAPIT (pidetään id:t käytössä -> :global) 
+:global(#movieSearch_button) {
+  background-color: green;
+  border: none;
+  color: azure;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+
+:global(#next_button),
+:global(#prev_button) {
+  border: none;
+  color: #000;
+  padding: 10px 16px;
+  cursor: pointer;
+  border-radius: 3px;
+}
+  */
+
+/* Prev/Next -napit sisältävä alue 
+.next_prev {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+  */
+
+/* BOXIT: osa on id:llä JSX:ssä → :global  
+:global(#popular-box) {
+  border: 1px solid black;
+  width: 500px;
+  height: 500px;
+}
+  */
+
+  /*
+.movieResult-box {
+  text-align: center;
+  margin: 1rem;
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #fafafa;
+  width: 300px;
+}
+
+:global(#overview-box) {
+  border: 1px solid black;
+  width: 500px;
+  height: 500px;
+}
+  */
+
+/* POSTER-kuva (sama myös placeholderille) 
+.poster {
+  width: 150px;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+  */
+
+/* TMDb tähdet 
+.vote_stars {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  gap: 5px;
+}
+  
+
+
+.vote_stars svg {
+  width: 30px;
+  height: 30px;
+}
+*/

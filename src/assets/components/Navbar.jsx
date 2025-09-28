@@ -36,7 +36,7 @@ export default function Navbar() {
             {/* Keskilinkit */}
             <ul className={`${styles.links} ${styles.center}`}>
                 <li>
-                    <HashLink smooth to="/#search" className={styles.link}>
+                    <HashLink smooth to="/#movie_search" className={styles.link}>
                         Movie Search
                     </HashLink>
                 </li>
