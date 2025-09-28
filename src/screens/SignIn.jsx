@@ -12,7 +12,6 @@ import { useAuth } from "../context/AuthContext";
 export default function SignIn() {
     const navigate = useNavigate();
 
-
     // Haetaan contextista kirjautumisfunktio, auth-tila ja viimeisin virhe
     const { signIn, status, authError } = useAuth();
 
@@ -46,20 +45,37 @@ export default function SignIn() {
 
         // Ladataan: estetään painike ja näytetään "Signing in..."
         setLoading(true);
-        const result = await signIn({ username, password, returnTo });
+        const result = await signIn({ username, password });
         setLoading(false);
 
-
         if (result.ok) {
-            // Jos login onnistui:
-            sessionStorage.removeItem("returnTo");      // poistetaan paluuosoite
-            navigate("/", { replace: true });           // Ohjataan takaisin etusivulle
+            // Luodaan paluuosoite
+            const to = sessionStorage.getItem("returnTo");
+
+            // navigoidaan: jos to on, mennään sinne. Muuten etusivulle
+            if (to) {
+                sessionStorage.removeItem("returnTo")
+                navigate(to, { replace: true })
+
+            } else {
+                navigate("/", { replace: true })
+            }
         } else {
-            // Jos login epäonnistui: näytetään virhe
-            // authError tulee Contextista (esim. backendistä), 
-            // localError on omalle validoinnille
-            if (result.error) setLocalError(result.error);
+            // Näytetään kontekstin virhe tai signInin palauttama virhe
+            if (result?.error) setLocalError(result.error)
         }
+
+        //if (result.ok) {
+        //    // Jos login onnistui:
+        //    sessionStorage.removeItem("returnTo");      // poistetaan paluuosoite
+        //    navigate("/", { replace: true });           // Ohjataan takaisin etusivulle
+        //} else {
+        //    // Jos login epäonnistui: näytetään virhe
+        // authError tulee Contextista (esim. backendistä), 
+        // localError on omalle validoinnille
+        //    if (result.error) setLocalError(result.error);
+        //}
+
     };
 
 
@@ -116,10 +132,13 @@ export default function SignIn() {
                     )}
                 </form>
 
-                {/* Debug-info: näyttää nykyisen status-tilan (SKELETON, GUEST, USER) */}
+
+                {/* Debug-info: näyttää nykyisen status-tilan (SKELETON, GUEST, USER) 
+                
                 <p style={{ fontSize: 12, opacity: 0.6, marginTop: "1rem" }}>
                     Status: <strong>{status}</strong>
-                </p>
+                </p>*/}
+
             </div>
         </div>
     );

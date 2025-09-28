@@ -1,0 +1,22 @@
+.review_div a {
+    text-decoration: none;
+    color: black;
+}
+
+.review_div {
+    display: flex;
+    flex-direction: row;
+    border: 1px solid black;
+    padding: 1em;
+    margin: 1em;
+}
+
+.review_ul {
+    list-style: none;
+}
+
+.review_text {
+    border-left: 1px solid black;
+    margin-left: 1em;
+    padding-left: 1em;
+}

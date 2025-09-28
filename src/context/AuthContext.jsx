@@ -3,6 +3,7 @@
 // -----------------------------------------------------
 // AuthContext hoitaa auth-tilat: SKELETON -> GUEST -> USER
 // Käytetään axiosia backend-kutsuihin
+// ja tarjoaa signIn/signOut -funktiot muille komponenteille.
 
 // createContext → luo Reactin kontekstin, jonka kautta auth-tila ja funktiot jaetaan muille komponenteille.
 // useContext → hook, jolla muut komponentit voivat käyttää tätä kontekstia.
@@ -13,20 +14,24 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import axios from "axios";
 
+
+// 1) Luodaan konteksti ja siihen helppokäyttöinen hook
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
 
-// Käytetään frontendin .env-muuttujaa
+// 2) API-osoite .env:stä
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001";
 
-// Provider-komponentti, joka käärii koko sovelluksen
+// 3) Provider-komponentti, joka käärii koko sovelluksen ja jakaa auth-tilan
 export default function AuthProvider({ children }) {
     // Auth-tilan muuttujat
     const [status, setStatus] = useState("SKELETON"); // SKELETON | GUEST | USER
-    const [user, setUser] = useState(null);           // { id, email, username } | null
-    const [authError, setAuthError] = useState(null); // viimeisin signin-virhe
+    const [user, setUser] = useState(null);           // kirjautuneen käyttäjän tiedot tai null
+    const [authError, setAuthError] = useState(null); // viimeisin kirjautumisvirhe (näytettäväksi SignInissä)
 
-    // 1) Kun komponentti latautuu → tarkistetaan sessionStorage
+    // 4) Sovelluksen käynnistyessä luetaan mahdollinen istunto sessionStoragesta
+    //    Jos token + peruskentätä löytyvät -> asetetaan USER-tila ja user-objekti
+    //    Muuten ollaan GUEST-tilassa
     useEffect(() => {
         const token = sessionStorage.getItem("token");
         const id = sessionStorage.getItem("user_id");
@@ -38,7 +43,7 @@ export default function AuthProvider({ children }) {
             setUser({
                 id: String(id),
                 email,
-                username: username || undefined
+                username: username || undefined,
             });
             setStatus("USER");
         } else {
@@ -46,9 +51,13 @@ export default function AuthProvider({ children }) {
         }
     }, []);
 
-    // 2) SignIn axiosilla
-    const signIn = async ({ username, password, returnTo } = {}) => {
-        setAuthError(null); // nollataan vanhat virheet
+    // 5) SignIn:
+    //    - Validoi syötteet
+    //    - Kutsuu backendin / signin -päätettä
+    //    - Tallentaa tokenin ja käyttäjätiedot sessionStorageen
+    //    - Päivittää React tilan ja palauttaa { ok, user/error }
+    const signIn = async ({ username, password } = {}) => {
+        setAuthError(null); // nollataan aiempi virhe
 
         // jos käyttäjätunnus tai salasana puuttuu → virhe
         if (!username || !password) {
@@ -81,8 +90,10 @@ export default function AuthProvider({ children }) {
             sessionStorage.setItem("token", data.token);
             sessionStorage.setItem("email", data.email);
             sessionStorage.setItem("user_id", String(data.id));
-            //if (data.username) sessionStorage.setItem("username", data.username);
-            sessionStorage.setItem("username", data.username);
+            if (data.username) {
+                sessionStorage.setItem("username", data.username);
+            }
+
 
             // Reactin tilassa käytettävä user - objekti
             const nextUser = {
@@ -97,9 +108,6 @@ export default function AuthProvider({ children }) {
             setUser(nextUser);
             setStatus("USER");
 
-            // Jos returnTo on annettu (esim. ProtectedRoute-portilta) → tallennetaan se
-            if (returnTo) sessionStorage.setItem("returnTo", returnTo);
-
             // Palautetaan onnistunut login
             // Statuslippu: kutsuva komponentti esim. (SignIn.jsx) saa tiedon, ettö kirjautuminen onnistui
             return { ok: true, user: nextUser };
@@ -108,7 +116,7 @@ export default function AuthProvider({ children }) {
             let msg = "Sign in failed";
             if (err.response?.data?.error) msg = err.response.data.error;
             if (err.response?.data?.message) msg = err.response.data.message;
-            if (err.message === "Network Errori") msg = "Network errori. Please try again.";
+            if (err.message === "Network Errorr") msg = "Network error. Please try again.";
 
             // Tallennetaan virhetila
             setAuthError(msg);
@@ -117,13 +125,15 @@ export default function AuthProvider({ children }) {
         }
     };
 
-    // 3) SignOut
+    // 6) signOut:
+    //    - Poistaa kaikki authiin liittyvät arvot sessionStoragesta
+    //    - Nollaa Reactin tilan ja asettaa GUEST-tilan
     const signOut = () => {
         sessionStorage.removeItem("token");
         sessionStorage.removeItem("email");
         sessionStorage.removeItem("user_id");
         sessionStorage.removeItem("username");
-        sessionStorage.removeItem("returnTo");
+        sessionStorage.removeItem("returnTo"); // Varmistetaan ettei jää roikkumaan
         //ylläolevat voisi (ehkä) korvata rivillä: sessionStorage.clear()
 
         // Nollataan Reactin tila
@@ -132,21 +142,23 @@ export default function AuthProvider({ children }) {
         setAuthError(null);
     };
 
-    // 4) Rakennetaan value-objekti kontekstiin
-    // Kaikki mitä value objektiin laitetaan -> on saatavilla näin -> const {}
+    // 7) Kontekstiin jaettava arvo-objekti.
+    //    useMemo estää turhia uudelleenrenderöintejä.
+    //    Rakennetaan value-objekti kontekstiin
+    //    Kaikki mitä value objektiin laitetaan -> on saatavilla näin -> const {}
     const value = useMemo(
         () => ({
             status,                             // auth-tila (SKELETON | GUEST | USER)
             user,                               // kirjautunut
             signIn,                             // kirjautumisfunktio
             signOut,                            // uloskirjautumisfunktio
-            authError,                          // viimeisin virhe
+            authError,                          // viimeisin kirjautumisvirhe
             apiBaseUrl: API_BASE_URL,
         }),
         [status, user, authError]               // päivittyy vain kun nämä muuttuvat
     );
 
-    // Provider jakaa kontekstin arvot kaikille lapsikomponenteille
+    // 8) Palautetaan Provider, joka jakaa auth-tilan kaikille lapsille
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

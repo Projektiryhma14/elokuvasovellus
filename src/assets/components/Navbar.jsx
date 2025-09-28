@@ -1,14 +1,16 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
+import { NavLink, } from 'react-router-dom'
 import { HashLink } from 'react-router-hash-link';
 import { useLocation, useNavigate } from 'react-router-dom';
 import logo from '../../pics/logo2.png'
+import SettingsLogo from '../../pics/SettingsLogo.png'
 import styles from "./Navbar.module.css"
 import { useAuth } from '../../context/AuthContext.jsx'
 
 export default function Navbar() {
     const { status, signOut } = useAuth(); // 👈 saadaan tila + logout
     const navigate = useNavigate()
+    const location = useLocation()
 
 
     const handleLogout = () => {
@@ -36,7 +38,7 @@ export default function Navbar() {
             {/* Keskilinkit */}
             <ul className={`${styles.links} ${styles.center}`}>
                 <li>
-                    <HashLink smooth to="/#search" className={styles.link}>
+                    <HashLink smooth to="/#movie_search" className={styles.link}>
                         Movie Search
                     </HashLink>
                 </li>
@@ -49,6 +51,9 @@ export default function Navbar() {
                     <HashLink smooth to="/#extra" className={styles.link}>
                         Jotain muuta
                     </HashLink>
+                </li>
+                <li>
+                    <NavLink to="/reviews" className={styles.link}>Reviews</NavLink>
                 </li>
             </ul>
 
@@ -97,6 +102,19 @@ export default function Navbar() {
                         </li>
                         <li>
                             <NavLink
+                                to="/profileSettings"
+                                className={({ isActive }) =>
+                                    `${styles.link} ${isActive ? styles.active : ""}`
+                                }
+                            >
+                                My Profile Settings
+
+                                {/*to="/profileSettings" className={styles.brand}>
+                                <img src={SettingsLogo} alt="SettingsLogo.png" className={styles.logo} />*/}
+                            </NavLink>
+                        </li>
+                        <li>
+                            <NavLink
                                 to="/group"
                                 className={({ isActive }) =>
                                     `${styles.link} ${isActive ? styles.active : ""}`
@@ -105,6 +123,19 @@ export default function Navbar() {
                                 Group Page
                             </NavLink>
                         </li>
+
+                        {location.pathname === "/group" && (
+                            <li><NavLink
+                             to="/group/create"
+                              className={({isActive}) =>
+                            `${styles.link} ${isActive ? styles.active : ""}`
+                            }
+                            >
+                                Create Group
+                                </NavLink>
+                                </li>
+                        )}
+
                         <li>
                             {/* Logout napiksi mutta samaan tyyliin */}
                             {/* Huom! type="button" varmuuden vuoksi, ettei nappi koskaan subitoi mahdollisessa <form>-kontekstissa */}
