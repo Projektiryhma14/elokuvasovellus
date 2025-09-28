@@ -1,0 +1,59 @@
+
+/* ReviewForm.module.css */
+
+/* Koko lomakkeen kehys (containerin sisällä) */
+.review_wrap_container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;      
+  max-width: 800px;         /* sama kuin aiempi width: 800px */
+  margin: 0 auto;            /* keskitys containerin sisällä */
+ 
+}
+
+/* Vain tämän komponentin form (EI globaali) */
+.review_wrap_container form {
+  border: none;
+  margin-top: 16px;
+  width: 100%;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  height: auto;
+  padding: 25px;
+  border-radius: 5px;
+  background-color: aqua;
+  
+  
+}
+
+/* Labelien perus-tyyli */
+.review_form_label {
+  display: block;
+  margin: 8px 0 4px;
+  font-weight: 600;
+}
+
+/* Readonly kenttä (Bootstrapin form-controlin päällä) */
+.form_readonly {
+  background-color: #f8f9fa; /* kevyt harmaa tausta */
+}
+
+/* Selectin lisäsäätö (Bootstrapin form-selectin päällä) */
+.review_form_select {
+  width: 100%;
+}
+
+/* Tekstialueen lisäsäätö (Bootstrapin form-controlin päällä) */
+.review_textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 160px;
+  margin: 12px 0 4px;
+}
+
+/* Pieni responsiivinen kavennus kapeille näytöille */
+@media (max-width: 576px) {
+  .wrap_container {
+    max-width: 100%;
+  }
+}
+
