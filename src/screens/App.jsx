@@ -10,6 +10,7 @@ import Header from '../assets/components/Header.jsx';
 import TmdbSearch from '../assets/components/TmdbSearch.jsx'
 import FinnkinoSearch from '../assets/components/FinnkinoSearch.jsx';
 import MyProfile from "../screens/MyProfile.jsx"
+import ProfileSettings from "../screens/ProfileSettings.jsx"
 import Group from "../screens/Group.jsx"
 import CreateGroup from "../screens/CreateGroup.jsx"
 
@@ -58,6 +59,14 @@ function App() {
                     element={
                         <ProtectedRoute returnTo="/profile">
                             <MyProfile />
+                        </ProtectedRoute>
+                    }
+                    />
+                <Route
+                    path="/profileSettings"
+                    element={
+                        <ProtectedRoute returnTo="/profileSettings">
+                            <ProfileSettings />
                         </ProtectedRoute>
                     }
                 />
