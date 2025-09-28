@@ -7,24 +7,32 @@ import InfoBanner from '../assets/components/InfoBanner.jsx'
 import Navbar from '../assets/components/Navbar.jsx';
 import Header from '../assets/components/Header.jsx';
 
-
+import TmdbSearch from '../assets/components/TmdbSearch.jsx'
+import FinnkinoSearch from '../assets/components/FinnkinoSearch.jsx';
 import MyProfile from "../screens/MyProfile.jsx"
 import Group from "../screens/Group.jsx"
 import CreateGroup from "../screens/CreateGroup.jsx"
 
-import Search from '../assets/components/Search.jsx'
 import SignIn from '../screens/SignIn.jsx'
 import SignUp from '../screens/SignUp.jsx'
+
+import ReviewForm from './ReviewForm.jsx';
+
 import GroupProfile from './GroupProfile.jsx';
 
 
+import TestAuthStatus from './TestAuthStatus.jsx';
 
 
 function App() {
 
     return (
 
+
         <div className='App'>
+
+
+
             <InfoBanner />
             <Navbar />
 
@@ -33,7 +41,8 @@ function App() {
                     element={
                         <>
                             <Header />
-                            <Search />
+                            <TmdbSearch />
+                            <FinnkinoSearch />
                         </>
                     }
                 />
@@ -57,6 +66,14 @@ function App() {
                     element={
                         <ProtectedRoute returnTo="/group">
                             <Group />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/reviewform"
+                    element={
+                        <ProtectedRoute returnTo="/reviewform">
+                            <ReviewForm />
                         </ProtectedRoute>
                     }
                 />
