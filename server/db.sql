@@ -78,3 +78,23 @@ ALTER TABLE sharedShowtimes ADD sharer_id INT NOT NULL REFERENCES users(user_id)
 
 /* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaoleva rivi pgAdminissa */
 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
+
+ALTER TABLE group DROP CONSTRAINT group_owner_id_fkey, ADD CONSTRAINT group_owner_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE reviews DROP CONSTRAINT reviews_user_id_fkey, ADD CONSTRAINT reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE favourites DROP CONSTRAINT favourites_user_id_fkey, ADD CONSTRAINT favourites_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE sharedMovies DROP CONSTRAINT sharedMovies_group_id_fkey, ADD CONSTRAINT sharedMovies_group_id_fkey FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE;
+
+ALTER TABLE sharedMovies DROP CONSTRAINT sharedMovies_sharer_id_fkey, ADD CONSTRAINT sharedMovies_sharer_id_fkey FOREIGN KEY (sharer_id) REFERENCES users(user_id) ON DELETE CASCADE;
+
+ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_group_id_fkey, ADD CONSTRAINT sharedShowtimes_group_id_fkey FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE;
+
+ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_sharer_id_fkey, ADD CONSTRAINT sharedShowtimes_sharer_id_fkey FOREIGN KEY (sharer_id) REFERENCES users(user_id) ON DELETE CASCADE;
+
+
+
+
+
+

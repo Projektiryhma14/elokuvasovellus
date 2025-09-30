@@ -7,7 +7,7 @@ export default function CreateGroup() {
 
 
     const [group, setGroup] = useState('')
-    // const [groupDescription, setGroupDescription] = useState('')
+    const [groupDescription, setGroupDescription] = useState('')
     const [statusMessage, setStatusMessage] = useState('')
     const userId = sessionStorage.getItem("user_id");
 
@@ -23,7 +23,7 @@ if(!group) {
 }
 
 //axios.post(url, group)
-axios.post(url, { groupname: group, username: userId })
+axios.post(url, { groupname: group, username: userId, description: groupDescription })
 .then(response => {
     
     
@@ -49,10 +49,10 @@ axios.post(url, { groupname: group, username: userId })
             <input type="text" required onChange={e => setGroup(e.target.value)} ></input>
             </div>
 
-            {/* <div>
+            <div>
             <label>Insert group description:</label>
             <input type="text" required onChange={e => setGroupDescription(e.target.value)} ></input>
-            </div> */}
+            </div>
 
             <div>
             <button className='submit_button' type='submit'>Create group</button>

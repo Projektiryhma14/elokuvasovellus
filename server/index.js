@@ -43,15 +43,31 @@ app.get('/', (req, res) => {
     })
 })
 
-app.get('/group', (req, res) => {
+app.get('/group', async (req, res) => {
     const pool = openDb()
+    const userid = req.headers['userid']
 
-    pool.query('SELECT * FROM groups', (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message })
-        }
-        res.status(200).json(result.rows)
-    })
+    try{
+        const userGroupResult = await pool.query(
+            `SELECT groupid FROM users WHERE user_id=$1`, [userid]
+        )
+
+        const userGroupId = userGroupResult.rows[0].groupid
+
+        const allGroupsResult = await pool.query(`SELECT * FROM groups`)
+        const allGroups = allGroupsResult.rows
+
+        const groupsWithFlag = allGroups.map(group => ({
+            ...group,
+            isUserGroup: group.group_id === userGroupId
+        }))
+
+        res.status(200).json(groupsWithFlag)
+
+} catch(err) {
+    console.error("Error with getting groups")
+    res.status(500).json({error: err.message})
+}
 })
 
 // Haetaan ryhmän tiedot ID:n perusteella
@@ -272,7 +288,7 @@ app.post('/group/rejectrequest', async (req,res,next) => {
     }
 })
 
-// Omistaja poistaa käyttäjän ryhmästä
+// Omistaja poistaa käyttäjän ryhmästä JA KÄYTTÄJÄ POISTUU RYHMÄSTÄ
 app.post('/group/removemember', async (req,res,next) => {
     // Avataan tietokantayhteys ja otetaan muuttujat vastaan frontista
     const pool = openDb()
@@ -288,32 +304,53 @@ app.post('/group/removemember', async (req,res,next) => {
         }
         res.status(200).json({message: 'User removed from the group'})
     } catch(err) {
+        
     next(err)
     }
 })
 
 
 
-app.delete('/deleteuser/:id', (req, res, next) => {
-    /*
+app.delete('/deleteuser/:id', async (req, res, next) => {
+   
     const pool = openDb()
-    */
-    const pool = openDb()
+    const client = await pool.connect()
     const userId = req.params.id
-    console.log(req.params.id)
-    //console.log(req.params)
-    //(salasanan vahvistusta tms?)
 
-    pool.query('DELETE FROM users WHERE user_id = $1 RETURNING *', [userId], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message })
+    try {
 
-        if (result.length === 0) {
-            console.log('Tiliä ei löydy')
-            return res.status(404).json({ error: `Tiliä ei löytynyt id:llä ${userId}` })
+        await client.query('BEGIN')
+
+        // Katsotaan onko poistettava käyttäjä ryhmän omistaja
+        const ownedGroupResult = await pool.query(
+            `SELECT group_id FROM groups WHERE owner_id=$1`, [userId]
+        )
+
+        if(ownedGroupResult.rows.length !== 0){
+            const groupId = ownedGroupResult.rows[0].group_id
+
+            await pool.query(`UPDATE users SET groupid=null, hasactivegrouprequest=false WHERE groupid=$1`, [groupId])
         }
-        console.log(`Poistettu tili jonka id on ${userId}`)
-        return res.status(200).json(result.rows[0])
-    })
+
+        await pool.query(
+            `UPDATE users SET groupid=null WHERE user_id=$1`, [userId]
+        )
+
+        await pool.query(
+            `DELETE FROM users WHERE user_id=$1`, [userId]
+        )
+        res.status(200).json({ message: 'User deleted' })
+        await client.query('COMMIT')
+
+        
+    } catch (err) {
+        await client.query('ROLLBACK')
+        console.error('Transaktio epäonnistui', err)
+        next(err)
+    } finally {
+        client.release()
+    }
+
 })
 
 app.get('/reviews', (req, res) => {
@@ -423,7 +460,7 @@ app.post('/group/', async (req, res, next) => {
     const client = await pool.connect()
     
     // Tuodaan muuttujat axios-pyynnöstä
-    const { groupname, username } = req.body
+    const { groupname, username, description } = req.body
     
 
     // username on string joten luodaan muuttuja joka on INT
@@ -467,7 +504,7 @@ app.post('/group/', async (req, res, next) => {
 
         // Luodaan muuttuja johon tallennetaan kyselyn vastaus
         const groupResult = await client.query(
-            'INSERT INTO groups (group_name, owner_id) VALUES ($1, $2) RETURNING *', [groupname, userId]
+            'INSERT INTO groups (group_name, owner_id, group_description) VALUES ($1, $2, $3) RETURNING *', [groupname, userId, description]
         )
 
         // Otetaan datasta talteen luodun ryhmän groupID
@@ -563,6 +600,44 @@ app.delete('/favourites/delete/:id', (req, res) => {
       res.status(200).json(result.rows[0])
     }
   )
+})
+
+// RYHMÄN POISTO
+app.put('/group/:id', async (req, res, next) => {
+    
+    const pool = openDb()
+    const client = await pool.connect()
+    const groupid = req.params.id
+    
+
+    try {
+        await client.query('BEGIN')
+
+        // Päivitetään ensin ryhmän jäsenien groupid nulliksi
+        await client.query(
+            `UPDATE users SET groupid=null WHERE groupid=$1`, [groupid]
+        )
+        
+        // Poistetaan ryhmä
+        await client.query(
+            `DELETE FROM groups WHERE group_id=$1`, [groupid]
+        )
+
+        // Kommitoidaan
+        await client.query('COMMIT')
+        res.status(200).json({ message: "Group was deleted" })
+        
+
+
+    } catch (err) {
+        // Jos jompikumpi kyselyistä epäonnistuu niin perutaan kaikki muutokset
+        await client.query('ROLLBACK')
+        console.error('Ryhmän poisto-transaktio epäonnistui', err)
+        
+        next(err)
+    } finally {
+        client.release()
+    }
 })
 
 app.listen(port, () => {
