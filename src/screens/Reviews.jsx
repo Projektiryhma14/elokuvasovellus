@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useEffect } from 'react'
 import styles from './Reviews.module.css'
 import { HashLink } from 'react-router-hash-link'
+import { FaRegStar, FaStar } from 'react-icons/fa'
 
 export default function Reviews() {
     const base_url = "http://localhost:3001"
@@ -28,6 +29,31 @@ export default function Reviews() {
            })
     }
 
+    const ratingStars = (movieRating) => {
+
+        const maxStars = 5
+        const minStars = 1
+
+        if (movieRating > maxStars || movieRating < minStars) {
+            return (<div>N/A</div>)
+        }
+        const filledStars = movieRating
+        //const emptyStars = maxStars - filledStars
+        
+        return (
+            <div className='vote_stars'>
+                {Array.from({length: maxStars}, (_, i) => {
+                    if (i<filledStars) {
+                        return <FaStar key={i} color="gold" />
+                    }
+                    else {
+                        return <FaRegStar key={i} color="gold" />
+                    }
+                })}
+            </div>
+        )
+    }
+
     useEffect(() => {
         const fetchReviews = async () => {
             axios.get(base_url + "/reviews")
@@ -41,7 +67,7 @@ export default function Reviews() {
                 })
         }
         fetchReviews()
-        
+
     }, [])
 
     return (
@@ -107,7 +133,7 @@ export default function Reviews() {
                                 
                             </li>
                             <li key={item.review_id + item.movie_rating}>
-                                {item.movie_rating}/10
+                                {ratingStars(item.movie_rating)}
                             </li>
                             {/*<li key={item.review_id + item.movie_review}>{item.movie_review}</li>*/}
                         </ul>
