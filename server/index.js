@@ -339,23 +339,52 @@ app.get('/reviews', (req, res) => {
         })
 })
 
-/*
-app.get('/users/:id', (req, res) => {
+//haetaan reviews-sivun dropdown-valikkoon elokuvat
+app.get('/reviews/movies', (req, res) => {
     const pool = openDb()
-    const userId = req.params.id
 
-    pool.query('SELECT * FROM users WHERE user_id = $1', [userId], (err, result) => {
-        if (err) return res.status(500).json({error: err.message})
-        
-        if (result.length === 0) {
-            console.log('Tiliä ei löydy')
-            return res.status(404).json({ error: `Tiliä ei löytynyt id:llä ${userId}` })
+    pool.query(
+        `
+        SELECT DISTINCT ON (movie_name) 
+        movie_name, movie_id FROM reviews;
+        `,
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: err.message })
+            }
+            res.status(200).json(result.rows)
         }
-
-        return res.status(200).json(result.rows[0])
-    })
+    )
 })
+
+/*
+tätä endpointtia kutsutaan, kun halutaan näyttää
+arvostelusivulla vain yhden elokuvan arvostelut
 */
+app.get('/reviews/:id', (req, res) => {
+    const pool = openDb()
+    const movieId = req.params.id
+
+    pool.query(
+        `
+        SELECT reviews.review_id, 
+        reviews.movie_name,
+        reviews.movie_id,
+        reviews.movie_rating,
+        reviews.movie_review,
+        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH:MI') AS created_at,
+        users.email FROM reviews 
+        JOIN users ON reviews.user_id = users.user_id
+        WHERE reviews.movie_id = $1;
+        `, [movieId],
+        (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: err.message })
+            }
+            res.status(200).json(result.rows)
+
+        })
+})
 
 
 app.post("/reviews", authenticateToken, async (req, res) => {
