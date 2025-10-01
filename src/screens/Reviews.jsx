@@ -8,6 +8,26 @@ export default function Reviews() {
     const base_url = "http://localhost:3001"
     const [reviews, setReviews] = useState([])
 
+    const fetchMovieDetails = async (id) => {
+        const tmdb_api_url = "https://api.themoviedb.org/3/movie/" + id
+        const params = {
+            params: {
+                api_key: import.meta.env.VITE_API_KEY,
+                language: "en-US"
+            }
+        }
+        console.log(tmdb_api_url)
+        axios.get(tmdb_api_url, params)
+           .then(response => {
+               console.log(response.data)
+               sessionStorage.setItem("selected_movie", JSON.stringify(response.data))
+               //return response.data
+           })
+           .catch(err => {
+               console.error(err)
+           })
+    }
+
     useEffect(() => {
         const fetchReviews = async () => {
             axios.get(base_url + "/reviews")
@@ -68,8 +88,15 @@ export default function Reviews() {
                             <li key={item.review_id + item.created_at}>
                                 {item.created_at}
                             </li>
-                            <li key={item.review_id + item.movie_name}>
-                                <HashLink smooth to="/#search">
+                            <li key={item.review_id + item.movie_name} 
+                            onClick={
+                                (e) => {
+                                    e.preventDefault()
+                                    console.log(item.movie_id)
+                                    fetchMovieDetails(item.movie_id)
+                                }
+                            }>
+                                <HashLink smooth to="/#movie_search">
                                     {item.movie_name}
                                 </HashLink>
                                 {/*

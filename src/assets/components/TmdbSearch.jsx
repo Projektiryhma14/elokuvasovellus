@@ -87,6 +87,10 @@ export default function TmdbSearch() {
         };
 
         noudaPopular();     // kutsutaan heti
+        if (sessionStorage.getItem("selected_movie")) {
+            console.log("elokuva haettu sessionstoragesta")
+            setSelectedMovie(JSON.parse(sessionStorage.getItem("selected_movie")))
+        }
     }, []);                 // Ei uudelleen hae state-muutoksissa
 
     //Funktio jolla muutetaan TMDB- vote_average tähdiksi
@@ -193,6 +197,9 @@ export default function TmdbSearch() {
                                             key={m.id}
                                             onClick={() => {
                                                 setSelectedMovie(m);
+                                                //console.log(selectedMovie)
+                                                //console.log(JSON.parse(sessionStorage.getItem("selected_movie")))
+                                                sessionStorage.setItem("selected_movie", JSON.stringify(m))
                                                 setMsg(null);   // tyhjennetään mahdollinen varoitusviesti
                                             }}
                                         >
