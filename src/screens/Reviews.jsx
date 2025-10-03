@@ -6,7 +6,7 @@ import { HashLink } from 'react-router-hash-link'
 import { FaRegStar, FaStar } from 'react-icons/fa'
 
 export default function Reviews() {
-    const base_url = "http://localhost:3001"
+    const base_url = import.meta.env.VITE_API_BASE_URL || "http://localhost:3001"
     const [reviews, setReviews] = useState([])
     const [movies, setMovies] = useState([])
 

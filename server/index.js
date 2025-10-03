@@ -594,6 +594,62 @@ app.delete('/favourites/delete/:id', (req, res) => {
   )
 })
 
+//Haetaan yksittäisen käyttäjän tiedot
+app.get('/users/:id', (req, res) => {
+    const pool = openDb()
+    const userId = req.params.id
+
+    pool.query('SELECT * FROM users WHERE user_id = $1', [userId], (err, result) => {
+        if (err) return res.status(500).json({error: err.message})
+
+        if (result.length === 0) {
+            console.log("Käyttäjää ei löytynyt annetulla id:llä")
+            return res.status(404).json({ error: `Käyttäjää ei löytynyt id:llä ${userId}` })
+        }
+
+        return res.status(200).json(result.rows[0])
+    })
+
+})
+
+app.post('/sharedshowtimes', (req, res) => {
+
+    if (!req.body) {
+        return res.status(400).json({ error: 'Missing request body' })
+    }
+
+    const pool = openDb()
+    console.log(req.body)
+    //console.log(req.body.theatre)
+    const {theatre, movieName, startTime, groupId, sharerId} = req.body
+    /*
+    console.log(theatre)
+    console.log(movieName)
+    console.log(startTime)
+    console.log(groupId)
+    console.log(sharerId)
+    */
+    if (!theatre || !movieName || !startTime || !groupId || !sharerId) {
+        return res.status(400).json({ error: 'Request is missing necessary parameters' })
+    }
+
+    pool.query(
+        `
+        INSERT INTO sharedShowtimes 
+        (theatre, movie_name, dateandtime, group_id, sharer_id) 
+        VALUES
+        ($1, $2, $3, $4, $5)
+        RETURNING *
+        `,
+        [theatre, movieName, startTime, groupId, sharerId], (err, result) => {
+            if (err) {
+                return res.status(500).json({error: err.message})
+            }
+            res.status(201).json(result.rows[0])
+        }
+    )
+})
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
 })

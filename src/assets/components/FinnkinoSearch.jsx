@@ -15,6 +15,8 @@ export default function FinnkinoSearch() {
     const [selectedDate, setSelectedDate] = useState('')
     const [finnkinoShowtimes, setFinnkinoShowtimes] = useState([])
 
+    const [infotext, setInfotext] = useState("")
+
     //finnkino-hakuun tarvittavat funktiot
     const getFinnkinoTheatres = async () => {
         try {
@@ -123,8 +125,49 @@ export default function FinnkinoSearch() {
             })
     }
 
-    const addToGroupPage = (showtime) => {
+    const addToGroupPage = async (showtime) => {
         console.log(showtime)
+        //check if user is logged in
+        if (!sessionStorage.getItem("user_id")) {
+            console.log("sessionStoragesta ei löytynyt kenttää 'user_id' (kirjaudu sisään jatkaaksesi)")
+            alert("You must be logged in to use this feature")
+            //setInfotext("You must be logged in to use this feature")
+            return
+        }
+        //check if user belongs to a group
+        const get_url = import.meta.env.VITE_API_BASE_URL + "/users/" + sessionStorage.getItem("user_id")
+        console.log(get_url)
+        try {
+            const response = await axios.get(get_url)
+            console.log(response.data)
+            if (!response.data.groupid) {
+                console.log("user is not a in a group")
+                alert("You must belong to a group to use this feature")
+                return
+            }
+            //tässä kohtaa on varmistettu, että käyttäjä on kirjautunut sisään ja kuuluu ryhmään
+            const post_url = import.meta.env.VITE_API_BASE_URL + "/sharedshowtimes"
+            const params = {
+                theatre: showtime.location,
+                movieName: showtime.movieName,
+                startTime: showtime.startTime,
+                groupId: response.data.groupid,
+                sharerId: sessionStorage.getItem("user_id")
+            }
+            /*
+            const showtimeTheatre = showtime.location
+            const showtimeMovieName = showtime.movieName
+            const showtimeStartTime = showtime.startTime
+            const showtimeGroupId = response.data.groupid
+            const showtimeSharerId = sessionStorage.getItem("user_id")
+            */
+
+            const responseFromPost = await axios.post(post_url, params)
+            console.log(responseFromPost)
+        }
+        catch (err) {
+            console.error(err)
+        }
     }
 
 
@@ -181,6 +224,7 @@ export default function FinnkinoSearch() {
                                 )
                             }) : "No showtimes matching search criteria"}
                         </ul>
+                        {/*<p>{infotext}</p>*/}
                     </section>
                 </div>
             </section>
