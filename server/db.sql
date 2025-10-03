@@ -78,3 +78,7 @@ ALTER TABLE sharedShowtimes ADD sharer_id INT NOT NULL REFERENCES users(user_id)
 
 /* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaoleva rivi pgAdminissa */
 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
+
+/*Muuttaa email ja user_name kentät UNIQUE*/
+ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
+ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (user_name);

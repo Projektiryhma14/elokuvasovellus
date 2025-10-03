@@ -64,7 +64,7 @@ app.get('/group/:id', async (req, res, next) => {
     try {
         // Haetaan kaikki tarvittava data tietokannasta ja lisätään se result-muuttujaan
         const result = await pool.query(
-        `SELECT 
+            `SELECT 
         g.group_name, 
         g.group_description, 
         owner.user_id AS owner_id,
@@ -75,14 +75,14 @@ app.get('/group/:id', async (req, res, next) => {
         FROM groups g
         JOIN users owner ON g.owner_id = owner.user_id
         JOIN users member ON g.group_id = member.groupid
-        WHERE g.group_id = $1`,[groupId]
+        WHERE g.group_id = $1`, [groupId]
         )
 
         // Luodaan taulukko johon tallennetaan tietokantakyselyn kaikki rivit
         const rows = result.rows
 
-        if(rows.length === 0) {
-            return res.status(404).json({error: 'Group not found'})
+        if (rows.length === 0) {
+            return res.status(404).json({ error: 'Group not found' })
         }
 
         // Luodaan group-olio 
@@ -95,39 +95,95 @@ app.get('/group/:id', async (req, res, next) => {
                 member_name: r.member_name,
                 hasactivegrouprequest: r.hasactivegrouprequest,
                 member_id: r.user_id
-  }))
-}
+            }))
+        }
         res.status(200).json(group)
-        
+
     } catch (err) {
         next(err)
     }
 })
 
+// SIGN UP //
 app.post('/signup', (req, res, next) => {
     const pool = openDb()
     const user = req.body
 
     if (!user || !user.username || !user.email || !user.password) {
-        const error = new Error('Email, username & password are required')
-        return next(error)
+        return res.status(400).json({ error: "Email, username & password are required" })
+    }
+
+    const password = String(user.password)
+
+    // Password: 8+merkkiä, 1 iso, 1 numero, 1 erikoismerkki
+    const hasMinLength = password.length >= 8
+    const hasUpper = /[A-Z]/.test(password)
+    const hasDigit = /\d/.test(password)
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(password);
+
+    if (!(hasMinLength && hasUpper && hasDigit && hasSpecial)) {
+        return res.status(400).json({
+            error: 'Password must be at least 8 chars and include an uppercase letter, a digit, and special character'
+        })
     }
 
     hash(user.password, 10, (err, hashedPassword) => {
         if (err) return next(err)
 
-        pool.query('INSERT INTO users (user_name, email, password_hash) VALUES ($1, $2, $3) RETURNING *', [user.username, user.email, hashedPassword],
+        pool.query(
+            'INSERT INTO users (user_name, email, password_hash) VALUES ($1, $2, $3) RETURNING user_id AS id, email',
+            [user.username.trim(), user.email.trim(), hashedPassword],
             (err, result) => {
                 if (err) {
+                    // Postgres unique violation
+                    if (err.code === '23505') {
+                        return res.status(409).json({ error: "Username or email already in use" })
+                    }
                     return next(err)
                 }
-                res.status(201).json({ id: result.rows[0].id, email: user.email })
-            })
-    })
+                const row = result.rows[0];
+                console.log('RETURNED ROW:', result.rows[0])
+                res.status(201).json({ id: row.id, email: row.email });
+
+            }
+        );
+    });
+});
+
+// GET /CHECK-EMAIL (duplikaatit)
+
+app.get('/check-email', (req, res, next) => {
+    const pool = openDb()
+    const email = (req.query.email || '').trim()
+    if (!email) return res.status(400).json({ error: 'email required' })
+
+    pool.query(
+        'SELECT 1 FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1',
+        [email],
+        (err, result) => {
+            if (err) return next(err)
+            const exists = result.rowCount > 0
+            res.json({ available: !exists })
+        }
+    )
 })
 
+// GET /CHECK-USERNAME (duplikaatit)
+app.get('/check-username', (req, res, next) => {
+    const pool = openDb()
+    const username = (req.query.username || '').trim()
+    if (!username) return res.status(400).json({ error: 'username required' })
 
-
+    pool.query(
+        'SELECT 1 FROM users WHERE LOWER(user_name) = LOWER($1) LIMIT 1',
+        [username],
+        (err, result) => {
+            if (err) return next(err)
+            const exists = result.rowCount > 0
+            res.json({ available: !exists })
+        }
+    )
+})
 
 app.post('/signin', (req, res, next) => {
     const pool = openDb()
@@ -187,108 +243,108 @@ app.post('/signin', (req, res, next) => {
 
 // Käyttäjä on lähettänyt liittymispyynnön ryhmään
 app.post('/group/joinrequest', async (req, res, next) => {
-    
+
     // Avataan tietokantayhteys, luodaan yksittäinen tietokantayhteys transaktioita varten ja tuodaan muuttujat frontista
     const pool = openDb()
     const client = await pool.connect()
-    const {userid, groupId,} = req.body
+    const { userid, groupId, } = req.body
 
-    if(!userid || !groupId) {
+    if (!userid || !groupId) {
         const error = new Error('User, group or id missing')
         return next(error)
     }
     // Tehdään transaktio try-catch-lohkossa
-    try{
+    try {
         await client.query('BEGIN')
-    
-    // Haetaan käyttäjän hasActiveGroupRequest ja groupID:n arvot
-    const activeRequestAndGroupid = await client.query(`SELECT hasactivegrouprequest, groupid FROM users WHERE user_id = $1`, [userid])
 
-    // Tallennetaan saatu data muuttujiin
-    const hasActiveGroupRequest = activeRequestAndGroupid.rows[0].hasactivegrouprequest
-    const requestedgroupid = activeRequestAndGroupid.rows[0].groupid
+        // Haetaan käyttäjän hasActiveGroupRequest ja groupID:n arvot
+        const activeRequestAndGroupid = await client.query(`SELECT hasactivegrouprequest, groupid FROM users WHERE user_id = $1`, [userid])
 
-    // Jos groupID ei ole null JA hasActiveGroupRequest on true niin käyttäjällä on jo aktiivinen liittymispyyntö ja tehdään rollback
-    if(requestedgroupid !== null && hasActiveGroupRequest !== false) {
-        console.log('User has already requested to join in another group')
-        await client.query('ROLLBACK')
-        return res.status(400).json({ error: 'Cant request to join in group because you have active join request' }) 
+        // Tallennetaan saatu data muuttujiin
+        const hasActiveGroupRequest = activeRequestAndGroupid.rows[0].hasactivegrouprequest
+        const requestedgroupid = activeRequestAndGroupid.rows[0].groupid
+
+        // Jos groupID ei ole null JA hasActiveGroupRequest on true niin käyttäjällä on jo aktiivinen liittymispyyntö ja tehdään rollback
+        if (requestedgroupid !== null && hasActiveGroupRequest !== false) {
+            console.log('User has already requested to join in another group')
+            await client.query('ROLLBACK')
+            return res.status(400).json({ error: 'Cant request to join in group because you have active join request' })
+        }
+        // Päivitetään hasActiveGroupRequest trueksi ja groupID
+        await client.query(`UPDATE users SET hasactivegrouprequest=true, groupid=$1 WHERE user_id=$2`, [groupId, userid])
+        res.status(200).json({ message: 'Join request successful' })
+
+        await client.query('COMMIT')
     }
-    // Päivitetään hasActiveGroupRequest trueksi ja groupID
-    await client.query(`UPDATE users SET hasactivegrouprequest=true, groupid=$1 WHERE user_id=$2`, [groupId, userid])
-    res.status(200).json({ message: 'Join request successful' })
-
-    await client.query('COMMIT')    
-}
-catch(err) {
-    await client.query('ROLLBACK')
-    console.error('Transaktio epäonnistui', err)
-    next(err)
-} finally {
-    // Palautetaan yhteys takaisin pooliin
-    client.release()
-}
+    catch (err) {
+        await client.query('ROLLBACK')
+        console.error('Transaktio epäonnistui', err)
+        next(err)
+    } finally {
+        // Palautetaan yhteys takaisin pooliin
+        client.release()
+    }
 })
 
 // Omistaja hyväksyy liittymispyynnön ryhmään
-app.post('/group/acceptrequest', async (req,res,next) => {
+app.post('/group/acceptrequest', async (req, res, next) => {
 
     // Avataan tietokantayhteys ja otetaan muuttujat vastaan frontista
     const pool = openDb()
-    const {userId, groupId} = req.body
+    const { userId, groupId } = req.body
 
     try {
         // Päivitetään hasActiveGroupRequest falseksi
-        const result= await pool.query(
+        const result = await pool.query(
             `UPDATE users SET hasactivegrouprequest=false WHERE user_id=$1 AND groupid=$2`, [userId, groupId]
         )
-        if(result.rowCount === 0) {
-            return res.status(404).json({error: 'User not found'})
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'User not found' })
         }
-        res.status(200).json({message: 'Join request accepted'})
-    } catch(err) {
-    next(err)
+        res.status(200).json({ message: 'Join request accepted' })
+    } catch (err) {
+        next(err)
     }
 })
 
 // Omistaja hylkää liittymispyynnön ryhmään
-app.post('/group/rejectrequest', async (req,res,next) => {
-    
+app.post('/group/rejectrequest', async (req, res, next) => {
+
     // Avataan tietokantayhteys ja otetaan muuttujat vastaan frontista
     const pool = openDb()
-    const {userId, groupId} = req.body
+    const { userId, groupId } = req.body
 
     try {
         // Päivitetään hasActiveGroupRequest falseksi ja groupID nulliksi
-        const result= await pool.query(
+        const result = await pool.query(
             `UPDATE users SET hasactivegrouprequest=false, groupid=null WHERE user_id=$1 AND groupid=$2`, [userId, groupId]
         )
-        if(result.rowCount === 0) {
-            return res.status(404).json({error: 'User not found'})
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'User not found' })
         }
-        res.status(200).json({message: 'Join request rejected'})
-    } catch(err) {
-    next(err)
+        res.status(200).json({ message: 'Join request rejected' })
+    } catch (err) {
+        next(err)
     }
 })
 
 // Omistaja poistaa käyttäjän ryhmästä
-app.post('/group/removemember', async (req,res,next) => {
+app.post('/group/removemember', async (req, res, next) => {
     // Avataan tietokantayhteys ja otetaan muuttujat vastaan frontista
     const pool = openDb()
-    const {userId, groupId} = req.body
+    const { userId, groupId } = req.body
 
     try {
         // Päivitetään groupID nulliksi
-        const result= await pool.query(
+        const result = await pool.query(
             `UPDATE users SET groupid=null WHERE user_id=$1 AND groupid=$2`, [userId, groupId]
         )
-        if(result.rowCount === 0) {
-            return res.status(404).json({error: 'User not found'})
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'User not found' })
         }
-        res.status(200).json({message: 'User removed from the group'})
-    } catch(err) {
-    next(err)
+        res.status(200).json({ message: 'User removed from the group' })
+    } catch (err) {
+        next(err)
     }
 })
 
@@ -415,24 +471,24 @@ app.post("/reviews", authenticateToken, async (req, res) => {
 
 // Ryhmän luonti
 app.post('/group/', async (req, res, next) => {
-  
+
     // Avataan tietokantayhteys
     const pool = openDb()
 
     // Luodaan yksittäinen tietokantayhteys joka antaa täyden kontrollin transaktioihin ja kyselyihin
     const client = await pool.connect()
-    
+
     // Tuodaan muuttujat axios-pyynnöstä
     const { groupname, username } = req.body
-    
+
 
     // username on string joten luodaan muuttuja joka on INT
     const userId = Number(username)
-    
-    
-    
 
-    
+
+
+
+
     // Tarkistetaan, että groupname löytyy
     if (!groupname) {
         const error = new Error('Group name is required')
@@ -445,24 +501,24 @@ app.post('/group/', async (req, res, next) => {
 
         // Tehdään ensin kysely, jossa haetaan käyttäjän groupID
         const ownerGroupId = await client.query(
-            'SELECT groupID FROM users WHERE user_id = $1',[userId]
+            'SELECT groupID FROM users WHERE user_id = $1', [userId]
         )
 
-        
+
         // Otetaan datasta talteen käyttäjän groupID
         const currentGroupId = ownerGroupId.rows[0]?.groupid
 
         console.log(currentGroupId)
         console.log(ownerGroupId.rows[0]?.groupID)
 
-        
+
 
         // Jos groupID ei ole null niin perutaan transaktio koska käyttäjä voi olla vain yhdessä ryhmässä
         if (currentGroupId !== null) {
             console.log('User is already in group')
             await client.query('ROLLBACK')
             // Lähetetään virheilmoitus fronttiin
-            return res.status(400).json({ error: 'Creating a group failed because you are already in another group' })        
+            return res.status(400).json({ error: 'Creating a group failed because you are already in another group' })
         }
 
         // Luodaan muuttuja johon tallennetaan kyselyn vastaus
@@ -480,9 +536,9 @@ app.post('/group/', async (req, res, next) => {
         )
 
         await client.query('COMMIT')
-        res.status(201).json({groupID: groupId, groupname: groupResult.rows[0].group_name})
+        res.status(201).json({ groupID: groupId, groupname: groupResult.rows[0].group_name })
 
-    
+
     } catch (err) {
         // Jos jokin transaktion toimista epäonnistui niin tehdään rollback eli perutaan kaikki muutokset
         await client.query('ROLLBACK')
@@ -491,78 +547,80 @@ app.post('/group/', async (req, res, next) => {
     } finally {
         // Palautetaan yhteys takaisin pooliin
         client.release()
-    }})
+    }
+})
 
-    // Ryhmän poisto *TÄTÄ EI OLE VIELÄ KEHITETTY FRONTISSA*
-    app.delete('/group/:id', (req, res, next) => {
+// Ryhmän poisto *TÄTÄ EI OLE VIELÄ KEHITETTY FRONTISSA*
+app.delete('/group/:id', (req, res, next) => {
     const pool = openDb()
     const groupId = req.params.id
 
 
     pool.query('DELETE FROM groups WHERE group_id = $1 RETURNING *', [groupId], (err, result) => {
-        if (err) return res.status(500).json({error: err.message})
-        
-        if(result.length === 0) {
+        if (err) return res.status(500).json({ error: err.message })
+
+        if (result.length === 0) {
             console.log('Ryhmää ei löydy')
-            return res.status(404).json({error: `Ryhmää ei löytynyt id:llä ${groupId}`})
+            return res.status(404).json({ error: `Ryhmää ei löytynyt id:llä ${groupId}` })
         }
         console.log(`Poistettu Ryhmä jonka id on ${groupId}`)
         return res.status(200).json(result.rows[0])
-    })})
+    })
+})
 
 //HAETAAN KÄYTTÄJÄN SUOSIKIT
 app.get('/favourites', (req, res) => {
-    
-  const pool = openDb()
-  const { user_id } = req.query
 
-  if (!user_id) 
-    return res.status(400).json({ error: 'User_id:tä ei löytynyt' })
-  
-  pool.query('SELECT * FROM favourites WHERE user_id = $1', [user_id], (err, result) => {
-    if (err) {
-        return res.status(500).json({ error: err.message })
-    }
-    res.status(200).json(result.rows)
-  })
+    const pool = openDb()
+    const { user_id } = req.query
+
+    if (!user_id)
+        return res.status(400).json({ error: 'User_id:tä ei löytynyt' })
+
+    pool.query('SELECT * FROM favourites WHERE user_id = $1', [user_id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message })
+        }
+        res.status(200).json(result.rows)
+    })
 })
 
 //LISÄÄ UUSI SUOSIKKI
 app.post('/favourites/create', (req, res) => {
 
-  const pool = openDb()
-  const { movie_name, user_id } = req.body
+    const pool = openDb()
+    const { movie_name, user_id } = req.body
 
-  if (!movie_name) {
-    return res.status(400).json({ error: 'Elokuvan nimi puuttuu' })
-  }
+    if (!movie_name) {
+        return res.status(400).json({ error: 'Elokuvan nimi puuttuu' })
+    }
 
-  pool.query(
-    'INSERT INTO favourites (movie_name, user_id) VALUES ($1, $2) RETURNING *', [movie_name, user_id], (err, result) => {
-      if (err) {
-        return res.status(500).json({ error: err.message })
-      }
-      res.status(201).json(result.rows[0])
-    })
+    pool.query(
+        'INSERT INTO favourites (movie_name, user_id) VALUES ($1, $2) RETURNING *', [movie_name, user_id], (err, result) => {
+            if (err) {
+                return res.status(500).json({ error: err.message })
+            }
+            res.status(201).json(result.rows[0])
+        })
 })
 
 //POISTA SUOSIKKI
 app.delete('/favourites/delete/:id', (req, res) => {
 
-  const pool = openDb()
-  const favId = req.params.id
+    const pool = openDb()
+    const favId = req.params.id
     console.log(req.params.id)
     const { user_id } = req.query
 
-  pool.query('DELETE FROM favourites WHERE favourites_id = $1 AND user_id = $2 RETURNING*', [favId, user_id], (err, result) => {
-      if (err) return res.status(500).json({ error: err.message })
+    pool.query('DELETE FROM favourites WHERE favourites_id = $1 AND user_id = $2 RETURNING*', [favId, user_id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message })
 
-      if (result.rows.length === 0) {
-        return res.status(404).json({ error: `Suosikkia ei löytynyt id:llä ${favId}` })
-      }
-      res.status(200).json(result.rows[0])
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: `Suosikkia ei löytynyt id:llä ${favId}` })
+        }
+        res.status(200).json(result.rows[0])
     }
-  )
+    )
 })
 
 app.listen(port, () => {

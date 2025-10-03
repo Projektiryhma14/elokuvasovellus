@@ -200,27 +200,29 @@ export default function TmdbSearch() {
                                         </li>
                                     );
                                 })}
+
+                                <div className={styles.next_prev}>
+                                    <button
+                                        type="button"
+                                        id="prev_button"
+                                        onClick={() => setPage(page - 1)}
+                                        disabled={page === 1}
+                                    >
+                                        Edelliset
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        id="next_button"
+                                        onClick={() => setPage(page + 1)}
+                                        disabled={endIndex >= popularMovies.length}
+                                    >
+                                        Seuraavat
+                                    </button>
+                                </div>
                             </ul>
 
-                            <div className={styles.next_prev}>
-                                <button
-                                    type="button"
-                                    id="prev_button"
-                                    onClick={() => setPage(page - 1)}
-                                    disabled={page === 1}
-                                >
-                                    Edelliset
-                                </button>
 
-                                <button
-                                    type="button"
-                                    id="next_button"
-                                    onClick={() => setPage(page + 1)}
-                                    disabled={endIndex >= popularMovies.length}
-                                >
-                                    Seuraavat
-                                </button>
-                            </div>
                         </section>
 
                         {/* OIKEA: kääritään yhteen */}
