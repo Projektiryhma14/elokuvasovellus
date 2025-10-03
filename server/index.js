@@ -150,40 +150,6 @@ app.post('/signup', (req, res, next) => {
     });
 });
 
-// GET /CHECK-EMAIL (duplikaatit)
-
-app.get('/check-email', (req, res, next) => {
-    const pool = openDb()
-    const email = (req.query.email || '').trim()
-    if (!email) return res.status(400).json({ error: 'email required' })
-
-    pool.query(
-        'SELECT 1 FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1',
-        [email],
-        (err, result) => {
-            if (err) return next(err)
-            const exists = result.rowCount > 0
-            res.json({ available: !exists })
-        }
-    )
-})
-
-// GET /CHECK-USERNAME (duplikaatit)
-app.get('/check-username', (req, res, next) => {
-    const pool = openDb()
-    const username = (req.query.username || '').trim()
-    if (!username) return res.status(400).json({ error: 'username required' })
-
-    pool.query(
-        'SELECT 1 FROM users WHERE LOWER(user_name) = LOWER($1) LIMIT 1',
-        [username],
-        (err, result) => {
-            if (err) return next(err)
-            const exists = result.rowCount > 0
-            res.json({ available: !exists })
-        }
-    )
-})
 
 app.post('/signin', (req, res, next) => {
     const pool = openDb()
@@ -620,6 +586,115 @@ app.delete('/favourites/delete/:id', (req, res) => {
         }
         res.status(200).json(result.rows[0])
     }
+    )
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// GET /CHECK-EMAIL (duplikaatit)
+
+app.get('/check-email', (req, res, next) => {
+    const pool = openDb()
+    const email = (req.query.email || '').trim()
+    if (!email) return res.status(400).json({ error: 'email required' })
+
+    pool.query(
+        'SELECT 1 FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1',
+        [email],
+        (err, result) => {
+            if (err) return next(err)
+            const exists = result.rowCount > 0
+            res.json({ available: !exists })
+        }
+    )
+})
+
+// GET /CHECK-USERNAME (duplikaatit)
+app.get('/check-username', (req, res, next) => {
+    const pool = openDb()
+    const username = (req.query.username || '').trim()
+    if (!username) return res.status(400).json({ error: 'username required' })
+
+    pool.query(
+        'SELECT 1 FROM users WHERE LOWER(user_name) = LOWER($1) LIMIT 1',
+        [username],
+        (err, result) => {
+            if (err) return next(err)
+            const exists = result.rowCount > 0
+            res.json({ available: !exists })
+        }
     )
 })
 
