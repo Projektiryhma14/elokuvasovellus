@@ -1,0 +1,38 @@
+.signup_wrapper {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.sign_up_form {
+    border:none;
+    margin-top: 20px;
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+    border-radius: 5px;
+}
+
+.sign_up_form input {
+    width: 100%;
+    padding: 0px 5px 0px 5px;
+}
+
+.sign_up_form_label {
+  display: block;
+  margin: 8px 0 4px;
+  font-weight: 600;
+}
+
+.sign_up_ul li {
+    list-style: none;
+}
+
+.sign_up_help {
+    display: block;
+    margin: 5px;
+    
+}
