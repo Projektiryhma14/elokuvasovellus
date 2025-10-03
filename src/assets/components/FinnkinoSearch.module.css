@@ -2,3 +2,7 @@
     background-color: pink;
     height: 100vh;
 }
+
+#showtimes_ul {
+    list-style: none;
+}

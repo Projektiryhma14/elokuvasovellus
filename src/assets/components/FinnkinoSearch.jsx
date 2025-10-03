@@ -15,6 +15,8 @@ export default function FinnkinoSearch() {
     const [selectedDate, setSelectedDate] = useState('')
     const [finnkinoShowtimes, setFinnkinoShowtimes] = useState([])
 
+    const [infotext, setInfotext] = useState("")
+
     //finnkino-hakuun tarvittavat funktiot
     const getFinnkinoTheatres = async () => {
         try {
@@ -74,11 +76,15 @@ export default function FinnkinoSearch() {
 
     const searchShowtimes = () => {
         const theatreId = selectedTheatre
-        const eventId = selectedFinnkinoMovie
+        const movieId = selectedFinnkinoMovie
         const dt = selectedDate
-        const numberOfDays = 1
+        //console.log(dt)
         const base_url = "https://www.finnkino.fi/xml/Schedule/"
-        const full_url = base_url + "?area=" + theatreId + "&dt=" + dt + "&eventID=" + eventId// + "&nrOfDays=" + numberOfDays
+        let full_url = base_url + "?area=" + theatreId + "&dt=" + dt + "&eventID=" + movieId
+        if (dt === "") {
+            console.log("päivämäärää ei annettu, näytetään näytösajat seuraavan viikon ajalta")
+            full_url = full_url + "&nrOfDays=" + 7
+        }
         axios.get(full_url)
             .then(response => {
                 const xml = response.data
@@ -86,15 +92,82 @@ export default function FinnkinoSearch() {
                 const xmlDoc = parser.parseFromString(xml, 'application/xml')
                 const root = xmlDoc.children
                 const showtimes = root[0].children[1]
+                if (showtimes.children.length === 0) {
+                    //jos näytösaikoja ei löytynyt annetuilla kriteereillä
+                    setFinnkinoShowtimes()
+                    console.log("0 showtimes with chosen filters")
+                    return
+                }
+                //console.log(showtimes)
+                //console.log(showtimes.children.length)
+                //console.log(showtimes.children[0])
+                //console.log(showtimes.children[0].children[2].innerHTML)
+                //console.log(showtimes.children[0].children[15].innerHTML) //movie name
+                //console.log(showtimes.children[0].children[14].innerHTML) //event id
+                //console.log(showtimes.children[0].children[27].innerHTML) //theatre
                 const tempArray = []
                 for (let i = 0; i < showtimes.children.length; i++) {
-                    tempArray.push(showtimes.children[i].children[2].innerHTML)
+                    const showId = showtimes.children[i].children[0].innerHTML
+                    const eventStartTime = showtimes.children[i].children[2].innerHTML
+                    const eventLocation = showtimes.children[i].children[27].innerHTML
+                    const eventName = showtimes.children[i].children[15].innerHTML
+                    tempArray.push({
+                        showId: showId,
+                        startTime: eventStartTime,
+                        location: eventLocation,
+                        movieName: eventName
+                    })
                 }
                 setFinnkinoShowtimes(tempArray)
             })
             .catch(err => {
                 console.error(err)
             })
+    }
+
+    const addToGroupPage = async (showtime) => {
+        console.log(showtime)
+        //check if user is logged in
+        if (!sessionStorage.getItem("user_id")) {
+            console.log("sessionStoragesta ei löytynyt kenttää 'user_id' (kirjaudu sisään jatkaaksesi)")
+            alert("You must be logged in to use this feature")
+            //setInfotext("You must be logged in to use this feature")
+            return
+        }
+        //check if user belongs to a group
+        const get_url = import.meta.env.VITE_API_BASE_URL + "/users/" + sessionStorage.getItem("user_id")
+        console.log(get_url)
+        try {
+            const response = await axios.get(get_url)
+            console.log(response.data)
+            if (!response.data.groupid) {
+                console.log("user is not a in a group")
+                alert("You must belong to a group to use this feature")
+                return
+            }
+            //tässä kohtaa on varmistettu, että käyttäjä on kirjautunut sisään ja kuuluu ryhmään
+            const post_url = import.meta.env.VITE_API_BASE_URL + "/sharedshowtimes"
+            const params = {
+                theatre: showtime.location,
+                movieName: showtime.movieName,
+                startTime: showtime.startTime,
+                groupId: response.data.groupid,
+                sharerId: sessionStorage.getItem("user_id")
+            }
+            /*
+            const showtimeTheatre = showtime.location
+            const showtimeMovieName = showtime.movieName
+            const showtimeStartTime = showtime.startTime
+            const showtimeGroupId = response.data.groupid
+            const showtimeSharerId = sessionStorage.getItem("user_id")
+            */
+
+            const responseFromPost = await axios.post(post_url, params)
+            console.log(responseFromPost)
+        }
+        catch (err) {
+            console.error(err)
+        }
     }
 
 
@@ -139,12 +212,19 @@ export default function FinnkinoSearch() {
                     {/* Näytösajat */}
                     <section id="showtimes" aria-labelledby="showtimes-heading">
                         <h3 id="showtimes-heading">Showtimes</h3>
-                        <ul>
-                            {finnkinoShowtimes.map(showtime => {
-                                const datetime = new Date(showtime);
-                                return <li key={showtime}>{datetime.toLocaleString("en-US")}</li>;
-                            })}
+                        <ul id={styles.showtimes_ul}>
+                            {finnkinoShowtimes ? finnkinoShowtimes.map(showtime => {
+                                //console.log(finnkinoShowtimes)
+                                const datetime = new Date(showtime.startTime)
+                                return (
+                                <li key={showtime.startTime + showtime.location + showtime.movieName}>
+                                    {datetime.toLocaleString("en-US")} -- {showtime.location} -- {showtime.movieName}
+                                    <button onClick={() => {addToGroupPage(showtime)}}>Add to group page</button>
+                                </li>
+                                )
+                            }) : "No showtimes matching search criteria"}
                         </ul>
+                        {/*<p>{infotext}</p>*/}
                     </section>
                 </div>
             </section>
