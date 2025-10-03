@@ -87,6 +87,7 @@ app.get('/group/:id', async (req, res, next) => {
         owner.user_name AS owner_name, 
         member.user_name AS member_name,
         member.hasactivegrouprequest,
+        member.groupid AS member_groupid,
         member.user_id
         FROM groups g
         JOIN users owner ON g.owner_id = owner.user_id
@@ -110,6 +111,7 @@ app.get('/group/:id', async (req, res, next) => {
             members: rows.map(r => ({ // Käydään kaikki jäsenet läpi
                 member_name: r.member_name,
                 hasactivegrouprequest: r.hasactivegrouprequest,
+                member_groupid: r.member_groupid,
                 member_id: r.user_id
   }))
 }
@@ -224,12 +226,14 @@ app.post('/group/joinrequest', async (req, res, next) => {
     const hasActiveGroupRequest = activeRequestAndGroupid.rows[0].hasactivegrouprequest
     const requestedgroupid = activeRequestAndGroupid.rows[0].groupid
 
-    // Jos groupID ei ole null JA hasActiveGroupRequest on true niin käyttäjällä on jo aktiivinen liittymispyyntö ja tehdään rollback
-    if(requestedgroupid !== null && hasActiveGroupRequest !== false) {
+    // Jos groupID ei ole null TAI hasActiveGroupRequest on true niin käyttäjä on jo ryhmässä tai käyttäjällä on jo aktiivinen liittymispyyntö ja tehdään rollback
+    if(requestedgroupid !== null || hasActiveGroupRequest !== false) {
         console.log('User has already requested to join in another group')
         await client.query('ROLLBACK')
-        return res.status(400).json({ error: 'Cant request to join in group because you have active join request' }) 
+        return res.status(400).json({ error: 'Cant request to join in group because you are already in another group or you have active join request' }) 
     }
+
+
     // Päivitetään hasActiveGroupRequest trueksi ja groupID
     await client.query(`UPDATE users SET hasactivegrouprequest=true, groupid=$1 WHERE user_id=$2`, [groupId, userid])
     res.status(200).json({ message: 'Join request successful' })
@@ -245,6 +249,26 @@ catch(err) {
     client.release()
 }
 })
+
+// Käyttäjä peruu liittymispyynnön
+app.post('/group/canceljoinrequest', (req, res, next) => {
+    const pool = openDb()
+    const userid = req.body.userid
+
+        if(!userid) {
+        const error = new Error('User is missing')
+        return next(error)
+    }
+    try {
+    pool.query(`UPDATE users SET groupid=null, hasactivegrouprequest=false WHERE user_id=$1`, [userid])
+    return res.status(200).json({message: 'You have cancelled the join request'})
+
+    } catch(err) {
+    console.error(err)
+    next(err)
+    }
+})
+
 
 // Omistaja hyväksyy liittymispyynnön ryhmään
 app.post('/group/acceptrequest', async (req,res,next) => {
@@ -499,7 +523,7 @@ app.post('/group/', async (req, res, next) => {
             console.log('User is already in group')
             await client.query('ROLLBACK')
             // Lähetetään virheilmoitus fronttiin
-            return res.status(400).json({ error: 'Creating a group failed because you are already in another group' })        
+            return res.status(400).json({ error: 'Creating a group failed because you are already in another group or you have active join request' })        
         }
 
         // Luodaan muuttuja johon tallennetaan kyselyn vastaus

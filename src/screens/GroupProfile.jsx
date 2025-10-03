@@ -22,6 +22,7 @@ export default function GroupProfile() {
 
   // Haetaan ryhmän tiedot kun sivu avataan
   useEffect(() => {
+    fetchGroup()
     axios.get(`${url}/group/${id}`)
       .then(response => {
         setGroup(response.data)
@@ -42,6 +43,22 @@ export default function GroupProfile() {
       })
   }, [id])
 
+  // Haetaan ryhmän tiedot uudestaan aina kun liittymispyyntö on lähetetty tai se perutaan
+  const fetchGroup = async () => {
+  try {
+    const response = await axios.get(`${url}/group/${id}`)
+    setGroup(response.data)
+
+    const joinRequests = response.data.members.filter(m => m.hasactivegrouprequest === true)
+    const confirmedMembers = response.data.members.filter(m => m.hasactivegrouprequest === false)
+
+    setMembers(confirmedMembers)
+    setPendingRequests(joinRequests)
+  } catch (err) {
+    console.error('Virhe ryhmän haussa:', err)
+  }
+}
+
   // Vieras-käyttäjä lähettää liittymispyynnön
   const handleClick = async (e) => {
     e.preventDefault()
@@ -53,6 +70,26 @@ export default function GroupProfile() {
     })
       .then(response => {
         setStatusMessage(response.data.message)
+        fetchGroup()
+      })
+      .catch(err => {
+        const error = err.response.data.error
+        setStatusMessage(error)
+        console.error(err)
+      })
+  }
+
+  // Käyttäjä peruu liittymispyynnön
+  const handleCancelJoinRequest = async (e) => {
+    e.preventDefault()
+
+    axios.post(`${url}/group/canceljoinrequest`, {
+      // Välitetään käyttäjän userID backendille
+      userid
+    })
+      .then(response => {
+        setStatusMessage(response.data.message)
+        fetchGroup()
       })
       .catch(err => {
         const error = err.response.data.error
@@ -112,25 +149,6 @@ export default function GroupProfile() {
 
   }
 
-  // // Käyttäjä poistuu ryhmästä
-  // const handleLeaveGroup = async (e) => {
-  //   e.preventDefault()
-
-  //   axios.put(`${url}/group/leavegroup`, {
-  //     userid,
-  //     groupId: id
-  //   })
-  //   .then(response => {
-  //     setStatusMessage(response.data.message)
-  //     // Poistetaan käyttäjä jäsen-listasta
-  //     setMembers(prev => prev.filter(m => m.member_id !== memberId))
-  //   })
-  //   .catch(err => {
-  //     const error = err.response.data.error
-  //     setStatusMessage(error)
-  //     console.error(err)
-  //   })
-  // }
 
     // Käyttäjä poistuu ryhmästä (Käytetään samaa endpointtia kuin Omistaja poistaa käyttäjän ryhmästä)
   const handleLeaveGroup = async (e) => {
@@ -176,7 +194,8 @@ export default function GroupProfile() {
   // Käyttäjien roolit 
   const isOwner = group && userid === String(group.owner_id)
   const isMember = !isOwner && group && group.members.some(m => String(m.member_id) === userid && m.hasactivegrouprequest === false)
-  const isGuest = !isOwner && !isMember
+  const hasJoinRequest = !isOwner && group && group.members.some(m => String(m.member_id) === userid && m.hasactivegrouprequest === true)
+  const isGuest = !isOwner && !isMember && !hasJoinRequest
 
   if (!group) {
   return <p>Ladataan ryhmän tiedot...</p>
@@ -254,6 +273,23 @@ export default function GroupProfile() {
             }
           </ul>
           <button onClick={e => { handleLeaveGroup(e) }}>Leave group</button>
+        </div>
+      )}
+
+      {hasJoinRequest && ( // Liittymispyynnön lähettäneen näkymä
+        <div>
+          <p>Olet lähettänyt liittymispyynnön tähän ryhmään</p>
+          <ul>
+            {
+              members.map(member => ( // Listataan ryhmän jäsenet
+                <li key={member.member_name}>
+                  <Link to={`/profile/${member.member_id}`} >{member.member_name}</Link>
+                </li>
+              ))
+            }
+          </ul>
+          <button onClick={e => { handleCancelJoinRequest(e) }}>Cancel join request</button>
+          <p>{statusMessage}</p>
         </div>
       )}
 

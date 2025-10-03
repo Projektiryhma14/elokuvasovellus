@@ -67,16 +67,16 @@ dateAndTime TIMESTAMP NOT NULL
 
 
 
-ALTER TABLE users ADD groupID INT REFERENCES groups(group_id);
-ALTER TABLE reviews ADD user_id INT NOT NULL REFERENCES users(user_id);
-ALTER TABLE favourites ADD user_id INT NOT NULL REFERENCES users(user_id);
-ALTER TABLE groups ADD owner_id INT NOT NULL REFERENCES users(user_id);
-ALTER TABLE sharedMovies ADD group_id INT NOT NULL REFERENCES groups(group_id);
-ALTER TABLE sharedMovies ADD sharer_id INT NOT NULL REFERENCES users(user_id);
-ALTER TABLE sharedShowtimes ADD group_id INT NOT NULL REFERENCES groups(group_id);
-ALTER TABLE sharedShowtimes ADD sharer_id INT NOT NULL REFERENCES users(user_id);
+ALTER TABLE users ADD groupID INT REFERENCES groups(group_id) ON DELETE CASCADE;
+ALTER TABLE reviews ADD user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE favourites ADD user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE groups ADD owner_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE sharedMovies ADD group_id INT NOT NULL REFERENCES groups(group_id) ON DELETE CASCADE;
+ALTER TABLE sharedMovies ADD sharer_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE sharedShowtimes ADD group_id INT NOT NULL REFERENCES groups(group_id) ON DELETE CASCADE;
+ALTER TABLE sharedShowtimes ADD sharer_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
 
-/* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaoleva rivi pgAdminissa */
+/* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaolevat rivit pgAdminissa */
 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
 
 ALTER TABLE group DROP CONSTRAINT group_owner_id_fkey, ADD CONSTRAINT group_owner_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;

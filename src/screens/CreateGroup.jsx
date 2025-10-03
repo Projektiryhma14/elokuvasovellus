@@ -51,7 +51,7 @@ axios.post(url, { groupname: group, username: userId, description: groupDescript
 
             <div>
             <label>Insert group description:</label>
-            <input type="text" required onChange={e => setGroupDescription(e.target.value)} ></input>
+            <input type="text" onChange={e => setGroupDescription(e.target.value)} ></input>
             </div>
 
             <div>
