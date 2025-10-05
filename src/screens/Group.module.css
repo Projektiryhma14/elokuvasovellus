@@ -4,7 +4,20 @@
     padding: 0;
 }
 
-h1 {
-    
-    background-color: rgb(190, 29, 29);
+.title {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin-bottom: 60px;
+    margin-top: 60px;
+    text-align: center;
+}
+
+.groupList {
+    text-align: center;
+}
+
+.groupList ul {
+  display: inline-block;
+  text-align: left;
+  padding-left: 50px;
+  margin: 0;
 }

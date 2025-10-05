@@ -34,8 +34,8 @@ export default function Group() {
 
     return (
         <div>
-        <h1>Group</h1>
-
+        <h1 className={styles.title}>Groups</h1>
+        <div className={styles.groupList}>
         <ul>
             {
                 groups.map(group => (           
@@ -49,6 +49,7 @@ export default function Group() {
                 ))
             }
         </ul>
+        </div>
         
         
 

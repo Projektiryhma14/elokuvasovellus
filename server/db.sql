@@ -65,15 +65,6 @@ dateAndTime TIMESTAMP NOT NULL
 /*sharer_id INT NOT NULL REFERENCES users(user_id)*/
 ); 
 
-
-
-/* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaolevat rivit pgAdminissa */
-ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
-
-/*Muuttaa email ja user_name kentät UNIQUE*/
-ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
-ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (user_name);
-
 ALTER TABLE users ADD groupID INT REFERENCES groups(group_id) ON DELETE CASCADE;
 ALTER TABLE reviews ADD user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
 ALTER TABLE favourites ADD user_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
@@ -84,7 +75,18 @@ ALTER TABLE sharedShowtimes ADD group_id INT NOT NULL REFERENCES groups(group_id
 ALTER TABLE sharedShowtimes ADD sharer_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
 
 
-ALTER TABLE groups DROP CONSTRAINT group_owner_id_fkey, ADD CONSTRAINT group_owner_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
+
+/* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaolevat rivit pgAdminissa */
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
+
+/*Muuttaa email ja user_name kentät UNIQUE*/
+ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
+ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (user_name);
+
+
+
+
+/*ALTER TABLE groups DROP CONSTRAINT group_owner_id_fkey, ADD CONSTRAINT group_owner_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
 
 ALTER TABLE reviews DROP CONSTRAINT reviews_user_id_fkey, ADD CONSTRAINT reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
 
@@ -96,7 +98,7 @@ ALTER TABLE sharedMovies DROP CONSTRAINT sharedMovies_sharer_id_fkey, ADD CONSTR
 
 ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_group_id_fkey, ADD CONSTRAINT sharedShowtimes_group_id_fkey FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE;
 
-ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_sharer_id_fkey, ADD CONSTRAINT sharedShowtimes_sharer_id_fkey FOREIGN KEY (sharer_id) REFERENCES users(user_id) ON DELETE CASCADE;
+ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_sharer_id_fkey, ADD CONSTRAINT sharedShowtimes_sharer_id_fkey FOREIGN KEY (sharer_id) REFERENCES users(user_id) ON DELETE CASCADE;*/
 
 
 
