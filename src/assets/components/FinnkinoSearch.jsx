@@ -127,6 +127,7 @@ export default function FinnkinoSearch() {
 
     const addToGroupPage = async (showtime) => {
         console.log(showtime)
+        let responseGroupId = null
         //check if user is logged in
         if (!sessionStorage.getItem("user_id")) {
             console.log("sessionStoragesta ei löytynyt kenttää 'user_id' (kirjaudu sisään jatkaaksesi)")
@@ -145,28 +146,58 @@ export default function FinnkinoSearch() {
                 alert("You must belong to a group to use this feature")
                 return
             }
+            responseGroupId = response.data.groupid
+        }
+        catch (err) {
+            console.error(err)
+            alert("An error occurred.")
+            return
+        }
+
+        try {
             //tässä kohtaa on varmistettu, että käyttäjä on kirjautunut sisään ja kuuluu ryhmään
             const post_url = import.meta.env.VITE_API_BASE_URL + "/sharedshowtimes"
             const params = {
                 theatre: showtime.location,
                 movieName: showtime.movieName,
                 startTime: showtime.startTime,
-                groupId: response.data.groupid,
+                groupId: responseGroupId,
                 sharerId: sessionStorage.getItem("user_id")
             }
-            /*
-            const showtimeTheatre = showtime.location
-            const showtimeMovieName = showtime.movieName
-            const showtimeStartTime = showtime.startTime
-            const showtimeGroupId = response.data.groupid
-            const showtimeSharerId = sessionStorage.getItem("user_id")
-            */
 
             const responseFromPost = await axios.post(post_url, params)
             console.log(responseFromPost)
+            //console.log("responsefrompost start time:" + responseFromPost.data.dateandtime)
+            //console.log("responsefrompost theater: " + responseFromPost.data.theatre)
+            //console.log("responsefrompost movie name: " + responseFromPost.data.movie_name)
+            //console.log("responsefrompost sharer id: " + responseFromPost.data.sharer_id)
+            if (responseFromPost.status === 201) {
+                const formattedStartTime = new Date(responseFromPost.data.dateandtime).toLocaleString("en-US")
+                alert(`You have successfully added the following showtime to your group page:
+                    ${responseFromPost.data.movie_name}
+                    ${responseFromPost.data.theatre}
+                    ${formattedStartTime}`)
+            }
+            else if (responseFromPost.status === 500) {
+                console.log(responseFromPost.data.error)
+                alert("An error occurred.")
+            }
+            else {
+                alert("An error occurred.")
+            }
         }
         catch (err) {
             console.error(err)
+            //console.log(err.response.data)
+            if (!err || !err.response || !err.response.data || !err.response.data.error) {
+                alert("An error occurred")
+            }
+            else if (err.response.data.error === 'duplicate key value violates unique constraint \"unique_showtime\"') {
+                alert("Showtime has already been added to your group page!")
+            }
+            else {
+                alert("An error occurred")
+            }
         }
     }
 

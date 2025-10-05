@@ -409,6 +409,7 @@ app.delete('/deleteuser/:id', async (req, res, next) => {
 app.get('/reviews', (req, res) => {
     const pool = openDb()
 
+    //kellonaika joko 'HH12:MI am/AM' (12-hour clock) tai 'HH24:MI' (24-hour clock)
     pool.query(
         `
         SELECT reviews.review_id, 
@@ -416,7 +417,7 @@ app.get('/reviews', (req, res) => {
         reviews.movie_id,
         reviews.movie_rating,
         reviews.movie_review,
-        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH:MI') AS created_at,
+        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH24:MI') AS created_at,
         users.email FROM reviews 
         JOIN users ON reviews.user_id = users.user_id;
         `,
