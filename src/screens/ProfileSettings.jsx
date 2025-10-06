@@ -94,7 +94,11 @@ export default function ProfileSettings() {
   //KÄYTTÄJÄN TILIN POISTO
   const deleteUser = async () => {
     try {
-      const userId = sessionStorage.getItem("user_id")
+      const confirmed = window.confirm("Are you sure you want to delete your account? All of your data will be removed.")
+
+      if(!confirmed) return
+
+      const userId = sessionStorage.getItem("user_id");
       const response = await axios.delete(`${API_BASE_URL}/deleteuser/${userId}`)
       alert("Käyttäjä poistettu")
       signOut()

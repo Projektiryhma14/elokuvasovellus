@@ -31,18 +31,55 @@ export default function TmdbSearch() {
     const [page, setPage] = useState(1);                    // nykyinen sivu (1-pohjainen)
     const itemsPerPage = 10;                                // montako itemiä näytetään per sivu
 
+
     // Lasketaan mitä indeksejä näytetään nykyisellä sivulla
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    // Leikataan näkyviin tuleva pätkä popularMovies-taulukosta
-    const currentMovies = popularMovies.slice(startIndex, endIndex);
 
     const [movieDetails, setMovieDetails] = useState([]);
     const [selectedMovie, setSelectedMovie] = useState("")
 
+    // moodi kertoo näytetäänkö haku vai trending
+    const [issearchActive, setIsSearchActive] = useState(false)
+
+    // käytetään moodin mukaista lähdettä
+    const source = issearchActive ? movies : popularMovies
+
+    // Leikataan näkyviin tuleva pätkä popularMovies-taulukosta
+    const currentMovies = source.slice(startIndex, endIndex)
+
+    /*UUSI HAKUFUNKTIO*/
+    const searchMovie = async () => {
+        try {
+            // kootaan vain aktiiviset parametrit
+            const params = {
+                api_key: import.meta.env.VITE_API_KEY,
+                include_adult: false,
+                language: "en-US",
+                page: 1,
+            };
+            if (language) params.with_original_language = language;
+            if (genre) params.with_genres = genre;
+            if (year) params.primary_release_year = year;
+
+            const { data } = await axios.get("https://api.themoviedb.org/3/discover/movie", { params });
+
+            console.log("Search result count", data.results?.length);
+            setMovies(data.results || []);
+            setPage(1);
+            setIsSearchActive(true)                 // asetetaan hakutila päälle
+
+        } catch (err) {
+            console.log("Search failed:", err)
+        }
+    };
+
+
     // MOVIE SEARCH OSIO !!!!!
     // Suoritetaan kun käyttäjä painaa "Search" (form on submit)
+
+    /* VANHA HAKUFUNKTIO
     const searchMovie = async () => {
         try {
             const res = await axios.get("https://api.themoviedb.org/3/discover/movie", {
@@ -50,20 +87,52 @@ export default function TmdbSearch() {
                     api_key: import.meta.env.VITE_API_KEY,        // v3 API key
                     include_adult: false,
                     language: "en-US",      // UI-teksti suomeksi, jos on saatavilla
+                    page: 1,
                     with_original_language: language || undefined,
                     with_genres: genre || undefined,
                     primary_release_year: year || undefined,
-                    page: 1,
                 },
+
             });
-            setMovies(res.data.results || []);                      // Tallennetaan dropdown valinnat listaan.
-            setPopularMovies(res.data.results || []);
+            //setMovies(res.data.results || []);                      // Tallennetaan dropdown valinnat listaan.
+            //setPopularMovies(res.data.results || []);
+
+            // Kirjoitetaan hakutulokset VAIN movies-tilaan (popularMovies pidetään erikseen muistissa)
+            setMovies(res.data.results || [])
+            setPage(1)                                              // Sivustus alkaa alusta hakutilassa
+
             console.log(res.data.results);                          // debug (näkyy konsolissa)
             setOutput(JSON.stringify(res.data.results, null, 2));   // raakadata <pre>-näyttöön (debugia varten)
         } catch (err) {
             console.error(err);
         }
     }
+    */
+
+    // RESET / SHOW TRENDING
+    const resetToTrending = async () => {
+        setGenre("");
+        setYear("");
+        setLanguage("");
+        setMovies([]);
+        setPage(1);
+        setIsSearchActive(false)        // Palaaminen trendingiin
+
+        try {
+            // Haetaan uudelleen trending-lista, jotta on ajantasainen
+            const { data } = await axios.get("https://api.themoviedb.org/3/trending/movie/day", {
+                params: {
+                    api_key: import.meta.env.VITE_API_KEY,
+                    language: "en-US",
+                },
+            });
+            setPopularMovies(data.results || []);
+            console.log("Trending refreshed:", data.results?.length);
+        } catch (err) {
+            console.error("Trending refresh failed:", err);
+        }
+    }
+
 
     // Käytetään useEfectiä, eli haetaan vain kerran, kun komponentti ladataan
     // Ladataan popular movies listaan
@@ -87,6 +156,12 @@ export default function TmdbSearch() {
         };
 
         noudaPopular();     // kutsutaan heti
+
+
+        if (sessionStorage.getItem("selected_movie")) {
+            console.log("elokuva haettu sessionstoragesta")
+            setSelectedMovie(JSON.parse(sessionStorage.getItem("selected_movie")))
+        }
     }, []);                 // Ei uudelleen hae state-muutoksissa
 
     //Funktio jolla muutetaan TMDB- vote_average tähdiksi
@@ -108,6 +183,72 @@ export default function TmdbSearch() {
                 })}
             </div>
         )
+    }
+
+    const shareMovie = async (movie) => {
+        console.log(movie)
+        let responseGroupId = null
+        //check if user is logged in
+        if (!sessionStorage.getItem("user_id")) {
+            console.log("sessionStoragesta ei löytynyt kenttää 'user_id' (kirjaudu sisään jatkaaksesi)")
+            alert("You must be logged in to use this feature")
+            return
+        }
+        //check if user belongs to a group
+        const get_url = import.meta.env.VITE_API_BASE_URL + "/users/" + sessionStorage.getItem("user_id")
+        console.log(get_url)
+        try {
+            const response = await axios.get(get_url)
+            console.log(response.data)
+            if (!response.data.groupid) {
+                console.log("user is not a in a group")
+                alert("You must belong to a group to use this feature")
+                return
+            }
+            responseGroupId = response.data.groupid
+        }
+        catch (err) {
+            console.error(err)
+            alert("An error occurred.")
+            return
+        }
+
+        try {
+            //tässä kohtaa on varmistettu, että käyttäjä on kirjautunut sisään ja kuuluu ryhmään
+            const post_url = import.meta.env.VITE_API_BASE_URL + "/sharedmovies"
+            console.log(post_url)
+            //console.log(movie.title)
+            //console.log(sessionStorage.getItem("user_id"))
+            //console.log(responseGroupId)
+            const params = {
+                movieName: movie.title,
+                groupId: responseGroupId,
+                sharerId: sessionStorage.getItem("user_id")
+            }
+            const responseFromPost = await axios.post(post_url, params)
+            console.log(responseFromPost)
+
+            if (responseFromPost.status === 201) {
+                alert(`The following movie has been shared to your group page:
+                    ${responseFromPost.data.movie_name}`)
+            }
+            else {
+                alert("An error occurred.")
+            }
+        }
+        catch (err) {
+            console.error(err)
+            //console.log(err.response.data)
+            if (!err || !err.response || !err.response.data || !err.response.data.error) {
+                alert("An error occurred")
+            }
+            else if (err.response.data.error === 'duplicate key value violates unique constraint \"unique_movie\"') {
+                alert("Movie has already been added to your group page!")
+            }
+            else {
+                alert("An error occurred")
+            }
+        }
     }
 
     return (
@@ -174,7 +315,14 @@ export default function TmdbSearch() {
                                 <br />
                                 <button type="submit" className={styles.search_button}>Search</button>
 
-
+                                {/* Reset / Show trending*/}
+                                <button
+                                    type='button'
+                                    className={styles.reset_button}
+                                    onClick={resetToTrending}
+                                >
+                                    Show Trending
+                                </button>
 
                             </form>
                         </aside>
@@ -193,6 +341,9 @@ export default function TmdbSearch() {
                                             key={m.id}
                                             onClick={() => {
                                                 setSelectedMovie(m);
+                                                //console.log(selectedMovie)
+                                                //console.log(JSON.parse(sessionStorage.getItem("selected_movie")))
+                                                sessionStorage.setItem("selected_movie", JSON.stringify(m))
                                                 setMsg(null);   // tyhjennetään mahdollinen varoitusviesti
                                             }}
                                         >
@@ -200,27 +351,34 @@ export default function TmdbSearch() {
                                         </li>
                                     );
                                 })}
+
+                                <div className={styles.next_prev}>
+                                    <button
+                                        type="button"
+                                        id="prev_button"
+                                        className={styles.prev_button}
+                                        onClick={() => setPage(page - 1)}
+                                        disabled={page === 1}
+                                    >
+                                        Prev
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        id="next_button"
+                                        className={styles.next_button}
+                                        onClick={() => setPage(page + 1)}
+                                        // disabled={endIndex >= popularMovies.length}
+                                        // aina käytössä olevan lähteen pituuteen sidottu
+                                        disabled={endIndex >= source.length}
+
+                                    >
+                                        Next
+                                    </button>
+                                </div>
                             </ul>
 
-                            <div className={styles.next_prev}>
-                                <button
-                                    type="button"
-                                    id="prev_button"
-                                    onClick={() => setPage(page - 1)}
-                                    disabled={page === 1}
-                                >
-                                    Edelliset
-                                </button>
 
-                                <button
-                                    type="button"
-                                    id="next_button"
-                                    onClick={() => setPage(page + 1)}
-                                    disabled={endIndex >= popularMovies.length}
-                                >
-                                    Seuraavat
-                                </button>
-                            </div>
                         </section>
 
                         {/* OIKEA: kääritään yhteen */}
@@ -282,6 +440,7 @@ export default function TmdbSearch() {
                                         </p>
                                     )}
 
+                                    <button onClick={() => {shareMovie(selectedMovie)}}>Share to group page</button>
                                 </div>
 
 
