@@ -204,29 +204,53 @@ export default function FinnkinoSearch() {
 
     return (
         <>
-            <section id="search" className={styles.container_movieSearch}></section>
+
 
             {/* FINNKINO SHOWTIMES -OSIO */}
-            <section id="finnkino" className={styles.section}>
-                <div id="finnkino-search">
-                    <h3>Näytösaikojen haku</h3>
+            <section id="finnkino" className={styles.finnkino_wrapper}>
+                <section className={styles.container_finnkino}>
+                    <h2>Finnkino search</h2>
 
-                    <form onSubmit={e => { e.preventDefault(); searchShowtimes(); }}>
-                        <select value={selectedFinnkinoMovie} onChange={(e) => { setSelectedFinnkinoMovie(e.target.value); console.log(e.target.value) }}>
-                            <option className={styles.search_criteria} value="">Choose movie</option>
+
+                    <form
+                        className={styles.finnkino_form}
+                        onSubmit={e => { e.preventDefault(); searchShowtimes(); }}>
+
+
+                        <h4>Select movie, theatre and date</h4>
+
+
+                        <select
+                            className={styles.finnkino_select}
+                            value={selectedFinnkinoMovie}
+                            onChange={(e) => {
+                                setSelectedFinnkinoMovie(e.target.value);
+                                console.log(e.target.value)
+                            }}>
+                            <option value="">Choose movie</option>
                             {finnkinoMovies.map(m => (
                                 <option key={m.id} value={m.id}>{m.name}</option>
                             ))}
                         </select>
 
-                        <select value={selectedTheatre} onChange={(e) => { setSelectedTheatre(e.target.value); console.log(e.target.value) }}>
-                            <option className={styles.search_criteria} value="">Choose theatre</option>
+                        <select className={styles.finnkino_select}
+                            value={selectedTheatre}
+                            onChange={(e) => {
+                                setSelectedTheatre(e.target.value);
+                                console.log(e.target.value)
+                            }}>
+                            <option value="">Choose theatre</option>
                             {finnkinoTheatres.map(theatre => (
                                 <option key={theatre.id} value={theatre.id}>{theatre.name}</option>
                             ))}
                         </select>
 
-                        <select value={selectedDate} onChange={(e) => { setSelectedDate(e.target.value); console.log(e.target.value) }}>
+                        <select className={styles.finnkino_select}
+                            value={selectedDate}
+                            onChange={(e) => {
+                                setSelectedDate(e.target.value);
+                                console.log(e.target.value)
+                            }}>
                             <option className={styles.search_criteria} value="">Choose date</option>
                             {Array.from({ length: 14 }, (_, i) => {
                                 const date = new Date();
@@ -237,28 +261,32 @@ export default function FinnkinoSearch() {
                             })}
                         </select>
 
-                        <button type="submit" id="finnkinoSearch_button">Search</button>
+
+                        <button className={styles.finnkino_button} type="submit" id="finnkinoSearch_button">Search</button>
+
+
                     </form>
 
-                    {/* Näytösajat */}
-                    <section id="showtimes" aria-labelledby="showtimes-heading">
-                        <h3 id="showtimes-heading">Showtimes</h3>
-                        <ul id={styles.showtimes_ul}>
-                            {finnkinoShowtimes ? finnkinoShowtimes.map(showtime => {
-                                //console.log(finnkinoShowtimes)
-                                const datetime = new Date(showtime.startTime)
-                                return (
-                                <li key={showtime.startTime + showtime.location + showtime.movieName}>
+
+                </section >
+                {/* Näytösajat */}
+                <section className={styles.finnkino_showtimes} id="showtimes" aria-labelledby="showtimes-heading">
+                    <h3 id="showtimes-heading">Showtimes</h3>
+                    <ul className={styles.showtimes_ul}>
+                        {finnkinoShowtimes ? finnkinoShowtimes.map(showtime => {
+                            //console.log(finnkinoShowtimes)
+                            const datetime = new Date(showtime.startTime)
+                            return (
+                                <li className={styles.showtimes_li} key={showtime.startTime + showtime.location + showtime.movieName}>
                                     {datetime.toLocaleString("en-US")} -- {showtime.location} -- {showtime.movieName}
-                                    <button onClick={() => {addToGroupPage(showtime)}}>Add to group page</button>
+                                    <button className={styles.showtime_button} onClick={() => { addToGroupPage(showtime) }}>Add to group page</button>
                                 </li>
-                                )
-                            }) : "No showtimes matching search criteria"}
-                        </ul>
-                        {/*<p>{infotext}</p>*/}
-                    </section>
-                </div>
-            </section>
+                            )
+                        }) : "No showtimes matching search criteria"}
+                    </ul>
+                    {/*<p>{infotext}</p>*/}
+                </section>
+            </section >
         </>
     );
 
