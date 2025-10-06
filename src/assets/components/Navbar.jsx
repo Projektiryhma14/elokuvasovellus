@@ -8,7 +8,7 @@ import styles from "./Navbar.module.css"
 import { useAuth } from '../../context/AuthContext.jsx'
 
 export default function Navbar() {
-    const { status, signOut } = useAuth(); // 👈 saadaan tila + logout
+    const { status, signOut, user } = useAuth(); // 👈 saadaan tila + logout
     const navigate = useNavigate()
     const location = useLocation()
 
@@ -92,12 +92,15 @@ export default function Navbar() {
                     <>
                         <li>
                             <NavLink
-                                to="/profile"
+                                to={`/profile/${user?.username ?? ""}`}
                                 className={({ isActive }) =>
                                     `${styles.link} ${isActive ? styles.active : ""}`
                                 }
                             >
                                 My Profile
+
+                                {/*Jos on erikoismerkkejä niin käytä tätä
+                                to={`/profile/${encodeURIComponent(user?.username || "")}`}*/}
                             </NavLink>
                         </li>
                         <li>
