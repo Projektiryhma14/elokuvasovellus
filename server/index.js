@@ -561,6 +561,7 @@ app.post('/group/', async (req, res, next) => {
     const userId = Number(username)
 
 
+
     // Tarkistetaan, että groupname löytyy
     if (!groupname) {
         const error = new Error('Group name is required')
@@ -907,6 +908,94 @@ app.delete('/sharedmovies/:id', (req, res) => {
         res.status(201).json(result.rows[0])
     })
 })
+
+//JAA SUOSIKKI
+app.post('/favourites/share', async (req, res) => {
+
+    const pool = openDb()
+    const { user_id } = req.body
+
+    if (!user_id)
+        return res.status(400).json({ error: "user_id puuttuu" })
+
+    try {
+        //Tarkistetaan että käyttäjällä on vähintään yksi suosikki
+        const { rows } = await pool.query(
+            `SELECT 1 FROM favourites WHERE user_id = $1`, [user_id]
+        )
+        if (rows.length === 0) {
+            return res.status(400).json({ error: "Lisää vähintään yksi suosikki ennen suosikkilistan jakamista" })
+        }
+
+        //Estetään että jakoa ei voi tehdä useampaa kertaa
+        const alreadyShared = await pool.query(
+            "SELECT favourites_is_shared FROM users WHERE user_id = $1", [user_id]
+        )
+
+        if (alreadyShared.rows[0].favourites_is_shared) {
+            return res.status(409).json({ error: "Suosikkilista on jo jaettu" })
+        }
+
+        //Ilmoita kun jaettu ja tallenna aikeleima
+        await pool.query(
+            `UPDATE users SET favourites_is_shared = true, 
+            favourites_shared_at = NOW() WHERE user_id = $1`, [user_id]
+        )
+
+        return res.status(200).json({ message: "Suosikkisi on jaettu!" })
+
+    } catch (err) {
+        console.error("Error")
+        return res.status(500).json({ error: err.message })
+    }
+})
+
+//PERU SUOSIKKILISTAN JAKO
+app.post('/favourites/unshare', async (req, res) => {
+
+    const pool = openDb()
+    const { user_id } = req.body
+
+    if (!user_id)
+        return res.status(400).json({ error: "user_id puuttuu" })
+
+    //Nollaa favourites_is_shared ja aikaleima
+    try {
+        const result = await pool.query(
+            `UPDATE users SET favourites_is_shared = false, 
+            favourites_shared_at = NULL WHERE user_id = $1 
+            AND favourites_is_shared = true`, [user_id]
+        )
+
+        if (result.rowCount === 0) {
+            return res.status(409).json({ error: "Suosikkilista ei ole jaettu" })
+        }
+
+        return res.status(200).json({ message: "Favourites unshared!" })
+    } catch (err) {
+        console.error(err)
+        return res.status(500).json({ error: err.message })
+    }
+})
+
+//HAE JAETTUJEN SUOSIKKILISTOJEN KÄYTTÄJÄNIMET LISTAAN UUSIMMASTA VANHIMPAAN
+app.get('/favourites/shared', async (req, res) => {
+    const pool = openDb()
+
+    try {
+        const sharedList = await pool.query(
+            `SELECT user_id, user_name
+            FROM users
+            WHERE favourites_is_shared = true
+            ORDER BY favourites_shared_at DESC`
+        )
+        return res.json(sharedList.rows)
+    } catch (e) {
+        console.error(e)
+        return res.status(500).json({ error: "Server error" })
+    }
+})
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)

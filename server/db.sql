@@ -112,10 +112,3 @@ ALTER TABLE sharedMovies DROP CONSTRAINT sharedMovies_sharer_id_fkey, ADD CONSTR
 ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_group_id_fkey, ADD CONSTRAINT sharedShowtimes_group_id_fkey FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE;
 
 ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_sharer_id_fkey, ADD CONSTRAINT sharedShowtimes_sharer_id_fkey FOREIGN KEY (sharer_id) REFERENCES users(user_id) ON DELETE CASCADE;*/
-
-
-
-
-
-
-

@@ -55,16 +55,17 @@ function App() {
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/reviews" element={<Reviews />} />
 
-
-                {/* Suojatut linkit */}
                 <Route
-                    path="/profile"
+                    path="/profile/:username"
                     element={
-                        <ProtectedRoute returnTo="/profile">
+                        <ProtectedRoute returnTo="/profile/:username">
                             <MyProfile />
                         </ProtectedRoute>
                     }
                     />
+
+                {/* Suojatut linkit */}
+
                 <Route
                     path="/profileSettings"
                     element={

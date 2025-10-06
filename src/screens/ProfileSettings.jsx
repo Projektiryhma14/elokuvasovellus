@@ -2,19 +2,26 @@ import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import FavouritesList from '../assets/components/FavouritesList.jsx'
 import { useAuth } from "../context/AuthContext.jsx"
-import { useNavigate } from 'react-router-dom'
-import { useMemo } from "react";
+import { useNavigate, Link } from 'react-router-dom'
+import { useMemo } from "react"
 
 export default function ProfileSettings() {
 
   const navigate = useNavigate()
-
-  const { user, status, signOut } = useAuth();
+  const { user, status, signOut } = useAuth()
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
   const [input, setInput] = useState("")      //tekstikentälle arvo
   const [favourite, setFavourite] = useState([])    //Suosikkilista taulukko
+  const [users, setUsers] = useState([])
+
+  const [isShared, setIsShared] = useState(false)
+  const [statusMessage, setStatusMessage] = useState("")
+
+  const userId = useMemo(() => sessionStorage.getItem("user_id") ?? "", [])
+  const userName = user?.username
+
 
 
   useEffect(() => {
@@ -41,10 +48,10 @@ export default function ProfileSettings() {
 
 
     //Haetaan user_id, varmistetaan että tieto tallentuu vain tälle käyttäjälle
-    const userId = sessionStorage.getItem('user_id');
+    const userId = sessionStorage.getItem('user_id')
     if (!userId) {
-      alert('user_id puuttuu');
-      return;
+      alert('user_id puuttuu')
+      return
     }
 
     const headers = { headers: { Authorization: user.token } }
@@ -67,10 +74,10 @@ export default function ProfileSettings() {
   //SUOSIKIN POISTO
   const deleteFavourite = (deleted) => {
 
-    const userId = sessionStorage.getItem('user_id');
+    const userId = sessionStorage.getItem('user_id')
     if (!userId) {
-      alert('user_id puuttuu');
-      return;
+      alert('user_id puuttuu')
+      return
     }
 
     const headers = { headers: { Authorization: user.token } }
@@ -95,7 +102,7 @@ export default function ProfileSettings() {
       const response = await axios.delete(`${API_BASE_URL}/deleteuser/${userId}`)
       alert("Käyttäjä poistettu")
       signOut()
-      navigate("/", { replace: true, state: { flash: "User has been deleted", from: "profile" } });
+      navigate("/", { replace: true, state: { flash: "User has been deleted", from: "profile" } })
 
 
     }
@@ -104,7 +111,101 @@ export default function ProfileSettings() {
     }
 
   }
-  
+
+  //SUOSIKKILISTAN JAKO
+  const shareFavourites = async (e) => {
+    e.preventDefault()
+
+    try {
+
+      const headers = { headers: { Authorization: user.token } }
+
+      await axios.post(`${API_BASE_URL}/favourites/share`, { user_id: userId }, headers)
+
+      setIsShared(true)
+      setUsers([...users, { user_id: userId, user_name: userName }])
+      setStatusMessage("Suosikkilista jaettu.")
+
+      await refreshShare({ favIsShared: true })
+    } catch (err) {
+      const status = err?.response?.status
+      const msg = err?.response?.data?.error || "Jakaminen epäonnistui."
+      setStatusMessage(msg)
+
+      if (status !== 409) {
+        setIsShared(false)
+        setUsers(users.filter(u => String(u.user_id) !== String(userId)))
+      }
+    }
+  }
+
+  //LOPETA JAKAMINEN
+  const unshareFavourites = async (e) => {
+    e.preventDefault()
+
+    try {
+      const headers = { headers: { Authorization: user.token } }
+      await axios.post(`${API_BASE_URL}/favourites/unshare`, { user_id: userId }, headers)
+
+      //Päivitä UI heti
+      setIsShared(false)
+      setUsers(users.filter(u => String(u.user_id) !== String(userId)))
+      setStatusMessage("Suosikkilistan jako peruttu.")
+
+      await refreshShare({ favIsShared: true })
+    } catch (err) {
+      const status = err?.response?.status
+      const msg = err?.response?.data?.error || "Peruminen epäonnistui."
+      setStatusMessage(msg)
+
+      
+      if (status !== 409) {
+        setIsShared(true)
+        setUsers([...users, { user_id: userId, user_name: userName }])
+      }
+    }
+  }
+
+  //PÄIVITÄ LISTAUS
+  const refreshShare = async (opts = {}) => {
+    const { favIsShared = false } = opts
+
+    try {
+      //Hae omat suosikit
+      if (userId) {
+        const fav = await axios.get(`${API_BASE_URL}/favourites?user_id=${userId}`)
+        setFavourite(fav.data ?? [])
+      }
+
+      //Hae kaikki käyttäjät, jotka ovat jakaneet listansa
+      const sharedFav = await axios.get(`${API_BASE_URL}/favourites/shared`)
+      const favList = sharedFav.data ?? []
+
+      //Poista duplikaatit user_id:n perusteella
+      const uniqueFav = Array.from(
+        new Map(favList.map(u => [String(u.user_id), u])).values()
+      )
+
+      //Päivitä lista
+      setUsers(uniqueFav)
+
+      //Päivitä oma jaon tila
+      const update = uniqueFav.some(u => String(u.user_id) === String(userId))
+      if (!favIsShared) {
+        setIsShared(update)
+      }
+
+    } catch (err) {
+      console.error("Virhe päivityksessä", err)
+    }
+  }
+
+  useEffect(() => {
+    if (!userId) return
+    refreshShare()
+    
+  }, [userId, userName])
+
 
   return (
 
@@ -143,6 +244,32 @@ export default function ProfileSettings() {
           }
         </ul>
       </div>
+
+      <button
+        type="button"
+        id="share_favourites"
+        onClick={isShared ? unshareFavourites : shareFavourites}
+      >
+        {isShared ? "Peru suosikkilistan jako" : "Jaa suosikkilista"}
+      </button>
+
+      {statusMessage && <p>{statusMessage}</p>}
+
+      <div>
+        <ul>
+          <h3>Käyttäjien jakamia suosikkilistoja</h3>
+          {/*Jokaisesta käyttäjästä, joka on jakanut suosikkilistansa, tehdään linkki heidän profiiliinsa käyttäjänimellä*/}
+          {users.map((u, i) => (
+            <li key={i}>
+              <Link to={`/profile/${encodeURIComponent(u.user_name)}`}>
+                {u.user_name}
+              </Link>
+            </li>
+          ))}
+
+        </ul>
+      </div>
+
     </div>
   )
 }
