@@ -74,6 +74,19 @@ ALTER TABLE sharedMovies ADD sharer_id INT NOT NULL REFERENCES users(user_id) ON
 ALTER TABLE sharedShowtimes ADD group_id INT NOT NULL REFERENCES groups(group_id) ON DELETE CASCADE;
 ALTER TABLE sharedShowtimes ADD sharer_id INT NOT NULL REFERENCES users(user_id) ON DELETE CASCADE;
 
+/* ESTETÄÄN DUPLIKAATTIEN NÄYTÖSAIKOJEN LISÄÄMINEN TIETOKANTAAN: */
+/* jos unique_showtime rajoitus on jo olemassa, poista se */
+ALTER TABLE IF EXISTS sharedShowtimes DROP CONSTRAINT IF EXISTS unique_showtime;
+/* lisätään sharedshowtimes tauluun rajoitus, joka estää duplikaatit lisäykset (saman näytösajan lisääminen monta kertaa saman ryhmän sivulle) */
+ALTER TABLE IF EXISTS sharedShowtimes ADD CONSTRAINT unique_showtime UNIQUE (theatre, movie_name, dateandtime, group_id);
+/* jos rajoituksen lisääminen ei onnistu, tietokannassa on duplikaatteja rivejä, jotka pitää poistaa */
+
+/* ESTETÄÄN DUPLIKAATTIEN ELOKUVIEN LISÄÄMINEN TIETOKANTAAN: */
+/* jos unique_movie rajoitus on jo olemassa, poista se */
+ALTER TABLE IF EXISTS sharedMovies DROP CONSTRAINT IF EXISTS unique_movie;
+/* lisätään sharedmovies tauluun rajoitus, joka estää duplikaatit lisäykset (saman elokuvan lisääminen monta kertaa saman ryhmän sivulle) */
+ALTER TABLE IF EXISTS sharedMovies ADD CONSTRAINT unique_movie UNIQUE (movie_name, group_id);
+/* jos ylläolevan rajoituksen lisääminen ei onnistu, tietokannassa on duplikaatteja rivejä, jotka pitää poistaa */
 
 
 /* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaolevat rivit pgAdminissa */

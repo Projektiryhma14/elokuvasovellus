@@ -6,6 +6,8 @@ import { useAuth } from "../context/AuthContext.jsx"
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
 import styles from './GroupProfile.module.css'
+import GroupShowtimes from '../assets/components/GroupShowtimes.jsx'
+import GroupMovies from '../assets/components/GroupMovies.jsx'
 
 export default function GroupProfile() {
   // Haetaan ryhmän ID parametreistä
@@ -253,7 +255,8 @@ export default function GroupProfile() {
             </div>
               </div>
           </div>
-          
+          <GroupShowtimes members={members} group={group} />
+          <GroupMovies members={members} group={group} />
 
         </div>
       )}
@@ -304,6 +307,8 @@ export default function GroupProfile() {
           </ul>
           </div>
           </div>
+          <GroupShowtimes members={members} group={group} />
+          <GroupMovies members={members} group={group} />
           
         </div>
       )}

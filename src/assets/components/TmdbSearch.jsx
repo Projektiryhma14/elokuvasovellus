@@ -185,6 +185,72 @@ export default function TmdbSearch() {
         )
     }
 
+    const shareMovie = async (movie) => {
+        console.log(movie)
+        let responseGroupId = null
+        //check if user is logged in
+        if (!sessionStorage.getItem("user_id")) {
+            console.log("sessionStoragesta ei löytynyt kenttää 'user_id' (kirjaudu sisään jatkaaksesi)")
+            alert("You must be logged in to use this feature")
+            return
+        }
+        //check if user belongs to a group
+        const get_url = import.meta.env.VITE_API_BASE_URL + "/users/" + sessionStorage.getItem("user_id")
+        console.log(get_url)
+        try {
+            const response = await axios.get(get_url)
+            console.log(response.data)
+            if (!response.data.groupid) {
+                console.log("user is not a in a group")
+                alert("You must belong to a group to use this feature")
+                return
+            }
+            responseGroupId = response.data.groupid
+        }
+        catch (err) {
+            console.error(err)
+            alert("An error occurred.")
+            return
+        }
+
+        try {
+            //tässä kohtaa on varmistettu, että käyttäjä on kirjautunut sisään ja kuuluu ryhmään
+            const post_url = import.meta.env.VITE_API_BASE_URL + "/sharedmovies"
+            console.log(post_url)
+            //console.log(movie.title)
+            //console.log(sessionStorage.getItem("user_id"))
+            //console.log(responseGroupId)
+            const params = {
+                movieName: movie.title,
+                groupId: responseGroupId,
+                sharerId: sessionStorage.getItem("user_id")
+            }
+            const responseFromPost = await axios.post(post_url, params)
+            console.log(responseFromPost)
+
+            if (responseFromPost.status === 201) {
+                alert(`The following movie has been shared to your group page:
+                    ${responseFromPost.data.movie_name}`)
+            }
+            else {
+                alert("An error occurred.")
+            }
+        }
+        catch (err) {
+            console.error(err)
+            //console.log(err.response.data)
+            if (!err || !err.response || !err.response.data || !err.response.data.error) {
+                alert("An error occurred")
+            }
+            else if (err.response.data.error === 'duplicate key value violates unique constraint \"unique_movie\"') {
+                alert("Movie has already been added to your group page!")
+            }
+            else {
+                alert("An error occurred")
+            }
+        }
+    }
+
     return (
         <>
 
@@ -374,6 +440,7 @@ export default function TmdbSearch() {
                                         </p>
                                     )}
 
+                                    <button onClick={() => {shareMovie(selectedMovie)}}>Share to group page</button>
                                 </div>
 
 

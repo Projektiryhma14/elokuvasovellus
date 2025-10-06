@@ -188,6 +188,7 @@ app.post('/signin', (req, res, next) => {
         }
 
         const dbUser = result.rows[0]
+        console.log(dbUser)
 
         compare(password, dbUser.password_hash, (err, isMatch) => {
             if (err) return next(err)
@@ -210,6 +211,22 @@ app.post('/signin', (req, res, next) => {
                 username: dbUser.user_name,
                 token,
             })
+        })
+
+        /*
+        const token = jwt.sign(
+            { id: dbUser.user_id, email: dbUser.email, username: dbUser.user_name },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        )
+
+        return res.status(200).json({
+            id: dbUser.user_id,
+            email: dbUser.email,
+            username: dbUser.user_name,
+            token,
+        })
+        */
 
         })
 
@@ -404,6 +421,7 @@ app.delete('/deleteuser/:id', async (req, res, next) => {
 app.get('/reviews', (req, res) => {
     const pool = openDb()
 
+    //kellonaika joko 'HH12:MI am/AM' (12-hour clock) tai 'HH24:MI' (24-hour clock)
     pool.query(
         `
         SELECT reviews.review_id, 
@@ -411,7 +429,7 @@ app.get('/reviews', (req, res) => {
         reviews.movie_id,
         reviews.movie_rating,
         reviews.movie_review,
-        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH:MI') AS created_at,
+        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH24:MI') AS created_at,
         users.email FROM reviews 
         JOIN users ON reviews.user_id = users.user_id;
         `,
@@ -457,7 +475,7 @@ app.get('/reviews/:id', (req, res) => {
         reviews.movie_id,
         reviews.movie_rating,
         reviews.movie_review,
-        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH:MI') AS created_at,
+        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH24:MI') AS created_at,
         users.email FROM reviews 
         JOIN users ON reviews.user_id = users.user_id
         WHERE reviews.movie_id = $1;
@@ -808,6 +826,87 @@ app.post('/sharedshowtimes', (req, res) => {
             res.status(201).json(result.rows[0])
         }
     )
+})
+
+app.get('/sharedshowtimes/group/:id', (req, res) => {
+    const groupId = req.params.id
+    const pool = openDb()
+
+    pool.query('SELECT * FROM sharedshowtimes WHERE group_id=$1', [groupId], (err, result) => {
+        if (err) {
+            return res.status(500).json({error: err.message})
+        }
+        res.status(201).json(result.rows)
+    })
+    //console.log(groupId)
+})
+
+app.delete('/sharedshowtimes/:id', (req, res) => {
+    const showtimeId = req.params.id
+    const pool = openDb()
+
+    pool.query('DELETE FROM sharedShowtimes WHERE shared_showtime_id=$1 RETURNING *', [showtimeId], (err, result) => {
+        if (err) {
+            return res.status(500).json({error: err.message})
+        }
+        res.status(201).json(result.rows[0])
+    })
+})
+
+app.post('/sharedmovies', (req, res) => {
+    if (!req.body) {
+        return res.status(400).json({ error: 'Missing request body' })
+    }
+    //console.log(req.body)
+
+    const { movieName, groupId, sharerId } = req.body
+
+    //console.log("leffan nimi: " + movieName)
+    //console.log("ryhmän id: " + groupId)
+    //console.log("jakajan id: " + sharerId)
+
+    if (!movieName || !groupId || !sharerId) {
+        return res.status(400).json({ error: 'Request is missing necessary parameters' })
+    }
+
+    const pool = openDb()
+
+    pool.query(`
+        INSERT INTO sharedMovies 
+        (movie_name, group_id, sharer_id) 
+        VALUES ($1, $2, $3) 
+        RETURNING *
+        `, [movieName, groupId, sharerId], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message })
+        }
+        res.status(201).json(result.rows[0])
+        })
+})
+
+app.get('/sharedmovies/group/:id', (req, res) => {
+    const groupId = req.params.id
+    const pool = openDb()
+
+    pool.query('SELECT * FROM sharedmovies WHERE group_id=$1', [groupId], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message })
+        }
+        res.status(201).json(result.rows)
+    })
+    //console.log(groupId)
+})
+
+app.delete('/sharedmovies/:id', (req, res) => {
+    const sharedMovieId = req.params.id
+    const pool = openDb()
+
+    pool.query('DELETE FROM sharedMovies WHERE shared_movie_id=$1 RETURNING *', [sharedMovieId], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message })
+        }
+        res.status(201).json(result.rows[0])
+    })
 })
 
 app.listen(port, () => {
