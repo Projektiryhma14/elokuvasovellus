@@ -841,6 +841,62 @@ app.delete('/sharedshowtimes/:id', (req, res) => {
     })
 })
 
+app.post('/sharedmovies', (req, res) => {
+    if (!req.body) {
+        return res.status(400).json({ error: 'Missing request body' })
+    }
+    //console.log(req.body)
+
+    const { movieName, groupId, sharerId } = req.body
+
+    //console.log("leffan nimi: " + movieName)
+    //console.log("ryhmän id: " + groupId)
+    //console.log("jakajan id: " + sharerId)
+
+    if (!movieName || !groupId || !sharerId) {
+        return res.status(400).json({ error: 'Request is missing necessary parameters' })
+    }
+
+    const pool = openDb()
+
+    pool.query(`
+        INSERT INTO sharedMovies 
+        (movie_name, group_id, sharer_id) 
+        VALUES ($1, $2, $3) 
+        RETURNING *
+        `, [movieName, groupId, sharerId], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message })
+        }
+        res.status(201).json(result.rows[0])
+        })
+})
+
+app.get('/sharedmovies/group/:id', (req, res) => {
+    const groupId = req.params.id
+    const pool = openDb()
+
+    pool.query('SELECT * FROM sharedmovies WHERE group_id=$1', [groupId], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message })
+        }
+        res.status(201).json(result.rows)
+    })
+    //console.log(groupId)
+})
+
+app.delete('/sharedmovies/:id', (req, res) => {
+    const sharedMovieId = req.params.id
+    const pool = openDb()
+
+    pool.query('DELETE FROM sharedMovies WHERE shared_movie_id=$1 RETURNING *', [sharedMovieId], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message })
+        }
+        res.status(201).json(result.rows[0])
+    })
+})
+
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
 })
