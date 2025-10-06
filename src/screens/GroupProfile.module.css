@@ -1,0 +1,91 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+.title {
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    margin-bottom: 60px;
+    margin-top: 60px;
+    text-align: center;
+}
+
+.description {
+    /* background-color: rgb(128, 128, 119); */
+    width: 33%;
+    padding: 10px;
+    word-wrap: break-word;
+    white-space: normal;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.description h5 {
+  padding: 20px;
+  border: 1px solid #ccc;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.deleteAndJoin {
+  padding: 20px;
+  text-align: center;
+}
+
+.deleteAndJoin button {
+  padding: 2px;
+}
+
+ul {
+  list-style: none;
+  text-align: center;
+  padding: 0;
+}
+
+
+
+.membersAndRequests {
+  /* background-color: rgb(116, 89, 89); */
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+}
+
+.members {
+  width: 33%;
+  /* background-color: rgb(172, 139, 139); */
+  padding: 10px;
+  margin-left: 0px;
+  margin-right: auto;
+  text-align: center;
+}
+
+.members ul {
+display: inline-block;
+text-align: left;
+}
+
+
+.requests {
+  width: 33%;
+  /* background-color: rgb(172, 139, 139); */
+  padding: 10px;
+  margin-left: auto;
+  margin-right: 0px;
+  text-align: center;
+}
+
+
+.requests button {
+  padding: 2px;
+  margin: 0 5px;
+}
+
+.membersAndRequests h3,
+.members h3,
+.requests h3 {
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  margin-bottom: 10px;
+}

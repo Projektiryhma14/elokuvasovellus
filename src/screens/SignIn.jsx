@@ -1,7 +1,7 @@
 // src/screens/SignIn.jsx
-import "./SignIn.css";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import styles from './SignIn.module.css'
 
 // Link = React Routerin linkki (korvaa <a href>)
 // useNavigate = ohjelmallinen siirtyminen toiseen reittiin
@@ -81,42 +81,45 @@ export default function SignIn() {
 
 
     return (
-        <div className="wrapper">
-            <div className="signin_container">
-                <form className="sign_in_form" onSubmit={handleSubmit} noValidate>
-                    <h1>Sign in</h1>
+        <div className={`container mt-5 ${styles.sign_in_wrapper}`}>
 
-                    <div>
-                        <label htmlFor="username">Enter your username:</label>
-                        <input
-                            id="username"
-                            type="text"
+            <form className={styles.sign_in_form} onSubmit={handleSubmit} noValidate>
+                <h2 className='mb-4'>Sign in</h2>
 
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            disabled={loading}                               // estetään syöttö kun login on käynnissä
-                        />
-                    </div>
+                <div className="mb-3">
+                    <label htmlFor='username' className={styles.sign_in_form_label}>
+                        Enter your username:</label>
+                    <input
+                        id="username"
+                        type="text"
 
-                    <div>
-                        <label htmlFor="password">Enter your password:</label>
-                        <input
-                            id="password"
-                            type="password"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        disabled={loading}                               // estetään syöttö kun login on käynnissä
+                    />
+                </div>
 
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            disabled={loading}
-                        />
-                    </div>
+                <div className="mb-3">
+                    <label htmlFor='password' className={styles.sign_in_form_label}
+                    >Enter your password:</label>
+                    <input
+                        id="password"
+                        type="password"
 
-                    {(localError || authError) && (
-                        <p className="error_msg" role="alert">
-                            {localError || authError}
-                        </p>
-                    )}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        disabled={loading}
+                    />
+                </div>
 
-                    <button className="signin_button" type="submit" disabled={loading}>
+                {(localError || authError) && (
+                    <p className="error_msg" role="alert">
+                        {localError || authError}
+                    </p>
+                )}
+
+                <div className="mb-3">
+                    <button className="btn btn-primary" type="submit" disabled={loading}>
                         {loading ? "Signing in..." : "Sign in"}
                     </button>
 
@@ -130,16 +133,17 @@ export default function SignIn() {
                             After signing in, you’ll be redirected to: <code>{returnTo}</code>
                         </p>
                     )}
-                </form>
+                </div>
+            </form>
 
 
-                {/* Debug-info: näyttää nykyisen status-tilan (SKELETON, GUEST, USER) 
+            {/* Debug-info: näyttää nykyisen status-tilan (SKELETON, GUEST, USER) 
                 
                 <p style={{ fontSize: 12, opacity: 0.6, marginTop: "1rem" }}>
                     Status: <strong>{status}</strong>
                 </p>*/}
 
-            </div>
+
         </div>
     );
 }
