@@ -463,7 +463,7 @@ app.get('/reviews/:id', (req, res) => {
         reviews.movie_id,
         reviews.movie_rating,
         reviews.movie_review,
-        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH:MI') AS created_at,
+        TO_CHAR(reviews.created_at, 'YYYY/MM/DD HH24:MI') AS created_at,
         users.email FROM reviews 
         JOIN users ON reviews.user_id = users.user_id
         WHERE reviews.movie_id = $1;
@@ -814,6 +814,31 @@ app.post('/sharedshowtimes', (req, res) => {
             res.status(201).json(result.rows[0])
         }
     )
+})
+
+app.get('/sharedshowtimes/group/:id', (req, res) => {
+    const groupId = req.params.id
+    const pool = openDb()
+
+    pool.query('SELECT * FROM sharedshowtimes WHERE group_id=$1', [groupId], (err, result) => {
+        if (err) {
+            return res.status(500).json({error: err.message})
+        }
+        res.status(201).json(result.rows)
+    })
+    //console.log(groupId)
+})
+
+app.delete('/sharedshowtimes/:id', (req, res) => {
+    const showtimeId = req.params.id
+    const pool = openDb()
+
+    pool.query('DELETE FROM sharedShowtimes WHERE shared_showtime_id=$1 RETURNING *', [showtimeId], (err, result) => {
+        if (err) {
+            return res.status(500).json({error: err.message})
+        }
+        res.status(201).json(result.rows[0])
+    })
 })
 
 app.listen(port, () => {
