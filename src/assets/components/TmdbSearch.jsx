@@ -172,7 +172,7 @@ export default function TmdbSearch() {
                 alert("An error occurred")
             }
             else if (err.response.data.error === 'duplicate key value violates unique constraint \"unique_movie\"') {
-                alert("Showtime has already been added to your group page!")
+                alert("Movie has already been added to your group page!")
             }
             else {
                 alert("An error occurred")

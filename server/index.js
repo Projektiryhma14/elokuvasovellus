@@ -188,8 +188,9 @@ app.post('/signin', (req, res, next) => {
         }
 
         const dbUser = result.rows[0]
+        console.log(dbUser)
 
-        compare(password, dbUser.password, (err, isMatch) => {
+        compare(password, dbUser.password_hash, (err, isMatch) => {
             if (err) return next(err)
 
             if (!isMatch) {
@@ -197,8 +198,22 @@ app.post('/signin', (req, res, next) => {
                 error.status = 401
                 return next(error)
             }
+
+            const token = jwt.sign(
+                { id: dbUser.user_id, email: dbUser.email, username: dbUser.user_name },
+                process.env.JWT_SECRET,
+                { expiresIn: "1h" }
+            )
+
+            return res.status(200).json({
+                id: dbUser.user_id,
+                email: dbUser.email,
+                username: dbUser.user_name,
+                token,
+            })
         })
 
+        /*
         const token = jwt.sign(
             { id: dbUser.user_id, email: dbUser.email, username: dbUser.user_name },
             process.env.JWT_SECRET,
@@ -211,6 +226,7 @@ app.post('/signin', (req, res, next) => {
             username: dbUser.user_name,
             token,
         })
+        */
 
         {/*
         const token = sign({ user: dbUser.email }, process.env.JWT_SECRET)
