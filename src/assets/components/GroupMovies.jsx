@@ -51,7 +51,7 @@ export default function GroupMovies({ members, group }) {
     }, [])
 
     return (
-        <div className={styles.movie_recs}>
+        <div className={(movies.length > 0) ? styles.movie_recs : styles.movie_recs_empty}>
             {(movies.length > 0) ? (<h4 className={styles.shared_movies_header}>Movie recommendations!</h4>) : ""}
             <ul>
             {movies.map(movie => {

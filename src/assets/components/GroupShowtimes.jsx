@@ -55,7 +55,7 @@ export default function GroupShowtimes({ members, group }) {
     }, [])
 
   return (
-    <div className={styles.movie_dates}>
+    <div className={(showtimes.length > 0) ? styles.movie_dates : styles.movie_dates_empty}>
         {(showtimes.length > 0) ? (<h4 className={styles.shared_showtimes_header}>Upcoming movie dates!</h4>) : ""}
         <ul>
         {showtimes.map(showtime => (
