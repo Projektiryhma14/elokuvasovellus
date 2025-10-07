@@ -156,6 +156,7 @@ export default function TmdbSearch() {
         };
 
         noudaPopular();     // kutsutaan heti
+        //console.log("tmdbsearchin useeffect")
 
 
         if (sessionStorage.getItem("selected_movie")) {

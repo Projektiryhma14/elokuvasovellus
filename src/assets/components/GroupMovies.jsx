@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
+import styles from './GroupMovies.module.css'
 
 export default function GroupMovies({ members, group }) {
     const [movies, setMovies] = useState([])
@@ -50,20 +51,22 @@ export default function GroupMovies({ members, group }) {
     }, [])
 
     return (
-        <div>
-            <h4>Recommendations from group members!</h4>
+        <div className={styles.movie_recs}>
+            {(movies.length > 0) ? (<h4 className={styles.shared_showtimes_header}>Movie recommendations!</h4>) : ""}
+            <ul>
             {movies.map(movie => {
                 const isOwner = (userId === String(group.owner_id)) //nykyinen käyttäjä on ryhmän omistaja
                 const isSharer = (userId === String(movie.sharer_id)) //nykyinen käyttäjä on elokuvan jakaja
                 return (
-                    <div key={movie.shared_movie_id}>
-                        {findSharerName(movie.sharer_id)} recommends watching {movie.movie_name}
-                        {(isOwner || isSharer) ? <button onClick={() => {
+                    <li className={styles.movie_rec_line} key={movie.shared_movie_id}>
+                        <b>{findSharerName(movie.sharer_id)}</b> recommends watching <b>{movie.movie_name}</b>
+                        {(isOwner || isSharer) ? <button className={styles.movies_delete_button} onClick={() => {
                             deleteMovie(movie.shared_movie_id)
                         }}>Delete</button> : ""}
-                    </div>
+                    </li>
                 )
             })}
+            </ul>
         </div>
     )
 }
