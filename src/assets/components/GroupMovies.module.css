@@ -5,12 +5,12 @@ div.movie_recs {
     line-height: 200%;
 }
 
-.shared_showtimes_header {
+.shared_movies_header {
     text-align: center;
 }
 
 .movie_rec_line {
-    text-align: left;
+    text-align: center;
     list-style: inside;
 }
 

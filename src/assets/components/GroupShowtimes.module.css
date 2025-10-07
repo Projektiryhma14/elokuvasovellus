@@ -5,12 +5,12 @@ div.movie_dates {
     line-height: 200%;
 }
 
-.shared_movies_header {
+.shared_showtimes_header {
     text-align: center;
 }
 
 .shared_showtime_line {
-    text-align: left;
+    text-align: center;
     list-style: inside;
 }
 

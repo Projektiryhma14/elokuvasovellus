@@ -52,7 +52,7 @@ export default function GroupMovies({ members, group }) {
 
     return (
         <div className={styles.movie_recs}>
-            {(movies.length > 0) ? (<h4 className={styles.shared_showtimes_header}>Movie recommendations!</h4>) : ""}
+            {(movies.length > 0) ? (<h4 className={styles.shared_movies_header}>Movie recommendations!</h4>) : ""}
             <ul>
             {movies.map(movie => {
                 const isOwner = (userId === String(group.owner_id)) //nykyinen käyttäjä on ryhmän omistaja

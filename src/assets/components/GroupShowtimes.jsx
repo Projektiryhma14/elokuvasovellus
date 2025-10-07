@@ -56,12 +56,15 @@ export default function GroupShowtimes({ members, group }) {
 
   return (
     <div className={styles.movie_dates}>
-        {(showtimes.length > 0) ? (<h4 className={styles.shared_movies_header}>Upcoming movie dates!</h4>) : ""}
+        {(showtimes.length > 0) ? (<h4 className={styles.shared_showtimes_header}>Upcoming movie dates!</h4>) : ""}
         <ul>
         {showtimes.map(showtime => (
             <li className={styles.shared_showtime_line} key={showtime.shared_showtime_id}>
                 <b>{findSharerName(showtime.sharer_id)}</b> is going to watch <b>{showtime.movie_name}</b> in <b>{showtime.theatre}</b> at <b>{formatDatetime(showtime.dateandtime)}</b>
-                {(userId === String(showtime.sharer_id) || userId === String(group.owner_id)) ? (<button className={styles.showtimes_delete_button} onClick={() => {deleteShowtime(showtime.shared_showtime_id)}}>Delete</button>) : ""}
+                {(userId === String(showtime.sharer_id) || userId === String(group.owner_id)) ? (<button 
+                className={styles.showtimes_delete_button} 
+                onClick={() => {deleteShowtime(showtime.shared_showtime_id)}}
+                type='button'>Delete</button>) : ""}
             </li>
         ))}
         </ul>
