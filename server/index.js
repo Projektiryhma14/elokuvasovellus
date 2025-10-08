@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
-import pkg from 'pg'
-import dotenv from 'dotenv'
+// import pkg from 'pg'
+// import dotenv from 'dotenv'
 import { compare, hash } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 
@@ -9,18 +9,25 @@ import { authenticateToken } from './middleware/authenticateToken.js'
 
 import { use } from 'react'
 
+import { pool } from './helper/db.js'
+
+import userRouter from './routes/userRouter.js'
+
 const { sign } = jwt
 
-dotenv.config()
+// dotenv.config()
 
 const port = 3001
-const { Pool } = pkg
+//const { Pool } = pkg
 
 const app = express()
 app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
+app.use('/', userRouter)
+
+/*
 const openDb = () => {
     const pool = new Pool({
         user: process.env.DB_USER,
@@ -30,21 +37,21 @@ const openDb = () => {
         port: process.env.DB_PORT
     })
     return pool
-}
+}*/
 
-app.get('/', (req, res) => {
-    const pool = openDb()
+// app.get('/', (req, res) => {
+//     //const pool = openDb()
 
-    pool.query('SELECT * FROM users', (err, result) => {
-        if (err) {
-            return res.status(500).json({ error: err.message })
-        }
-        res.status(200).json(result.rows)
-    })
-})
+//     pool.query('SELECT * FROM users', (err, result) => {
+//         if (err) {
+//             return res.status(500).json({ error: err.message })
+//         }
+//         res.status(200).json(result.rows)
+//     })
+// })
 
 app.get('/group', async (req, res) => {
-    const pool = openDb()
+    //const pool = openDb()
     const userid = req.headers['userid']
 
     try {
@@ -74,7 +81,7 @@ app.get('/group', async (req, res) => {
 app.get('/group/:id', async (req, res, next) => {
 
     // Avataan tietokantayhteys ja otetaan ryhmän id vastaan frontista
-    const pool = openDb()
+    //const pool = openDb()
     const groupId = req.params.id
 
     try {
@@ -123,124 +130,124 @@ app.get('/group/:id', async (req, res, next) => {
 })
 
 // SIGN UP //
-app.post('/signup', (req, res, next) => {
-    const pool = openDb()
-    const user = req.body
+// app.post('/signup', (req, res, next) => { //lisätty userRouteriin
+//     //const pool = openDb()
+//     const user = req.body
 
-    if (!user || !user.username || !user.email || !user.password) {
-        return res.status(400).json({ error: "Email, username & password are required" })
-    }
+//     if (!user || !user.username || !user.email || !user.password) {
+//         return res.status(400).json({ error: "Email, username & password are required" })
+//     }
 
-    const password = String(user.password)
+//     const password = String(user.password)
 
-    // Password: 8+merkkiä, 1 iso, 1 numero, 1 erikoismerkki
-    const hasMinLength = password.length >= 8
-    const hasUpper = /[A-Z]/.test(password)
-    const hasDigit = /\d/.test(password)
-    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(password);
+//     // Password: 8+merkkiä, 1 iso, 1 numero, 1 erikoismerkki
+//     const hasMinLength = password.length >= 8
+//     const hasUpper = /[A-Z]/.test(password)
+//     const hasDigit = /\d/.test(password)
+//     const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>/?]/.test(password);
 
-    if (!(hasMinLength && hasUpper && hasDigit && hasSpecial)) {
-        return res.status(400).json({
-            error: 'Password must be at least 8 chars and include an uppercase letter, a digit, and special character'
-        })
-    }
+//     if (!(hasMinLength && hasUpper && hasDigit && hasSpecial)) {
+//         return res.status(400).json({
+//             error: 'Password must be at least 8 chars and include an uppercase letter, a digit, and special character'
+//         })
+//     }
 
-    hash(user.password, 10, (err, hashedPassword) => {
-        if (err) return next(err)
+//     hash(user.password, 10, (err, hashedPassword) => {
+//         if (err) return next(err)
 
-        pool.query(
-            'INSERT INTO users (user_name, email, password_hash) VALUES ($1, $2, $3) RETURNING user_id AS id, email',
-            [user.username.trim(), user.email.trim(), hashedPassword],
-            (err, result) => {
-                if (err) {
-                    // Postgres unique violation
-                    if (err.code === '23505') {
-                        return res.status(409).json({ error: "Username or email already in use" })
-                    }
-                    return next(err)
-                }
-                const row = result.rows[0];
-                console.log('RETURNED ROW:', result.rows[0])
-                res.status(201).json({ id: row.id, email: row.email });
+//         pool.query(
+//             'INSERT INTO users (user_name, email, password_hash) VALUES ($1, $2, $3) RETURNING user_id AS id, email',
+//             [user.username.trim(), user.email.trim(), hashedPassword],
+//             (err, result) => {
+//                 if (err) {
+//                     // Postgres unique violation
+//                     if (err.code === '23505') {
+//                         return res.status(409).json({ error: "Username or email already in use" })
+//                     }
+//                     return next(err)
+//                 }
+//                 const row = result.rows[0];
+//                 console.log('RETURNED ROW:', result.rows[0])
+//                 res.status(201).json({ id: row.id, email: row.email });
 
-            }
-        );
-    });
-});
-
-
-app.post('/signin', (req, res, next) => {
-    const pool = openDb()
-    //const user = req.body
-    const { username, password } = req.body
-    if (!username || !password) {
-        const error = new Error('Username & password are required')
-        error.status = 400
-        return next(error)
-    }
-    pool.query('SELECT * FROM users WHERE user_name = $1', [username], (err, result) => {
-        if (err) return next(err)
-
-        if (result.rows.length === 0) {
-            const error = new Error('User not found')
-            error.status = 404
-            return next(error)
-        }
-
-        const dbUser = result.rows[0]
-        console.log(dbUser)
-
-        compare(password, dbUser.password_hash, (err, isMatch) => {
-            if (err) return next(err)
-
-            if (!isMatch) {
-                const error = new Error('Invalid password')
-                error.status = 401
-                return next(error)
-            }
-
-            const token = jwt.sign(
-                { id: dbUser.user_id, email: dbUser.email, username: dbUser.user_name },
-                process.env.JWT_SECRET,
-                { expiresIn: "1h" }
-            )
-
-            return res.status(200).json({
-                id: dbUser.user_id,
-                email: dbUser.email,
-                username: dbUser.user_name,
-                token,
-            })
-        })
-
-        /*
-        const token = jwt.sign(
-            { id: dbUser.user_id, email: dbUser.email, username: dbUser.user_name },
-            process.env.JWT_SECRET,
-            { expiresIn: "1h" }
-        )
-
-        return res.status(200).json({
-            id: dbUser.user_id,
-            email: dbUser.email,
-            username: dbUser.user_name,
-            token,
-        })
-        */
+//             }
+//         );
+//     });
+// });
 
 
+// app.post('/signin', (req, res, next) => { //lisätty userRoutteriin
+//     //const pool = openDb()
+//     //const user = req.body
+//     const { username, password } = req.body
+//     if (!username || !password) {
+//         const error = new Error('Username & password are required')
+//         error.status = 400
+//         return next(error)
+//     }
+//     pool.query('SELECT * FROM users WHERE user_name = $1', [username], (err, result) => {
+//         if (err) return next(err)
+
+//         if (result.rows.length === 0) {
+//             const error = new Error('User not found')
+//             error.status = 404
+//             return next(error)
+//         }
+
+//         const dbUser = result.rows[0]
+//         console.log(dbUser)
+
+//         compare(password, dbUser.password_hash, (err, isMatch) => {
+//             if (err) return next(err)
+
+//             if (!isMatch) {
+//                 const error = new Error('Invalid password')
+//                 error.status = 401
+//                 return next(error)
+//             }
+
+//             const token = jwt.sign(
+//                 { id: dbUser.user_id, email: dbUser.email, username: dbUser.user_name },
+//                 process.env.JWT_SECRET,
+//                 { expiresIn: "1h" }
+//             )
+
+//             return res.status(200).json({
+//                 id: dbUser.user_id,
+//                 email: dbUser.email,
+//                 username: dbUser.user_name,
+//                 token,
+//             })
+//         })
+
+//         /*
+//         const token = jwt.sign(
+//             { id: dbUser.user_id, email: dbUser.email, username: dbUser.user_name },
+//             process.env.JWT_SECRET,
+//             { expiresIn: "1h" }
+//         )
+
+//         return res.status(200).json({
+//             id: dbUser.user_id,
+//             email: dbUser.email,
+//             username: dbUser.user_name,
+//             token,
+//         })
+//         */
 
 
 
 
-    })
-})
+
+
+//     })
+// })
 
 // Käyttäjä on lähettänyt liittymispyynnön ryhmään
 app.post('/group/joinrequest', async (req, res, next) => {
 
     // Avataan tietokantayhteys, luodaan yksittäinen tietokantayhteys transaktioita varten ja tuodaan muuttujat frontista
-    const pool = openDb()
+    //const pool = openDb()
     const client = await pool.connect()
     const { userid, groupId, } = req.body
 
@@ -288,7 +295,7 @@ app.post('/group/joinrequest', async (req, res, next) => {
 
 // Käyttäjä peruu liittymispyynnön
 app.post('/group/canceljoinrequest', (req, res, next) => {
-    const pool = openDb()
+    //const pool = openDb()
     const userid = req.body.userid
 
     if (!userid) {
@@ -310,7 +317,7 @@ app.post('/group/canceljoinrequest', (req, res, next) => {
 app.post('/group/acceptrequest', async (req, res, next) => {
 
     // Avataan tietokantayhteys ja otetaan muuttujat vastaan frontista
-    const pool = openDb()
+    //const pool = openDb()
     const { userId, groupId } = req.body
 
     try {
@@ -331,7 +338,7 @@ app.post('/group/acceptrequest', async (req, res, next) => {
 app.post('/group/rejectrequest', async (req, res, next) => {
 
     // Avataan tietokantayhteys ja otetaan muuttujat vastaan frontista
-    const pool = openDb()
+    //const pool = openDb()
     const { userId, groupId } = req.body
 
     try {
@@ -353,7 +360,7 @@ app.post('/group/rejectrequest', async (req, res, next) => {
 app.post('/group/removemember', async (req, res, next) => {
 
     // Avataan tietokantayhteys ja otetaan muuttujat vastaan frontista
-    const pool = openDb()
+    //const pool = openDb()
     const { userId, groupId } = req.body
 
     try {
@@ -375,50 +382,50 @@ app.post('/group/removemember', async (req, res, next) => {
 
 
 
-app.delete('/deleteuser/:id', async (req, res, next) => {
+// app.delete('/deleteuser/:id', async (req, res, next) => { //lisätty userRouteriin
 
-    const pool = openDb()
-    const client = await pool.connect()
-    const userId = req.params.id
+//     //const pool = openDb()
+//     const client = await pool.connect()
+//     const userId = req.params.id
 
-    try {
+//     try {
 
-        await client.query('BEGIN')
+//         await client.query('BEGIN')
 
-        // Katsotaan onko poistettava käyttäjä ryhmän omistaja
-        const ownedGroupResult = await pool.query(
-            `SELECT group_id FROM groups WHERE owner_id=$1`, [userId]
-        )
+//         // Katsotaan onko poistettava käyttäjä ryhmän omistaja
+//         const ownedGroupResult = await pool.query(
+//             `SELECT group_id FROM groups WHERE owner_id=$1`, [userId]
+//         )
 
-        if (ownedGroupResult.rows.length !== 0) {
-            const groupId = ownedGroupResult.rows[0].group_id
+//         if (ownedGroupResult.rows.length !== 0) {
+//             const groupId = ownedGroupResult.rows[0].group_id
 
-            await pool.query(`UPDATE users SET groupid=null, hasactivegrouprequest=false WHERE groupid=$1`, [groupId])
-        }
+//             await pool.query(`UPDATE users SET groupid=null, hasactivegrouprequest=false WHERE groupid=$1`, [groupId])
+//         }
 
-        await pool.query(
-            `UPDATE users SET groupid=null WHERE user_id=$1`, [userId]
-        )
+//         await pool.query(
+//             `UPDATE users SET groupid=null WHERE user_id=$1`, [userId]
+//         )
 
-        await pool.query(
-            `DELETE FROM users WHERE user_id=$1`, [userId]
-        )
-        res.status(200).json({ message: 'User deleted' })
-        await client.query('COMMIT')
+//         await pool.query(
+//             `DELETE FROM users WHERE user_id=$1`, [userId]
+//         )
+//         res.status(200).json({ message: 'User deleted' })
+//         await client.query('COMMIT')
 
 
-    } catch (err) {
-        await client.query('ROLLBACK')
-        console.error('Transaktio epäonnistui', err)
-        next(err)
-    } finally {
-        client.release()
-    }
+//     } catch (err) {
+//         await client.query('ROLLBACK')
+//         console.error('Transaktio epäonnistui', err)
+//         next(err)
+//     } finally {
+//         client.release()
+//     }
 
-})
+// })
 
 app.get('/reviews', (req, res) => {
-    const pool = openDb()
+    //const pool = openDb()
 
     //kellonaika joko 'HH12:MI am/AM' (12-hour clock) tai 'HH24:MI' (24-hour clock)
     pool.query(
@@ -443,7 +450,7 @@ app.get('/reviews', (req, res) => {
 
 //haetaan reviews-sivun dropdown-valikkoon elokuvat
 app.get('/reviews/movies', (req, res) => {
-    const pool = openDb()
+    //const pool = openDb()
 
     pool.query(
         `
@@ -464,7 +471,7 @@ tätä endpointtia kutsutaan, kun halutaan näyttää
 arvostelusivulla vain yhden elokuvan arvostelut
 */
 app.get('/reviews/:id', (req, res) => {
-    const pool = openDb()
+    //const pool = openDb()
     const movieId = req.params.id
 
     pool.query(
@@ -490,7 +497,7 @@ app.get('/reviews/:id', (req, res) => {
 
 
 app.post("/reviews", authenticateToken, async (req, res) => {
-    const pool = openDb()
+    //const pool = openDb()
 
     console.log("post /reviews body:", req.body)
     console.log("post /reviews user:", req.user)
@@ -548,7 +555,7 @@ app.post("/reviews", authenticateToken, async (req, res) => {
 app.post('/group/', async (req, res, next) => {
 
     // Avataan tietokantayhteys
-    const pool = openDb()
+    //const pool = openDb()
 
     // Luodaan yksittäinen tietokantayhteys joka antaa täyden kontrollin transaktioihin ja kyselyihin
     const client = await pool.connect()
@@ -627,7 +634,7 @@ app.post('/group/', async (req, res, next) => {
 
 // Ryhmän poisto *TÄTÄ EI OLE VIELÄ KEHITETTY FRONTISSA*
 app.delete('/group/:id', (req, res, next) => {
-    const pool = openDb()
+    //const pool = openDb()
     const groupId = req.params.id
 
 
@@ -646,7 +653,7 @@ app.delete('/group/:id', (req, res, next) => {
 //HAETAAN KÄYTTÄJÄN SUOSIKIT
 app.get('/favourites', (req, res) => {
 
-    const pool = openDb()
+    //const pool = openDb()
     const { user_id } = req.query
 
     if (!user_id)
@@ -663,7 +670,7 @@ app.get('/favourites', (req, res) => {
 //LISÄÄ UUSI SUOSIKKI
 app.post('/favourites/create', (req, res) => {
 
-    const pool = openDb()
+    //const pool = openDb()
     const { movie_name, user_id } = req.body
 
     if (!movie_name) {
@@ -682,7 +689,7 @@ app.post('/favourites/create', (req, res) => {
 //POISTA SUOSIKKI
 app.delete('/favourites/delete/:id', (req, res) => {
 
-    const pool = openDb()
+    //const pool = openDb()
     const favId = req.params.id
     console.log(req.params.id)
     const { user_id } = req.query
@@ -701,43 +708,43 @@ app.delete('/favourites/delete/:id', (req, res) => {
 
 // GET /CHECK-EMAIL (duplikaatit)
 
-app.get('/check-email', (req, res, next) => {
-    const pool = openDb()
-    const email = (req.query.email || '').trim()
-    if (!email) return res.status(400).json({ error: 'email required' })
+// app.get('/check-email', (req, res, next) => { //lisätty userRouteriin
+//     //const pool = openDb()
+//     const email = (req.query.email || '').trim()
+//     if (!email) return res.status(400).json({ error: 'email required' })
 
-    pool.query(
-        'SELECT 1 FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1',
-        [email],
-        (err, result) => {
-            if (err) return next(err)
-            const exists = result.rowCount > 0
-            res.json({ available: !exists })
-        }
-    )
-})
+//     pool.query(
+//         'SELECT 1 FROM users WHERE LOWER(email) = LOWER($1) LIMIT 1',
+//         [email],
+//         (err, result) => {
+//             if (err) return next(err)
+//             const exists = result.rowCount > 0
+//             res.json({ available: !exists })
+//         }
+//     )
+// })
 
-// GET /CHECK-USERNAME (duplikaatit)
-app.get('/check-username', (req, res, next) => {
-    const pool = openDb()
-    const username = (req.query.username || '').trim()
-    if (!username) return res.status(400).json({ error: 'username required' })
+// // GET /CHECK-USERNAME (duplikaatit)
+// app.get('/check-username', (req, res, next) => { //lisätty userRouteriin
+//     //const pool = openDb()
+//     const username = (req.query.username || '').trim()
+//     if (!username) return res.status(400).json({ error: 'username required' })
 
-    pool.query(
-        'SELECT 1 FROM users WHERE LOWER(user_name) = LOWER($1) LIMIT 1',
-        [username],
-        (err, result) => {
-            if (err) return next(err)
-            const exists = result.rowCount > 0
-            res.json({ available: !exists })
-        }
-    )
-})
+//     pool.query(
+//         'SELECT 1 FROM users WHERE LOWER(user_name) = LOWER($1) LIMIT 1',
+//         [username],
+//         (err, result) => {
+//             if (err) return next(err)
+//             const exists = result.rowCount > 0
+//             res.json({ available: !exists })
+//         }
+//     )
+// })
 
 // RYHMÄN POISTO
 app.put('/group/:id', async (req, res, next) => {
 
-    const pool = openDb()
+    //const pool = openDb()
     const client = await pool.connect()
     const groupid = req.params.id
 
@@ -773,22 +780,22 @@ app.put('/group/:id', async (req, res, next) => {
 })
 
 //Haetaan yksittäisen käyttäjän tiedot
-app.get('/users/:id', (req, res) => {
-    const pool = openDb()
-    const userId = req.params.id
+// app.get('/users/:id', (req, res) => { //lisätty userRouteriin
+//     //const pool = openDb()
+//     const userId = req.params.id
 
-    pool.query('SELECT * FROM users WHERE user_id = $1', [userId], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message })
+//     pool.query('SELECT * FROM users WHERE user_id = $1', [userId], (err, result) => {
+//         if (err) return res.status(500).json({ error: err.message })
 
-        if (result.length === 0) {
-            console.log("Käyttäjää ei löytynyt annetulla id:llä")
-            return res.status(404).json({ error: `Käyttäjää ei löytynyt id:llä ${userId}` })
-        }
+//         if (result.length === 0) {
+//             console.log("Käyttäjää ei löytynyt annetulla id:llä")
+//             return res.status(404).json({ error: `Käyttäjää ei löytynyt id:llä ${userId}` })
+//         }
 
-        return res.status(200).json(result.rows[0])
-    })
+//         return res.status(200).json(result.rows[0])
+//     })
 
-})
+// })
 
 app.post('/sharedshowtimes', (req, res) => {
 
@@ -796,7 +803,7 @@ app.post('/sharedshowtimes', (req, res) => {
         return res.status(400).json({ error: 'Missing request body' })
     }
 
-    const pool = openDb()
+    //const pool = openDb()
     console.log(req.body)
     //console.log(req.body.theatre)
     const { theatre, movieName, startTime, groupId, sharerId } = req.body
@@ -830,7 +837,7 @@ app.post('/sharedshowtimes', (req, res) => {
 
 app.get('/sharedshowtimes/group/:id', (req, res) => {
     const groupId = req.params.id
-    const pool = openDb()
+    //const pool = openDb()
 
     pool.query('SELECT * FROM sharedshowtimes WHERE group_id=$1', [groupId], (err, result) => {
         if (err) {
@@ -843,7 +850,7 @@ app.get('/sharedshowtimes/group/:id', (req, res) => {
 
 app.delete('/sharedshowtimes/:id', (req, res) => {
     const showtimeId = req.params.id
-    const pool = openDb()
+    //const pool = openDb()
 
     pool.query('DELETE FROM sharedShowtimes WHERE shared_showtime_id=$1 RETURNING *', [showtimeId], (err, result) => {
         if (err) {
@@ -869,7 +876,7 @@ app.post('/sharedmovies', (req, res) => {
         return res.status(400).json({ error: 'Request is missing necessary parameters' })
     }
 
-    const pool = openDb()
+    //const pool = openDb()
 
     pool.query(`
         INSERT INTO sharedMovies 
@@ -886,7 +893,7 @@ app.post('/sharedmovies', (req, res) => {
 
 app.get('/sharedmovies/group/:id', (req, res) => {
     const groupId = req.params.id
-    const pool = openDb()
+    //const pool = openDb()
 
     pool.query('SELECT * FROM sharedmovies WHERE group_id=$1', [groupId], (err, result) => {
         if (err) {
@@ -899,7 +906,7 @@ app.get('/sharedmovies/group/:id', (req, res) => {
 
 app.delete('/sharedmovies/:id', (req, res) => {
     const sharedMovieId = req.params.id
-    const pool = openDb()
+    //const pool = openDb()
 
     pool.query('DELETE FROM sharedMovies WHERE shared_movie_id=$1 RETURNING *', [sharedMovieId], (err, result) => {
         if (err) {
@@ -912,7 +919,7 @@ app.delete('/sharedmovies/:id', (req, res) => {
 //JAA SUOSIKKI
 app.post('/favourites/share', async (req, res) => {
 
-    const pool = openDb()
+    //const pool = openDb()
     const { user_id } = req.body
 
     if (!user_id)
@@ -953,7 +960,7 @@ app.post('/favourites/share', async (req, res) => {
 //PERU SUOSIKKILISTAN JAKO
 app.post('/favourites/unshare', async (req, res) => {
 
-    const pool = openDb()
+    //const pool = openDb()
     const { user_id } = req.body
 
     if (!user_id)
@@ -980,7 +987,7 @@ app.post('/favourites/unshare', async (req, res) => {
 
 //HAE JAETTUJEN SUOSIKKILISTOJEN KÄYTTÄJÄNIMET LISTAAN UUSIMMASTA VANHIMPAAN
 app.get('/favourites/shared', async (req, res) => {
-    const pool = openDb()
+    //const pool = openDb()
 
     try {
         const sharedList = await pool.query(
