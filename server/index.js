@@ -996,6 +996,10 @@ app.get('/favourites/shared', async (req, res) => {
     }
 })
 
+app.use((err, req, res, next) => {
+  res.status(err.status || 500).json({ error: err.message });
+});
+
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`)
