@@ -1,6 +1,7 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import styles from './GroupShowtimes.module.css'
 
 export default function GroupShowtimes({ members, group }) {
     const [showtimes, setShowtimes] = useState([])
@@ -54,14 +55,19 @@ export default function GroupShowtimes({ members, group }) {
     }, [])
 
   return (
-    <div>
-        <h4>Upcoming movie dates!</h4>
+    <div className={(showtimes.length > 0) ? styles.movie_dates : styles.movie_dates_empty}>
+        {(showtimes.length > 0) ? (<h4 className={styles.shared_showtimes_header}>Upcoming movie dates!</h4>) : ""}
+        <ul>
         {showtimes.map(showtime => (
-            <div key={showtime.shared_showtime_id}>
-                {findSharerName(showtime.sharer_id)} is going to watch {showtime.movie_name} in {showtime.theatre} at {formatDatetime(showtime.dateandtime)}
-                {(userId === String(showtime.sharer_id) || userId === String(group.owner_id)) ? (<button onClick={() => {deleteShowtime(showtime.shared_showtime_id)}}>Delete</button>) : ""}
-            </div>
+            <li className={styles.shared_showtime_line} key={showtime.shared_showtime_id}>
+                <b>{findSharerName(showtime.sharer_id)}</b> is going to watch <b>{showtime.movie_name}</b> in <b>{showtime.theatre}</b> at <b>{formatDatetime(showtime.dateandtime)}</b>
+                {(userId === String(showtime.sharer_id) || userId === String(group.owner_id)) ? (<button 
+                className={styles.showtimes_delete_button} 
+                onClick={() => {deleteShowtime(showtime.shared_showtime_id)}}
+                type='button'>Delete</button>) : ""}
+            </li>
         ))}
+        </ul>
     </div>
   )
 }

@@ -1,0 +1,27 @@
+div.movie_dates {
+    border-top: 1px solid black;
+    margin: 1em;
+    padding: 1em;
+    line-height: 200%;
+}
+
+div.movie_dates_empty {
+    margin: 1em;
+    padding: 1em;
+    line-height: 200%;
+}
+
+.shared_showtimes_header {
+    text-align: center;
+}
+
+.shared_showtime_line {
+    text-align: center;
+    list-style: inside;
+}
+
+.showtimes_delete_button {
+    margin-left: 1em;
+    padding-inline: 0.5em;
+    line-height: 150%;
+}
