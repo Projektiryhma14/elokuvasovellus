@@ -1,4 +1,8 @@
-import { selectAllUsers, selectByUserName, removeAllUsersFromGroup, setGroupIdToNull, deleteUserById, addNewUser } from '../models/userModel.js'
+import {
+    selectAllUsers, selectByUserName, removeAllUsersFromGroup, setGroupIdToNull,
+    deleteUserById, insertUser, checkEmailAvailability, checkUsernameAvailability,
+    selectById
+} from '../models/userModel.js'
 import { compare, hash } from 'bcrypt'
 import jwt from 'jsonwebtoken'
 import {selectOwner} from '../models/groupModel.js'
@@ -131,7 +135,7 @@ const signUp = async (req, res, next) => {
 
             const trimmedUsername = user.username.trim()
             const trimmedEmail = user.email.trim()
-            const result = await addNewUser(trimmedUsername, trimmedEmail, hashedPassword)
+            const result = await insertUser(trimmedUsername, trimmedEmail, hashedPassword)
 
             const row = result.rows[0]
             console.log('RETURNED ROW:', result.rows[0])
@@ -148,6 +152,55 @@ const signUp = async (req, res, next) => {
     }
 }
 
+const checkEmail = async (req, res, next) => {
+    try {
+        const email = (req.query.email || '').trim()
+        if (!email) return res.status(400).json({ error: 'email required' })
+        const result = await checkEmailAvailability(email)
+        const exists = result.rowCount > 0
+        res.json({ available: !exists })
+    }
+    catch (err) {
+        return next(err)
+    }
+}
+
+const checkUsername = async (req, res, next) => {
+    try {
+        const username = (req.query.username || '').trim()
+        if (!username) return res.status(400).json({ error: 'username required' })
+
+        const result = await checkUsernameAvailability(username)
+        const exists = result.rowCount > 0
+        res.json({ available: !exists })
+    }
+    catch (err) {
+        return next(err)
+    }
+}
+
+const getUserById = async (req, res, next) => {
+    try {
+        const userId = req.params.id
+        if (!userId) {
+            console.log("requestissa ei parametria id")
+            return res.status(400).json({ error: `Request missing required id parameter` })
+        }
+
+        const result = await selectById(userId)
+
+        if (result.length === 0) {
+            console.log("Käyttäjää ei löytynyt annetulla id:llä")
+            return res.status(404).json({ error: `Käyttäjää ei löytynyt id:llä ${userId}` })
+        }
+
+        return res.status(200).json(result.rows[0])
+    }
+    catch (err) {
+        return next(err)
+    }
+}
 
 
-export { getUsers, signIn, deleteUser, signUp }
+
+export { getUsers, signIn, deleteUser, signUp, checkEmail, checkUsername, getUserById }
