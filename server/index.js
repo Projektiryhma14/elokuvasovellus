@@ -2,18 +2,19 @@ import express from 'express'
 import cors from 'cors'
 // import pkg from 'pg'
 // import dotenv from 'dotenv'
-import { compare, hash } from 'bcrypt'
-import jwt from 'jsonwebtoken'
+//import { compare, hash } from 'bcrypt'
+//import jwt from 'jsonwebtoken'
 
-import { authenticateToken } from './middleware/authenticateToken.js'
+//import { authenticateToken } from './middleware/authenticateToken.js'
 
 import { use } from 'react'
 
 import { pool } from './helper/db.js'
 
 import userRouter from './routes/userRouter.js'
+import reviewRouter from './routes/reviewRouter.js'
 
-const { sign } = jwt
+//const { sign } = jwt
 
 // dotenv.config()
 
@@ -26,6 +27,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.use('/', userRouter)
+app.use('/', reviewRouter)
 
 /*
 const openDb = () => {
@@ -424,7 +426,8 @@ app.post('/group/removemember', async (req, res, next) => {
 
 // })
 
-app.get('/reviews', (req, res) => {
+/*
+app.get('/reviews', (req, res) => { //LISÄTTY REVIEWROUTERIIN
     //const pool = openDb()
 
     //kellonaika joko 'HH12:MI am/AM' (12-hour clock) tai 'HH24:MI' (24-hour clock)
@@ -446,10 +449,11 @@ app.get('/reviews', (req, res) => {
             res.status(200).json(result.rows)
 
         })
-})
+})*/
 
 //haetaan reviews-sivun dropdown-valikkoon elokuvat
-app.get('/reviews/movies', (req, res) => {
+/*
+app.get('/reviews/movies', (req, res) => { //LISÄTTY REVIEWROUTERIIN
     //const pool = openDb()
 
     pool.query(
@@ -464,13 +468,14 @@ app.get('/reviews/movies', (req, res) => {
             res.status(200).json(result.rows)
         }
     )
-})
+})*/
 
 /*
 tätä endpointtia kutsutaan, kun halutaan näyttää
 arvostelusivulla vain yhden elokuvan arvostelut
 */
-app.get('/reviews/:id', (req, res) => {
+/*
+app.get('/reviews/:id', (req, res) => { //LISÄTTY REVIEWROUTERIIN
     //const pool = openDb()
     const movieId = req.params.id
 
@@ -493,10 +498,10 @@ app.get('/reviews/:id', (req, res) => {
             res.status(200).json(result.rows)
 
         })
-})
+})*/
 
-
-app.post("/reviews", authenticateToken, async (req, res) => {
+/*
+app.post("/reviews", authenticateToken, async (req, res) => { //LISÄTTY REVIEWROUTERIIN
     //const pool = openDb()
 
     console.log("post /reviews body:", req.body)
@@ -549,7 +554,7 @@ app.post("/reviews", authenticateToken, async (req, res) => {
         console.error("Error creating review:", err)
         return res.status(500).json({ error: "Sisäinen server error" })
     }
-})
+})*/
 
 // Ryhmän luonti
 app.post('/group/', async (req, res, next) => {
@@ -1004,6 +1009,7 @@ app.get('/favourites/shared', async (req, res) => {
 })
 
 app.use((err, req, res, next) => {
+    console.log("common middleware")
   res.status(err.status || 500).json({ error: err.message });
 });
 

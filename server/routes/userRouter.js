@@ -1,4 +1,4 @@
-import { pool } from '../helper/db.js'
+//import { pool } from '../helper/db.js'
 import { Router } from 'express'
 //import { compare, hash } from 'bcrypt'
 //import jwt from 'jsonwebtoken'
