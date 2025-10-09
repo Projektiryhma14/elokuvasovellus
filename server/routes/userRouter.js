@@ -1,9 +1,9 @@
 import { pool } from '../helper/db.js'
 import { Router } from 'express'
-import { compare, hash } from 'bcrypt'
+//import { compare, hash } from 'bcrypt'
 //import jwt from 'jsonwebtoken'
 
-import {getUsers, signIn, deleteUser} from '../controllers/userController.js'
+import {getUsers, signIn, deleteUser, signUp} from '../controllers/userController.js'
 
 const router = Router()
 
@@ -103,6 +103,8 @@ router.delete('/deleteuser/:id', async (req, res, next) => {
 */
 
 // SIGN UP //
+router.post('/signup', signUp)
+/*
 router.post('/signup', (req, res, next) => {
     const user = req.body
 
@@ -146,6 +148,7 @@ router.post('/signup', (req, res, next) => {
         );
     });
 });
+*/
 
 // GET /CHECK-EMAIL (duplikaatit)
 

@@ -21,4 +21,12 @@ const setGroupIdToNull = async (userId) => {
     return await pool.query('UPDATE users SET groupid=null WHERE user_id=$1', [userId])
 }
 
-export { selectAllUsers, selectByUserName, deleteUserById, removeAllUsersFromGroup, setGroupIdToNull }
+const addNewUser = async (uname, email, pw_hashed) => {
+    return await pool.query(
+        `
+        INSERT INTO users (user_name, email, password_hash) VALUES ($1, $2, $3) RETURNING user_id AS id, email
+        `,
+        [uname, email, pw_hashed])
+}
+
+export { selectAllUsers, selectByUserName, deleteUserById, removeAllUsersFromGroup, setGroupIdToNull, addNewUser }
