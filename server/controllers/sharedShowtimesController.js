@@ -22,7 +22,7 @@ const addSharedShowtime = async (req, res, next) => {
     }
 }
 
-const getShowtimesForGroup = async (req, res, next) => {
+const getGroupShowtimes = async (req, res, next) => {
     try {
         const groupId = req.params.id
 
@@ -54,4 +54,4 @@ const deleteSharedShowtime = async (req, res, next) => {
     }
 }
 
-export { addSharedShowtime, getShowtimesForGroup, deleteSharedShowtime }
+export { addSharedShowtime, getGroupShowtimes, deleteSharedShowtime }

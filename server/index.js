@@ -14,6 +14,7 @@ import { pool } from './helper/db.js'
 import userRouter from './routes/userRouter.js'
 import reviewRouter from './routes/reviewRouter.js'
 import showtimesRouter from './routes/sharedShowtimesRouter.js'
+import moviesRouter from './routes/sharedMoviesRouter.js'
 
 //const { sign } = jwt
 
@@ -30,6 +31,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use('/', userRouter)
 app.use('/', reviewRouter)
 app.use('/', showtimesRouter)
+app.use('/', moviesRouter)
 
 /*
 const openDb = () => {
@@ -871,7 +873,8 @@ app.delete('/sharedshowtimes/:id', (req, res) => { //lisätty sharedshowtimesrou
 })
 */
 
-app.post('/sharedmovies', (req, res) => {
+/*
+app.post('/sharedmovies', (req, res) => { //siirretty sharedmoviesrouteriin
     if (!req.body) {
         return res.status(400).json({ error: 'Missing request body' })
     }
@@ -901,8 +904,10 @@ app.post('/sharedmovies', (req, res) => {
         res.status(201).json(result.rows[0])
         })
 })
+*/
 
-app.get('/sharedmovies/group/:id', (req, res) => {
+/*
+app.get('/sharedmovies/group/:id', (req, res) => { //lisätty sharedmoviesrouteriin
     const groupId = req.params.id
     //const pool = openDb()
 
@@ -914,8 +919,10 @@ app.get('/sharedmovies/group/:id', (req, res) => {
     })
     //console.log(groupId)
 })
+*/
 
-app.delete('/sharedmovies/:id', (req, res) => {
+/*
+app.delete('/sharedmovies/:id', (req, res) => { //siirretty sharedmoviesrouteriin
     const sharedMovieId = req.params.id
     //const pool = openDb()
 
@@ -926,6 +933,7 @@ app.delete('/sharedmovies/:id', (req, res) => {
         res.status(201).json(result.rows[0])
     })
 })
+*/
 
 //JAA SUOSIKKI
 app.post('/favourites/share', async (req, res) => {
