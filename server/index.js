@@ -13,6 +13,7 @@ import { pool } from './helper/db.js'
 
 import userRouter from './routes/userRouter.js'
 import reviewRouter from './routes/reviewRouter.js'
+import showtimesRouter from './routes/sharedShowtimesRouter.js'
 
 //const { sign } = jwt
 
@@ -28,6 +29,7 @@ app.use(express.urlencoded({ extended: false }))
 
 app.use('/', userRouter)
 app.use('/', reviewRouter)
+app.use('/', showtimesRouter)
 
 /*
 const openDb = () => {
@@ -802,45 +804,46 @@ app.put('/group/:id', async (req, res, next) => {
 
 // })
 
-app.post('/sharedshowtimes', (req, res) => {
+// app.post('/sharedshowtimes', (req, res) => { //lisätty sharedshowtimesrouteriin
 
-    if (!req.body) {
-        return res.status(400).json({ error: 'Missing request body' })
-    }
+//     if (!req.body) {
+//         return res.status(400).json({ error: 'Missing request body' })
+//     }
 
-    //const pool = openDb()
-    console.log(req.body)
-    //console.log(req.body.theatre)
-    const { theatre, movieName, startTime, groupId, sharerId } = req.body
-    /*
-    console.log(theatre)
-    console.log(movieName)
-    console.log(startTime)
-    console.log(groupId)
-    console.log(sharerId)
-    */
-    if (!theatre || !movieName || !startTime || !groupId || !sharerId) {
-        return res.status(400).json({ error: 'Request is missing necessary parameters' })
-    }
+//     //const pool = openDb()
+//     console.log(req.body)
+//     //console.log(req.body.theatre)
+//     const { theatre, movieName, startTime, groupId, sharerId } = req.body
+//     /*
+//     console.log(theatre)
+//     console.log(movieName)
+//     console.log(startTime)
+//     console.log(groupId)
+//     console.log(sharerId)
+//     */
+//     if (!theatre || !movieName || !startTime || !groupId || !sharerId) {
+//         return res.status(400).json({ error: 'Request is missing necessary parameters' })
+//     }
 
-    pool.query(
-        `
-        INSERT INTO sharedShowtimes 
-        (theatre, movie_name, dateandtime, group_id, sharer_id) 
-        VALUES
-        ($1, $2, $3, $4, $5)
-        RETURNING *
-        `,
-        [theatre, movieName, startTime, groupId, sharerId], (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: err.message })
-            }
-            res.status(201).json(result.rows[0])
-        }
-    )
-})
+//     pool.query(
+//         `
+//         INSERT INTO sharedShowtimes 
+//         (theatre, movie_name, dateandtime, group_id, sharer_id) 
+//         VALUES
+//         ($1, $2, $3, $4, $5)
+//         RETURNING *
+//         `,
+//         [theatre, movieName, startTime, groupId, sharerId], (err, result) => {
+//             if (err) {
+//                 return res.status(500).json({ error: err.message })
+//             }
+//             res.status(201).json(result.rows[0])
+//         }
+//     )
+// })
 
-app.get('/sharedshowtimes/group/:id', (req, res) => {
+/*
+app.get('/sharedshowtimes/group/:id', (req, res) => { //lisätty sharedshowtimesrouteriin
     const groupId = req.params.id
     //const pool = openDb()
 
@@ -852,8 +855,10 @@ app.get('/sharedshowtimes/group/:id', (req, res) => {
     })
     //console.log(groupId)
 })
+*/
 
-app.delete('/sharedshowtimes/:id', (req, res) => {
+/*
+app.delete('/sharedshowtimes/:id', (req, res) => { //lisätty sharedshowtimesrouteriin
     const showtimeId = req.params.id
     //const pool = openDb()
 
@@ -864,6 +869,7 @@ app.delete('/sharedshowtimes/:id', (req, res) => {
         res.status(201).json(result.rows[0])
     })
 })
+*/
 
 app.post('/sharedmovies', (req, res) => {
     if (!req.body) {
