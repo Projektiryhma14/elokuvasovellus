@@ -22,7 +22,7 @@
 }
 
 .logo {
-  height: 72px;
+  height:90px;
   width: auto;
   display: block;
 }
@@ -70,30 +70,174 @@
   background: #fff;
 }
 
-/* Responsiivisuus */
+
+
+  /*====== Hamburger + Drawer (mobiili) ======*/
+
+  /*Nappi: piilotetaan desktopissa, näytetään mobiilissa*/
+.menuButton {
+  display: none;                 /* oletus: desktopissa piilossa */
+  border: none;
+  background: transparent;
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  line-height: 1;
+  color: #fff;
+}
+
+.menuButton:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* Yksinkertaiset "tikut" hamburgeriin */
+.menuBar {
+  display: block;
+  width: 30px;
+  height: 2px;
+  background: currentColor;
+  margin: 4px 0;
+ 
+  
+}
+
+/* Taustapeite drawerille */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 999;                  /* drawerin alle, navin yli */
+}
+
+/* Drawer itse */
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(86vw, 340px);
+  height: 100vh;
+  background: #111;
+  color: #fff;
+  transform: translateX(100%);   /* piilossa */
+  z-index: 1000;                 /* nav ~1000, pidetään yli */
+  display: flex;
+  flex-direction: column;
+  /* Ei animaatiota tässä vaiheessa (yksinkertaisin) */
+}
+
+.drawerOpen {
+  transform: translateX(0);      /* näkyvillä */
+}
+
+/* Drawer yläosa: logo + close */
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.logoSmall {
+  height: 48px;
+  width: auto;
+}
+
+/* Drawer-osioiden peruslayout */
+.drawerSection {
+  padding: 12px 8px;
+}
+
+.drawerTitle {
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  color: #bbb;
+  text-transform: uppercase;
+  padding: 8px 8px;
+}
+
+.drawerList {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.drawerLink,
+.drawerLinkBtn {
+  display: block;
+  width: 100%;
+  text-align: left;
+  color: #eee;
+  text-decoration: none;
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.drawerLink:hover,
+.drawerLinkBtn:hover {
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+}
+
+.drawerNote {
+  color: #ccc;
+  padding: 8px 12px;
+}
+
+
+
+
+/* ====== Mobiilinäkymän breakpoints ====== */
 @media (max-width: 768px) {
+  /* Päänavi: rivitetään kuten sulla on jo */
   .nav {
-    flex-wrap: wrap;
-    gap: 10px;
-    padding: 12px 16px;
-  }
-
-  .center {
-    order: 3;
+    flex-wrap: nowrap; /* pidetään yhdellä rivillä: logo + (tyhjää) + hamburger */
     width: 100%;
-    justify-content: flex-start;
-    flex: 0 0 auto;
   }
 
+  /* Piilota desktop-listaukset mobiilissa */
+  .center,
   .auth {
-    order: 2;
-    margin-left: auto;
-    gap: 12px;
+    display: none;
   }
 
-  /*
-  .logo {
-    height: 30px;
+   /* Näytä hamburger-nappi mobiilissa */
+  .menuButton {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    width: 40px;
+    height: 40px;
+    line-height: 1;
+    margin-left: auto; /* työnnä oikeaan reunaan */
+    background: transparent;
+    color: #fff;
+    
   }
-    */
+
+  /* Viivojen perustyyli */
+  .menuBar {
+    display: block;
+    width: 26px;
+    height: 3px;
+    background: currentColor;     /* käyttää napin color-arvoa */
+    border-radius: 2px;           /* pieni pyöristys näyttää paremmalta */
+    margin: 0;
+  }
+}
+
+/* Varmistetaan, ettei hamburger näy desktopissa missään tilanteessa */
+@media (min-width: 769px) {
+  .menuButton {
+    display: none !important;
+  }
 }
