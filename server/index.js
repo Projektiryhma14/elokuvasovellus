@@ -2,10 +2,10 @@ import express from 'express'
 import cors from 'cors'
 // import pkg from 'pg'
 // import dotenv from 'dotenv'
-import { compare, hash } from 'bcrypt'
-import jwt from 'jsonwebtoken'
+//import { compare, hash } from 'bcrypt'
+//import jwt from 'jsonwebtoken'
 
-import { authenticateToken } from './middleware/authenticateToken.js'
+//import { authenticateToken } from './middleware/authenticateToken.js'
 
 import { use } from 'react'
 
@@ -14,8 +14,11 @@ import { pool } from './helper/db.js'
 import userRouter from './routes/userRouter.js'
 import groupRouter from './routes/groupRouter.js'
 import favouritesRouter from './routes/favouritesRouter.js'
+import reviewRouter from './routes/reviewRouter.js'
+import showtimesRouter from './routes/sharedShowtimesRouter.js'
+import moviesRouter from './routes/sharedMoviesRouter.js'
 
-const { sign } = jwt
+//const { sign } = jwt
 
 // dotenv.config()
 
@@ -30,6 +33,9 @@ app.use(express.urlencoded({ extended: false }))
 app.use('/', userRouter)
 app.use('/', groupRouter)
 app.use('/', favouritesRouter)
+app.use('/', reviewRouter)
+app.use('/', showtimesRouter)
+app.use('/', moviesRouter)
 
 /*
 const openDb = () => {
@@ -428,7 +434,8 @@ const openDb = () => {
 
 // })
 
-app.get('/reviews', (req, res) => {
+/*
+app.get('/reviews', (req, res) => { //LISÄTTY REVIEWROUTERIIN
     //const pool = openDb()
 
     //kellonaika joko 'HH12:MI am/AM' (12-hour clock) tai 'HH24:MI' (24-hour clock)
@@ -450,10 +457,11 @@ app.get('/reviews', (req, res) => {
             res.status(200).json(result.rows)
 
         })
-})
+})*/
 
 //haetaan reviews-sivun dropdown-valikkoon elokuvat
-app.get('/reviews/movies', (req, res) => {
+/*
+app.get('/reviews/movies', (req, res) => { //LISÄTTY REVIEWROUTERIIN
     //const pool = openDb()
 
     pool.query(
@@ -468,13 +476,14 @@ app.get('/reviews/movies', (req, res) => {
             res.status(200).json(result.rows)
         }
     )
-})
+})*/
 
 /*
 tätä endpointtia kutsutaan, kun halutaan näyttää
 arvostelusivulla vain yhden elokuvan arvostelut
 */
-app.get('/reviews/:id', (req, res) => {
+/*
+app.get('/reviews/:id', (req, res) => { //LISÄTTY REVIEWROUTERIIN
     //const pool = openDb()
     const movieId = req.params.id
 
@@ -497,10 +506,10 @@ app.get('/reviews/:id', (req, res) => {
             res.status(200).json(result.rows)
 
         })
-})
+})*/
 
-
-app.post("/reviews", authenticateToken, async (req, res) => {
+/*
+app.post("/reviews", authenticateToken, async (req, res) => { //LISÄTTY REVIEWROUTERIIN
     //const pool = openDb()
 
     console.log("post /reviews body:", req.body)
@@ -553,7 +562,7 @@ app.post("/reviews", authenticateToken, async (req, res) => {
         console.error("Error creating review:", err)
         return res.status(500).json({ error: "Sisäinen server error" })
     }
-})
+})*/
 
 // Ryhmän luonti
 // app.post('/group/', async (req, res, next) => {
@@ -801,45 +810,46 @@ app.post("/reviews", authenticateToken, async (req, res) => {
 
 // })
 
-app.post('/sharedshowtimes', (req, res) => {
+// app.post('/sharedshowtimes', (req, res) => { //lisätty sharedshowtimesrouteriin
 
-    if (!req.body) {
-        return res.status(400).json({ error: 'Missing request body' })
-    }
+//     if (!req.body) {
+//         return res.status(400).json({ error: 'Missing request body' })
+//     }
 
-    //const pool = openDb()
-    console.log(req.body)
-    //console.log(req.body.theatre)
-    const { theatre, movieName, startTime, groupId, sharerId } = req.body
-    /*
-    console.log(theatre)
-    console.log(movieName)
-    console.log(startTime)
-    console.log(groupId)
-    console.log(sharerId)
-    */
-    if (!theatre || !movieName || !startTime || !groupId || !sharerId) {
-        return res.status(400).json({ error: 'Request is missing necessary parameters' })
-    }
+//     //const pool = openDb()
+//     console.log(req.body)
+//     //console.log(req.body.theatre)
+//     const { theatre, movieName, startTime, groupId, sharerId } = req.body
+//     /*
+//     console.log(theatre)
+//     console.log(movieName)
+//     console.log(startTime)
+//     console.log(groupId)
+//     console.log(sharerId)
+//     */
+//     if (!theatre || !movieName || !startTime || !groupId || !sharerId) {
+//         return res.status(400).json({ error: 'Request is missing necessary parameters' })
+//     }
 
-    pool.query(
-        `
-        INSERT INTO sharedShowtimes 
-        (theatre, movie_name, dateandtime, group_id, sharer_id) 
-        VALUES
-        ($1, $2, $3, $4, $5)
-        RETURNING *
-        `,
-        [theatre, movieName, startTime, groupId, sharerId], (err, result) => {
-            if (err) {
-                return res.status(500).json({ error: err.message })
-            }
-            res.status(201).json(result.rows[0])
-        }
-    )
-})
+//     pool.query(
+//         `
+//         INSERT INTO sharedShowtimes 
+//         (theatre, movie_name, dateandtime, group_id, sharer_id) 
+//         VALUES
+//         ($1, $2, $3, $4, $5)
+//         RETURNING *
+//         `,
+//         [theatre, movieName, startTime, groupId, sharerId], (err, result) => {
+//             if (err) {
+//                 return res.status(500).json({ error: err.message })
+//             }
+//             res.status(201).json(result.rows[0])
+//         }
+//     )
+// })
 
-app.get('/sharedshowtimes/group/:id', (req, res) => {
+/*
+app.get('/sharedshowtimes/group/:id', (req, res) => { //lisätty sharedshowtimesrouteriin
     const groupId = req.params.id
     //const pool = openDb()
 
@@ -851,8 +861,10 @@ app.get('/sharedshowtimes/group/:id', (req, res) => {
     })
     //console.log(groupId)
 })
+*/
 
-app.delete('/sharedshowtimes/:id', (req, res) => {
+/*
+app.delete('/sharedshowtimes/:id', (req, res) => { //lisätty sharedshowtimesrouteriin
     const showtimeId = req.params.id
     //const pool = openDb()
 
@@ -863,8 +875,10 @@ app.delete('/sharedshowtimes/:id', (req, res) => {
         res.status(201).json(result.rows[0])
     })
 })
+*/
 
-app.post('/sharedmovies', (req, res) => {
+/*
+app.post('/sharedmovies', (req, res) => { //siirretty sharedmoviesrouteriin
     if (!req.body) {
         return res.status(400).json({ error: 'Missing request body' })
     }
@@ -894,8 +908,10 @@ app.post('/sharedmovies', (req, res) => {
         res.status(201).json(result.rows[0])
         })
 })
+*/
 
-app.get('/sharedmovies/group/:id', (req, res) => {
+/*
+app.get('/sharedmovies/group/:id', (req, res) => { //lisätty sharedmoviesrouteriin
     const groupId = req.params.id
     //const pool = openDb()
 
@@ -907,8 +923,10 @@ app.get('/sharedmovies/group/:id', (req, res) => {
     })
     //console.log(groupId)
 })
+*/
 
-app.delete('/sharedmovies/:id', (req, res) => {
+/*
+app.delete('/sharedmovies/:id', (req, res) => { //siirretty sharedmoviesrouteriin
     const sharedMovieId = req.params.id
     //const pool = openDb()
 
@@ -919,6 +937,7 @@ app.delete('/sharedmovies/:id', (req, res) => {
         res.status(201).json(result.rows[0])
     })
 })
+*/
 
 // //JAA SUOSIKKI
 // app.post('/favourites/share', async (req, res) => {
@@ -1008,6 +1027,7 @@ app.delete('/sharedmovies/:id', (req, res) => {
 // })
 
 app.use((err, req, res, next) => {
+    //console.log("common middleware")
   res.status(err.status || 500).json({ error: err.message });
 });
 

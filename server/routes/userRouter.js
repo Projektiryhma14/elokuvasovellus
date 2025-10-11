@@ -1,9 +1,9 @@
-import { pool } from '../helper/db.js'
+//import { pool } from '../helper/db.js'
 import { Router } from 'express'
-import { compare, hash } from 'bcrypt'
+//import { compare, hash } from 'bcrypt'
 //import jwt from 'jsonwebtoken'
 
-import {getUsers, signIn, deleteUser} from '../controllers/userController.js'
+import {getUsers, signIn, deleteUser, signUp, checkEmail, checkUsername, getUserById } from '../controllers/userController.js'
 
 const router = Router()
 
@@ -103,6 +103,8 @@ router.delete('/deleteuser/:id', async (req, res, next) => {
 */
 
 // SIGN UP //
+router.post('/signup', signUp)
+/*
 router.post('/signup', (req, res, next) => {
     const user = req.body
 
@@ -146,9 +148,12 @@ router.post('/signup', (req, res, next) => {
         );
     });
 });
+*/
 
 // GET /CHECK-EMAIL (duplikaatit)
 
+router.get('/check-email', checkEmail)
+/*
 router.get('/check-email', (req, res, next) => {
     //const pool = openDb()
     const email = (req.query.email || '').trim()
@@ -163,9 +168,11 @@ router.get('/check-email', (req, res, next) => {
             res.json({ available: !exists })
         }
     )
-})
+})*/
 
 // GET /CHECK-USERNAME (duplikaatit)
+router.get('/check-username', checkUsername)
+/*
 router.get('/check-username', (req, res, next) => {
     //const pool = openDb()
     const username = (req.query.username || '').trim()
@@ -180,9 +187,11 @@ router.get('/check-username', (req, res, next) => {
             res.json({ available: !exists })
         }
     )
-})
+})*/
 
-//Haetaan yksittäisen käyttäjän tiedot
+//Haetaan yksittäisen käyttäjän tiedot id:n perusteella
+router.get('/users/:id', getUserById)
+/*
 router.get('/users/:id', (req, res) => {
     //const pool = openDb()
     const userId = req.params.id
@@ -198,6 +207,6 @@ router.get('/users/:id', (req, res) => {
         return res.status(200).json(result.rows[0])
     })
 
-})
+})*/
 
 export default router
