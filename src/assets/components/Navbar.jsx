@@ -65,7 +65,9 @@ export default function Navbar() {
                     </HashLink>
                 </li>
                 <li>
-                    <NavLink to="/#" className={styles.link}>Jotain muuta</NavLink>
+                    <HashLink smooth to="/#sharedFavourites" className={styles.link}>
+                        Shared Favourites
+                   </HashLink>
                 </li>
                 <li>
                     <HashLink smooth to="/#popular_movies" className={styles.link}>

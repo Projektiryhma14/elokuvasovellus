@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
-import FavouritesList from '../assets/components/FavouritesList.jsx'
+import styles from './profileSettings.module.css'
 import { useAuth } from "../context/AuthContext.jsx"
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useMemo } from "react"
 
 export default function ProfileSettings() {
@@ -12,11 +12,11 @@ export default function ProfileSettings() {
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
-  const [input, setInput] = useState("")      //tekstikentälle arvo
+  const [input, setInput] = useState("")      //tekstikentälle arvo suosikkilistan luontiin
   const [favourite, setFavourite] = useState([])    //Suosikkilista taulukko
-  const [users, setUsers] = useState([])
+  const [users, setUsers] = useState([])          //Jaettujen käyttäjien lista (ei renderöidä täällä), vain tarkastusta varten
 
-  const [isShared, setIsShared] = useState(false)
+  const [isShared, setIsShared] = useState(false)   //Tarkistaa onko omaa listaa jaettu
   const [statusMessage, setStatusMessage] = useState("")
 
   const userId = useMemo(() => sessionStorage.getItem("user_id") ?? "", [])
@@ -29,10 +29,10 @@ export default function ProfileSettings() {
     const userId = sessionStorage.getItem('user_id')
     //Jos id:tä ei löydy
     if (!userId) {
-      console.log('userId puuttuu')
+      console.log('userId is missing')
       return
     }
-    //Jos id löytyy, tekee get pyynnön, hakee käyttäjän suosikit
+    //Jos id löytyy, tekee get pyynnön, hakee käyttäjän omat suosikit
     axios.get(`${API_BASE_URL}/favourites?user_id=${userId}`)
       .then((response) => {
         setFavourite(response.data)
@@ -47,10 +47,10 @@ export default function ProfileSettings() {
     if (!name) return
 
 
-    //Haetaan user_id, varmistetaan että tieto tallentuu vain tälle käyttäjälle
+    //Haetaan user_id, varmistaa että käyttäjä on kirjautunut
     const userId = sessionStorage.getItem('user_id')
     if (!userId) {
-      alert('user_id puuttuu')
+      alert('userId is missing')
       return
     }
 
@@ -74,9 +74,10 @@ export default function ProfileSettings() {
   //SUOSIKIN POISTO
   const deleteFavourite = (deleted) => {
 
+    //Haetaan user_id, varmistaa että käyttäjä on kirjautunut
     const userId = sessionStorage.getItem('user_id')
     if (!userId) {
-      alert('user_id puuttuu')
+      alert('userId is missing')
       return
     }
 
@@ -96,7 +97,7 @@ export default function ProfileSettings() {
     try {
       const confirmed = window.confirm("Are you sure you want to delete your account? All of your data will be removed.")
 
-      if(!confirmed) return
+      if (!confirmed) return
 
       const userId = sessionStorage.getItem("user_id");
       const response = await axios.delete(`${API_BASE_URL}/deleteuser/${userId}`)
@@ -122,19 +123,20 @@ export default function ProfileSettings() {
 
       await axios.post(`${API_BASE_URL}/favourites/share`, { user_id: userId }, headers)
 
+      //Päivitä UI heti
       setIsShared(true)
-      setUsers([...users, { user_id: userId, user_name: userName }])
-      setStatusMessage("Suosikkilista jaettu.")
+
+      setStatusMessage("Favourite list shared.")
 
       await refreshShare({ favIsShared: true })
     } catch (err) {
       const status = err?.response?.status
-      const msg = err?.response?.data?.error || "Jakaminen epäonnistui."
+      const msg = err?.response?.data?.error || "Sharing failed."
       setStatusMessage(msg)
 
       if (status !== 409) {
         setIsShared(false)
-        setUsers(users.filter(u => String(u.user_id) !== String(userId)))
+
       }
     }
   }
@@ -144,24 +146,25 @@ export default function ProfileSettings() {
     e.preventDefault()
 
     try {
+
       const headers = { headers: { Authorization: user.token } }
+
       await axios.post(`${API_BASE_URL}/favourites/unshare`, { user_id: userId }, headers)
 
       //Päivitä UI heti
       setIsShared(false)
-      setUsers(users.filter(u => String(u.user_id) !== String(userId)))
-      setStatusMessage("Suosikkilistan jako peruttu.")
+
+      setStatusMessage("Favourite list sharing cancelled.")
 
       await refreshShare({ favIsShared: true })
     } catch (err) {
       const status = err?.response?.status
-      const msg = err?.response?.data?.error || "Peruminen epäonnistui."
+      const msg = err?.response?.data?.error || "Cancellation failed."
       setStatusMessage(msg)
 
-      
+
       if (status !== 409) {
         setIsShared(true)
-        setUsers([...users, { user_id: userId, user_name: userName }])
       }
     }
   }
@@ -196,33 +199,38 @@ export default function ProfileSettings() {
       }
 
     } catch (err) {
-      console.error("Virhe päivityksessä", err)
+      console.error("Error during update", err)
     }
   }
 
   useEffect(() => {
     if (!userId) return
     refreshShare()
-    
+
   }, [userId, userName])
 
 
   return (
 
 
-    <div>
-      <div>
+    <div className={styles.wrapper}>
 
-        <h2>My profile settings</h2>
-        <p>Käyttäjä: {user?.username}</p>
-        <p>Email: {user?.email}</p>
+
+      <h1 className={styles.title}>Profile settings</h1>
+
+
+      <div className={styles.profile}>
+        <h2>My profile</h2>
+        <p><span className={styles.label}>Username:</span> {user?.username}</p>
+        <p><span className={styles.label}>Email:</span> {user?.email}</p>
+
+        <button className={styles.deletebutton} type="button" id="delete_account" onClick={() => deleteUser()}>Delete account</button>
       </div>
 
-      <button type="button" id="delete_account" onClick={() => deleteUser()}>Delete account</button>
+      <div className={styles.myfavourites}>
+        <h2>My Favourites List</h2>
 
-      <div id="container">
-        <h3>My Favourite List</h3>
-        <input
+        <input className={styles.input}
           placeholder='My New Favourite Movie'
           value={input}
           onChange={e => setInput(e.target.value)}
@@ -232,44 +240,38 @@ export default function ProfileSettings() {
               addFavourite()
             }
           }}
+
         />
-        <ul>
-          {
-            favourite.map(item => (
-              <FavouritesList
-                item={item}
-                key={item.favourites_id}
-                deleteFavourite={deleteFavourite} />
-            ))
-          }
-        </ul>
+        <button className={styles.savebutton} type="button" id="add_favourite" onClick={addFavourite} >Save</button>
+
+        <div className={styles.list}>
+          <ul className={styles.favList}>
+
+            {favourite.map((item) => (
+              <li key={item.favourites_id} className={styles.li}>
+                <span className={styles.moviename}>{item.movie_name}</span>
+                <button className={styles.deletefavbutton} type="button" onClick={() => deleteFavourite(item.favourites_id)} >Delete</button>
+              </li>
+            ))}
+
+          </ul>
+
+          <div className={styles.shareactions}>
+
+            <button className={styles.sharebutton}
+              type="button"
+              id="share_favourites"
+              onClick={isShared ? unshareFavourites : shareFavourites}
+            >
+              {isShared ? "Undo favorite list sharing" : "Share your favorite list"}
+            </button>
+
+            {statusMessage && <p className={styles.statusmessage} role="status">{statusMessage}</p>}
+
+          </div>
+
+        </div>
       </div>
-
-      <button
-        type="button"
-        id="share_favourites"
-        onClick={isShared ? unshareFavourites : shareFavourites}
-      >
-        {isShared ? "Peru suosikkilistan jako" : "Jaa suosikkilista"}
-      </button>
-
-      {statusMessage && <p>{statusMessage}</p>}
-
-      <div>
-        <ul>
-          <h3>Käyttäjien jakamia suosikkilistoja</h3>
-          {/*Jokaisesta käyttäjästä, joka on jakanut suosikkilistansa, tehdään linkki heidän profiiliinsa käyttäjänimellä*/}
-          {users.map((u, i) => (
-            <li key={i}>
-              <Link to={`/profile/${encodeURIComponent(u.user_name)}`}>
-                {u.user_name}
-              </Link>
-            </li>
-          ))}
-
-        </ul>
-      </div>
-
     </div>
   )
 }
