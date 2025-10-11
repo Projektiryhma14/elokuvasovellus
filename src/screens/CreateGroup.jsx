@@ -23,7 +23,7 @@ export default function CreateGroup() {
         }
 
         //axios.post(url, group)
-        axios.post(url, { groupname: group, username: userId, description: groupDescription })
+        axios.post(url, { groupName: group, userId: userId, description: groupDescription })
             .then(response => {
 
 
