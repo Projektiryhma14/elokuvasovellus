@@ -9,7 +9,7 @@ import cors from 'cors'
 
 import { use } from 'react'
 
-import { pool } from './helper/db.js'
+//import { pool } from './helper/db.js'
 
 import userRouter from './routes/userRouter.js'
 import groupRouter from './routes/groupRouter.js'
