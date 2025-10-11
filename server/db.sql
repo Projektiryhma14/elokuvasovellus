@@ -22,7 +22,9 @@ user_name VARCHAR(20) NOT NULL UNIQUE,
 email VARCHAR(50) NOT NULL UNIQUE,
 password_hash VARCHAR(255) NOT NULL,
 /*groupID INT REFERENCES groups(group_id),*/
-HasActiveGroupRequest BOOLEAN DEFAULT false
+HasActiveGroupRequest BOOLEAN DEFAULT false,
+ALTER TABLE users ADD favourites_is_shared BOOLEAN DEFAULT false,
+ALTER TABLE users ADD favourites_shared_at TIMESTAMP
 ); 
 
 create table reviews ( 
@@ -95,6 +97,11 @@ ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
 /*Muuttaa email ja user_name kentät UNIQUE*/
 ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
 ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (user_name);
+
+/*Users tauluun lisättävät suosikkilistan jakamiseen tarvittavat kentät*/
+ALTER TABLE users ADD favourites_is_shared BOOLEAN DEFAULT false
+ALTER TABLE users ADD favourites_shared_at TIMESTAMP
+
 
 
 

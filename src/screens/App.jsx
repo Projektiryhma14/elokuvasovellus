@@ -9,10 +9,12 @@ import Header from '../assets/components/Header.jsx';
 
 import TmdbSearch from '../assets/components/TmdbSearch.jsx'
 import FinnkinoSearch from '../assets/components/FinnkinoSearch.jsx';
+import SharedFavourites from '../assets/components/SharedFavourites.jsx';
 import MyProfile from "../screens/MyProfile.jsx"
 import ProfileSettings from "../screens/ProfileSettings.jsx"
 import Group from "../screens/Group.jsx"
 import CreateGroup from "../screens/CreateGroup.jsx"
+
 
 import SignIn from '../screens/SignIn.jsx'
 import SignUp from '../screens/SignUp.jsx'
@@ -46,6 +48,7 @@ function App() {
                             <Header />
                             <TmdbSearch />
                             <FinnkinoSearch />
+                            <SharedFavourites />
                         </>
                     }
                 />
@@ -54,15 +57,7 @@ function App() {
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
                 <Route path="/reviews" element={<Reviews />} />
-
-                <Route
-                    path="/profile/:username"
-                    element={
-                        <ProtectedRoute returnTo="/profile/:username">
-                            <MyProfile />
-                        </ProtectedRoute>
-                    }
-                    />
+                <Route path="/profile/:username" element={<MyProfile />} />
 
                 {/* Suojatut linkit */}
 

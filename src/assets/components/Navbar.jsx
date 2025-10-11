@@ -48,8 +48,8 @@ export default function Navbar() {
                     </HashLink>
                 </li>
                 <li>
-                    <HashLink smooth to="/#extra" className={styles.link}>
-                        Jotain muuta
+                    <HashLink smooth to="/#sharedFavourites" className={styles.link}>
+                        Shared Favourites
                     </HashLink>
                 </li>
                 <li>
