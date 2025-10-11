@@ -95,14 +95,14 @@ const deleteUser = async (req, res, next) => {
         //commitTransaction(client)
     }
     catch (err) {
-        console.log("error haara")
+        //console.log("error haara")
         await client.query('ROLLBACK')
         //rollbackTransaction(client)
-        console.error('Transaktio epäonnistui', err)
+        console.error('Transaction failed', err)
         next(err)
     }
     finally {
-        console.log("finally haara")
+        //console.log("finally haara")
         client.release()
         //releaseClient(client)
     }
@@ -183,15 +183,15 @@ const getUserById = async (req, res, next) => {
     try {
         const userId = req.params.id
         if (!userId) {
-            console.log("requestissa ei parametria id")
+            console.log("Request missing required id parameter")
             return res.status(400).json({ error: `Request missing required id parameter` })
         }
 
         const result = await selectById(userId)
 
         if (result.length === 0) {
-            console.log("Käyttäjää ei löytynyt annetulla id:llä")
-            return res.status(404).json({ error: `Käyttäjää ei löytynyt id:llä ${userId}` })
+            console.log("User not found with given id")
+            return res.status(404).json({ error: `User not found with id: ${userId}` })
         }
 
         return res.status(200).json(result.rows[0])

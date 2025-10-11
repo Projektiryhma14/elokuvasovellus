@@ -25,7 +25,7 @@ const getReviewsForOneMovie = async (req, res, next) => {
     try {
         const movieId = req.params.id
         if (!movieId) {
-            console.log("requestissa ei parametria id")
+            console.log("Request missing required id parameter")
             return res.status(400).json({ error: `Request missing required id parameter` })
         }
         const result = await selectReviewsByMovieId(movieId)
@@ -87,7 +87,7 @@ const postReview = async (req, res) => {
         })
     } catch (err) {
         console.error("Error creating review:", err)
-        return res.status(500).json({ error: "Sisäinen server error" })
+        return res.status(500).json({ error: "Internal server error" })
     }
 }
 
