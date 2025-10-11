@@ -6,6 +6,7 @@ import InfoBanner from '../assets/components/InfoBanner.jsx'
 
 import Navbar from '../assets/components/Navbar.jsx';
 import Header from '../assets/components/Header.jsx';
+import PopularMovies from '../assets/components/PopularMovies.jsx'
 
 import TmdbSearch from '../assets/components/TmdbSearch.jsx'
 import FinnkinoSearch from '../assets/components/FinnkinoSearch.jsx';
@@ -44,8 +45,11 @@ function App() {
                     element={
                         <>
                             <Header />
-                            <TmdbSearch />
+                            <PopularMovies />
                             <FinnkinoSearch />
+                            <TmdbSearch />
+
+
                         </>
                     }
                 />
@@ -100,7 +104,7 @@ function App() {
                     }
                 />
 
-                                <Route
+                <Route
                     path="/group/:id"
                     element={
                         <ProtectedRoute returnTo="/group/:id">

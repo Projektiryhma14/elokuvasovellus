@@ -129,3 +129,18 @@
 
     background: #236bc7;
 }  
+
+
+
+/*============= MEDIA =================0*/
+
+@media (max-width: 768px) {
+    .finnkino_showtimes {
+        
+    }
+}
+
+
+@media (max-width: 480px) {
+
+}

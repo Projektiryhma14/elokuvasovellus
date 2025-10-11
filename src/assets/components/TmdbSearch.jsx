@@ -14,8 +14,8 @@ export default function TmdbSearch() {
     const navigate = useNavigate()
     const [msg, setMsg] = useState(null)                    // Onnistuminen / virhe
 
-    const [query, setQuery] = useState("")                  // ei käytössä
-    const [output, setOutput] = useState("")                // Näytetään <pre>-tagissä. APIN raaka-data (debug)
+    //const [query, setQuery] = useState("")                  // ei käytössä
+    //const [output, setOutput] = useState("")                // Näytetään <pre>-tagissä. APIN raaka-data (debug)
 
     // Filtterit (dropdown)
     const [genre, setGenre] = useState("")                  // TMDb genre-ID (esim. "28" = Action). Tyhjä = ei genrefiltteriä
@@ -24,146 +24,23 @@ export default function TmdbSearch() {
 
     // -- Data listaukseen --
     const [movies, setMovies] = useState([])                // tänne voisi tallentaa hakutulokset (nyt ei käytössä listauksessa)
-    const [popularMovies, setPopularMovies] = useState([])  // käytetään "Popular now" -listaan
-    const [plot, setPlot] = useState("")                    // valitun elokuvan juoni (oikean laatikon sisältö tulevaisuudessa)
+    const [selectedMovie, setSelectedMovie] = useState({})
 
     // -- Sivutus “näytä 10 kerrallaan” --
     const [page, setPage] = useState(1);                    // nykyinen sivu (1-pohjainen)
     const itemsPerPage = 10;                                // montako itemiä näytetään per sivu
 
-
     // Lasketaan mitä indeksejä näytetään nykyisellä sivulla
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
+    //const currentMovies = source.slice(startIndex, endIndex)
+    const currentMovies = movies.slice(startIndex, endIndex);
+    //const [movieDetails, setMovieDetails] = useState([]);
 
-    const [movieDetails, setMovieDetails] = useState([]);
-    const [selectedMovie, setSelectedMovie] = useState("")
-
-    // moodi kertoo näytetäänkö haku vai trending
-    const [issearchActive, setIsSearchActive] = useState(false)
-
-    // käytetään moodin mukaista lähdettä
-    const source = issearchActive ? movies : popularMovies
 
     // Leikataan näkyviin tuleva pätkä popularMovies-taulukosta
-    const currentMovies = source.slice(startIndex, endIndex)
-
-    /*UUSI HAKUFUNKTIO*/
-    const searchMovie = async () => {
-        try {
-            // kootaan vain aktiiviset parametrit
-            const params = {
-                api_key: import.meta.env.VITE_API_KEY,
-                include_adult: false,
-                language: "en-US",
-                page: 1,
-            };
-            if (language) params.with_original_language = language;
-            if (genre) params.with_genres = genre;
-            if (year) params.primary_release_year = year;
-
-            const { data } = await axios.get("https://api.themoviedb.org/3/discover/movie", { params });
-
-            console.log("Search result count", data.results?.length);
-            setMovies(data.results || []);
-            setPage(1);
-            setIsSearchActive(true)                 // asetetaan hakutila päälle
-
-        } catch (err) {
-            console.log("Search failed:", err)
-        }
-    };
-
-
-    // MOVIE SEARCH OSIO !!!!!
-    // Suoritetaan kun käyttäjä painaa "Search" (form on submit)
-
-    /* VANHA HAKUFUNKTIO
-    const searchMovie = async () => {
-        try {
-            const res = await axios.get("https://api.themoviedb.org/3/discover/movie", {
-                params: {
-                    api_key: import.meta.env.VITE_API_KEY,        // v3 API key
-                    include_adult: false,
-                    language: "en-US",      // UI-teksti suomeksi, jos on saatavilla
-                    page: 1,
-                    with_original_language: language || undefined,
-                    with_genres: genre || undefined,
-                    primary_release_year: year || undefined,
-                },
-
-            });
-            //setMovies(res.data.results || []);                      // Tallennetaan dropdown valinnat listaan.
-            //setPopularMovies(res.data.results || []);
-
-            // Kirjoitetaan hakutulokset VAIN movies-tilaan (popularMovies pidetään erikseen muistissa)
-            setMovies(res.data.results || [])
-            setPage(1)                                              // Sivustus alkaa alusta hakutilassa
-
-            console.log(res.data.results);                          // debug (näkyy konsolissa)
-            setOutput(JSON.stringify(res.data.results, null, 2));   // raakadata <pre>-näyttöön (debugia varten)
-        } catch (err) {
-            console.error(err);
-        }
-    }
-    */
-
-    // RESET / SHOW TRENDING
-    const resetToTrending = async () => {
-        setGenre("");
-        setYear("");
-        setLanguage("");
-        setMovies([]);
-        setPage(1);
-        setIsSearchActive(false)        // Palaaminen trendingiin
-
-        try {
-            // Haetaan uudelleen trending-lista, jotta on ajantasainen
-            const { data } = await axios.get("https://api.themoviedb.org/3/trending/movie/day", {
-                params: {
-                    api_key: import.meta.env.VITE_API_KEY,
-                    language: "en-US",
-                },
-            });
-            setPopularMovies(data.results || []);
-            console.log("Trending refreshed:", data.results?.length);
-        } catch (err) {
-            console.error("Trending refresh failed:", err);
-        }
-    }
-
-
-    // Käytetään useEfectiä, eli haetaan vain kerran, kun komponentti ladataan
-    // Ladataan popular movies listaan
-    useEffect(() => {
-        const noudaPopular = async () => {
-            try {
-                const { data } = await axios.get(
-                    "https://api.themoviedb.org/3/trending/movie/day",
-                    {
-
-                        params: {
-                            api_key: import.meta.env.VITE_API_KEY,
-                            language: "en-US",
-                        },
-                    }
-                );
-                setPopularMovies(data.results || []);           // tallennetaan popular-lista stateen, palauttaa max 20 itemiä
-            } catch (err) {
-                console.error("Popular-elokuvien haku epäonnistui:", err);
-            }
-        };
-
-        noudaPopular();     // kutsutaan heti
-        //console.log("tmdbsearchin useeffect")
-
-
-        if (sessionStorage.getItem("selected_movie")) {
-            console.log("elokuva haettu sessionstoragesta")
-            setSelectedMovie(JSON.parse(sessionStorage.getItem("selected_movie")))
-        }
-    }, []);                 // Ei uudelleen hae state-muutoksissa
+    //const currentMovies = source.slice(startIndex, endIndex)
 
     //Funktio jolla muutetaan TMDB- vote_average tähdiksi
     function NaytaTahdet({ vote_average, maxStars = 5 }) {
@@ -185,6 +62,40 @@ export default function TmdbSearch() {
             </div>
         )
     }
+
+    /*UUSI HAKUFUNKTIO*/
+    const searchMovie = async () => {
+        try {
+            // kootaan vain aktiiviset parametrit
+            const params = {
+                api_key: import.meta.env.VITE_API_KEY,
+                include_adult: false,
+                language: "en-US",
+                page: 1,
+            };
+            if (language) params.with_original_language = language;
+            if (genre) params.with_genres = genre;
+            if (year) params.primary_release_year = year;
+
+            const { data } = await axios.get("https://api.themoviedb.org/3/discover/movie", { params });
+            const results = data?.results ?? [];
+            console.log("Search result count", data.results?.length);
+            setMovies(results);
+            setPage(1);
+
+            if (results.length > 0) {
+                setSelectedMovie(results[0])
+                setMsg(null)
+            } else {
+                setSelectedMovie({})
+            }
+
+            //setIsSearchActive(true)                 // asetetaan hakutila päälle
+
+        } catch (err) {
+            console.log("Search failed:", err)
+        }
+    };
 
     const shareMovie = async (movie) => {
         console.log(movie)
@@ -258,14 +169,16 @@ export default function TmdbSearch() {
             {/* MOVIE SEARCH -OSIO */}
             <div id="movie_search" className={styles.wrapper}>
                 <section className={styles.container_movieSearch}>
-                    <span className={styles.headline}><h2>Movie Search</h2></span>
+                    <h2 className={styles.headline}>Movie Search</h2>
 
 
+                    {/* GRID: Filters | Results | Detail */}
                     <div className={styles.tmdb_container}>
-                        {/* VASEN: Suodattimet */}
+                        {/* Filtterit */}
                         <aside className={styles.search_box}>
                             <form className={styles.search_form} onSubmit={e => { e.preventDefault(); searchMovie(); }}>
                                 <div className={styles.select_div}>
+                                    {/*genre*/}
                                     <select value={genre} onChange={(e) => { setGenre(e.target.value); console.log(e.target.value) }}>
                                         <option className={styles.search_criteria} value="">Choose genre</option>
                                         <option value="28">Action</option>
@@ -290,6 +203,7 @@ export default function TmdbSearch() {
                                     </select>
                                 </div>
 
+                                {/*year*/}
                                 <div className={styles.select_div}>
                                     <select value={year} onChange={(e) => { setYear(e.target.value); console.log(e.target.value) }}>
                                         <option className={styles.search_criteria} value="">Choose year</option>
@@ -300,6 +214,7 @@ export default function TmdbSearch() {
                                     </select>
                                 </div>
 
+                                {/*langauge*/}
                                 <div className={styles.select_div}>
                                     <select value={language} onChange={(e) => { setLanguage(e.target.value); console.log(e.target.value) }}>
                                         <option className={styles.search_criteria} value="">Choose language</option>
@@ -316,80 +231,74 @@ export default function TmdbSearch() {
                                 <br />
                                 <button type="submit" className={styles.search_button}>Search</button>
 
-                                {/* Reset / Show trending*/}
-                                <button
-                                    type='button'
-                                    className={styles.reset_button}
-                                    onClick={resetToTrending}
-                                >
-                                    Show Trending
-                                </button>
+
 
                             </form>
                         </aside>
 
+
                         {/* KESKI: Lista + sivutus */}
-                        <section className={styles.popular_box} aria-labelledby="results-heading">
+
+                        <section className={styles.results}>
                             <h3 className={styles.results_heading}>
-                                {movies.length > 0 ? "Search Results" : "Popular Movies Today"}
+                                {movies.length > 0 ? "Search Results" : "No filters yet - try filters and Search"}
                             </h3>
 
-                            <ul>
+                            <ul className={styles.resultsList}>
                                 {currentMovies.map((m) => {
                                     const year = m.release_date?.slice(0, 4) || "—";
+                                    const active = selectedMovie?.id === m.id;
                                     return (
-                                        <li
-                                            key={m.id}
-                                            onClick={() => {
-                                                setSelectedMovie(m);
-                                                //console.log(selectedMovie)
-                                                //console.log(JSON.parse(sessionStorage.getItem("selected_movie")))
-                                                sessionStorage.setItem("selected_movie", JSON.stringify(m))
-                                                setMsg(null);   // tyhjennetään mahdollinen varoitusviesti
-                                            }}
-                                        >
-                                            {m.title} ({year})
+                                        <li key={m.id} className={styles.resultItem}>
+                                            <button
+                                                type="button"
+                                                className={`${styles.resultButton} ${active ? styles.resultButtonActive : ""}`}
+                                                onClick={() => {
+                                                    setSelectedMovie(m);
+                                                    sessionStorage.setItem("selected_movie", JSON.stringify(m))
+                                                    setMsg(null);   // tyhjennetään mahdollinen varoitusviesti
+                                                }}
+                                            >
+                                                {m.title} ({year})
+                                            </button>
                                         </li>
                                     );
                                 })}
-
-                                <div className={styles.next_prev}>
-                                    <button
-                                        type="button"
-                                        id="prev_button"
-                                        className={styles.prev_button}
-                                        onClick={() => setPage(page - 1)}
-                                        disabled={page === 1}
-                                    >
-                                        Prev
-                                    </button>
-
-                                    <button
-                                        type="button"
-                                        id="next_button"
-                                        className={styles.next_button}
-                                        onClick={() => setPage(page + 1)}
-                                        // disabled={endIndex >= popularMovies.length}
-                                        // aina käytössä olevan lähteen pituuteen sidottu
-                                        disabled={endIndex >= source.length}
-
-                                    >
-                                        Next
-                                    </button>
-                                </div>
                             </ul>
 
+                            <nav className={styles.pagination}>
+                                <button
+                                    type="button"
+                                    className={styles.prev_button}
+                                    onClick={() => setPage(page - 1)}
+                                    disabled={page === 1}
+                                >
+                                    Prev
+                                </button>
 
+                                <button
+                                    type="button"
+                                    className={styles.next_button}
+                                    onClick={() => setPage(page + 1)}
+                                    disabled={endIndex >= movies.length}
+                                >
+                                    Next
+                                </button>
+                            </nav>
                         </section>
 
-                        {/* OIKEA: kääritään yhteen */}
-                        <div className={styles.rightColumn}>
-                            {/* Valittu elokuva */}
-                            <article className={styles.movieResult_box} aria-labelledby="selected-movie-heading">
-                                <h3 className={styles.selected_movie_heading}>Selected movie</h3>
-                                <div>{selectedMovie.title}</div>
 
-                                <div>
+
+                        {/* Detail -> Valittu elokuva */}
+                        <section className={styles.detail}>
+                            <article className={styles.detailArticle}>
+                                <header className={styles.detailHeader}>
+                                    <h3 id='selected-title' className={styles.selected_movie_heading}>
+                                        {selectedMovie.title || "--"}
+                                    </h3>
+                                </header>
+
+                                <figure className={styles.posterWrap}>
                                     <img
                                         className={styles.poster}
                                         src={
@@ -397,60 +306,164 @@ export default function TmdbSearch() {
                                                 ? `https://image.tmdb.org/t/p/w342${selectedMovie.poster_path}`
                                                 : placeholder
                                         }
-                                        alt={selectedMovie.title}
+                                        alt={selectedMovie.title || "Poster not available"}
+                                        loading='lazy'
                                     />
-                                </div>
 
-                                <div className={styles.vote_stars}>
-                                    <NaytaTahdet vote_average={selectedMovie.vote_average} />
-                                </div>
+
+                                    <figcaption className={styles.vote_stars}>
+                                        <NaytaTahdet vote_average={selectedMovie?.vote_average ?? 0} />
+                                    </figcaption>
+                                </figure>
+
+
+                                {/* Kuvaus */}
+                                <section className={styles.overview}>
+                                    <h4 className={styles.overview_heading}>Overview</h4>
+                                    <p className={styles.overview_text}>
+                                        {selectedMovie.overview || "No overview available"}
+                                    </p>
+
+
+                                    <div id="leave_review" className={styles.actions}>
+                                        <button
+                                            onClick={() => {
+                                                if (!selectedMovie || !selectedMovie.id) {
+                                                    setMsg("Valitse ensin elokuva ennen kuin voit antaa arvostelun.");
+                                                    return
+                                                }
+
+                                                // Tallennetaan tiedot sessioon
+                                                const leffaTiedot = {
+                                                    movie_id: selectedMovie.id,
+                                                    movie_title: selectedMovie.title,
+                                                    poster_path: selectedMovie.poster_path ?? null,
+                                                    vote_average: selectedMovie.vote_average ?? null,
+                                                }
+
+                                                // JSON.stringify -> muuttaa objektin JSON-muotoiseksi merkkijonoksi
+                                                // Tämän sessionStorage osaa tallentaa
+                                                sessionStorage.setItem("pending_review", JSON.stringify(leffaTiedot))
+
+                                                // Menee reviewformiin; jos ei ole kirjautunut, gate ohjaa SignIniin
+                                                navigate("/reviewform")
+                                            }}
+                                        >
+                                            Arvostele leffa
+                                        </button>
+                                        {msg && (
+                                            <p style={{ color: "red", marginTop: "0.5rem", fontStyle: "bold" }}>
+                                                {msg}
+                                            </p>
+                                        )}
+
+                                        <button onClick={() => { shareMovie(selectedMovie) }}>Share to group page</button>
+                                    </div>
+
+
+                                </section>
                             </article>
-
-                            {/* Kuvaus */}
-                            <section className={styles.overview_box} aria-labelledby="overview-heading">
-                                <h3 className={styles.overview_heading}>Overview</h3>
-                                {selectedMovie.overview}
-
-                                <div id="leave_review">
-                                    {/*<button onClick={() => navigate("/reviewform", { state: { selectedMovie } })}>Arvostele leffa</button>*/}
-                                    <button onClick={() => {
-                                        if (!selectedMovie || !selectedMovie.id) {
-                                            setMsg("Valitse ensin elokuva ennen kuin voit antaa arvostelun.");
-                                            return
-                                        }
-
-                                        // Tallennetaan tiedot sessioon
-                                        const leffaTiedot = {
-                                            movie_id: selectedMovie.id,
-                                            movie_title: selectedMovie.title,
-                                            poster_path: selectedMovie.poster_path ?? null,
-                                            vote_average: selectedMovie.vote_average ?? null,
-                                        }
-
-                                        // JSON.stringify -> muuttaa objektin JSON-muotoiseksi merkkijonoksi
-                                        // Tämän sessionStorage osaa tallentaa
-                                        sessionStorage.setItem("pending_review", JSON.stringify(leffaTiedot))
-
-                                        // Menee reviewformiin; jos ei ole kirjautunut, gate ohjaa SignIniin
-                                        navigate("/reviewform")
-                                    }}
-                                    >Arvostele leffa</button>
-                                    {msg && (
-                                        <p style={{ color: "red", marginTop: "0.5rem", fontStyle: "bold" }}>
-                                            {msg}
-                                        </p>
-                                    )}
-
-                                    <button onClick={() => {shareMovie(selectedMovie)}}>Share to group page</button>
-                                </div>
-
-
-                            </section>
-                        </div>
+                        </section>
                     </div>
-                </section >
-            </div >
+                </section>
+            </div>
+
+
+
         </>
     )
 }
 
+
+
+// MOVIE SEARCH OSIO !!!!!
+// Suoritetaan kun käyttäjä painaa "Search" (form on submit)
+
+/* VANHA HAKUFUNKTIO
+const searchMovie = async () => {
+    try {
+        const res = await axios.get("https://api.themoviedb.org/3/discover/movie", {
+                    params: {
+                    api_key: import.meta.env.VITE_API_KEY,        // v3 API key
+                include_adult: false,
+                language: "en-US",      // UI-teksti suomeksi, jos on saatavilla
+                page: 1,
+                with_original_language: language || undefined,
+                with_genres: genre || undefined,
+                primary_release_year: year || undefined,
+            },
+
+        });
+                //setMovies(res.data.results || []);                      // Tallennetaan dropdown valinnat listaan.
+                //setPopularMovies(res.data.results || []);
+
+                // Kirjoitetaan hakutulokset VAIN movies-tilaan (popularMovies pidetään erikseen muistissa)
+                setMovies(res.data.results || [])
+                setPage(1)                                              // Sivustus alkaa alusta hakutilassa
+
+                console.log(res.data.results);                          // debug (näkyy konsolissa)
+                setOutput(JSON.stringify(res.data.results, null, 2));   // raakadata <pre>-näyttöön (debugia varten)
+    } catch (err) {
+                        console.error(err);
+    }
+}
+                    */
+
+/*
+// RESET / SHOW TRENDING
+const resetToTrending = async () => {
+                        setGenre("");
+                    setYear("");
+                    setLanguage("");
+                    setMovies([]);
+                    setPage(1);
+                    setIsSearchActive(false)        // Palaaminen trendingiin
+
+                    try {
+        // Haetaan uudelleen trending-lista, jotta on ajantasainen
+        const {data} = await axios.get("https://api.themoviedb.org/3/trending/movie/day", {
+                        params: {
+                        api_key: import.meta.env.VITE_API_KEY,
+                    language: "en-US",
+            },
+        });
+                    setPopularMovies(data.results || []);
+                    console.log("Trending refreshed:", data.results?.length);
+    } catch (err) {
+                        console.error("Trending refresh failed:", err);
+    }
+}
+                    */
+
+// Käytetään useEfectiä, eli haetaan vain kerran, kun komponentti ladataan
+// Ladataan popular movies listaan
+{/*
+    useEffect(() => {
+        const noudaPopular = async () => {
+            try {
+                const { data } = await axios.get(
+                    "https://api.themoviedb.org/3/trending/movie/day",
+                    {
+
+                        params: {
+                            api_key: import.meta.env.VITE_API_KEY,
+                            language: "en-US",
+                        },
+                    }
+                );
+                setPopularMovies(data.results || []);           // tallennetaan popular-lista stateen, palauttaa max 20 itemiä
+            } catch (err) {
+                console.error("Popular-elokuvien haku epäonnistui:", err);
+            }
+        };
+
+        noudaPopular();     // kutsutaan heti
+
+
+        if (sessionStorage.getItem("selected_movie")) {
+            console.log("elokuva haettu sessionstoragesta")
+            setSelectedMovie(JSON.parse(sessionStorage.getItem("selected_movie")))
+        }
+    }, []);                 // Ei uudelleen hae state-muutoksissa
+
+    */}
