@@ -180,7 +180,8 @@ export default function GroupProfile() {
     const confirmed = window.confirm("Do you really want to delete the group?")
     if(!confirmed) return
     
-    axios.put(`${url}/group/${id}`, {
+    // Tämä vaihdettu put -> delete
+    axios.delete(`${url}/group/${id}`, {
       
       
     })
@@ -229,7 +230,7 @@ export default function GroupProfile() {
               {
                 members.map(member => ( // Listataan ryhmän jäsenet
                   <li key={member.member_name}>        
-                    <Link to={`/profile/${member.member_id}`} >{member.member_name}</Link>
+                    <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
                     {member.member_name === group.owner_name && <span> (Owner)</span>}
                     {String(member.member_id) === userid && <span> (You)</span>}  
                     {member.member_name !== group.owner_name && ( // Lisätään käyttäjän poisto-nappi JOS se ei ole ryhmän omistaja
@@ -274,7 +275,7 @@ export default function GroupProfile() {
             {
               members.map(member => ( // Listataan ryhmän jäsenet
                 <li key={member.member_name}>
-                  <Link to={`/profile/${member.member_id}`} >{member.member_name}</Link>
+                  <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
                   {member.member_name === group.owner_name && <span> (Owner)</span>}
                 </li>
               ))
@@ -298,7 +299,7 @@ export default function GroupProfile() {
             {
               members.map(member => ( // Listataan ryhmän jäsenet
                 <li key={member.member_name}>
-                  <Link to={`/profile/${member.member_id}`} >{member.member_name}</Link>
+                  <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
                   {member.member_name === group.owner_name && <span> (Owner)</span>}
                   {String(member.member_id) === userid && <span> (You)</span>}  
                 </li>
@@ -326,7 +327,7 @@ export default function GroupProfile() {
             {
               members.map(member => ( // Listataan ryhmän jäsenet
                 <li key={member.member_name}>
-                  <Link to={`/profile/${member.member_id}`} >{member.member_name}</Link>
+                  <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
                   {member.member_name === group.owner_name && <span> (Owner)</span>}
                 </li>
               ))

@@ -1,0 +1,27 @@
+div.movie_recs {
+    border-top: 1px solid black;
+    padding: 1em;
+    margin: 1em;
+    line-height: 200%;
+}
+
+div.movie_recs_empty {
+    padding: 1em;
+    margin: 1em;
+    line-height: 200%;
+}
+
+.shared_movies_header {
+    text-align: center;
+}
+
+.movie_rec_line {
+    text-align: center;
+    list-style: inside;
+}
+
+.movies_delete_button {
+    margin-left: 1em;
+    padding-inline: 0.5em;
+    line-height: 150%;
+}

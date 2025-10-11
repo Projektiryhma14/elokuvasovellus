@@ -22,7 +22,9 @@ user_name VARCHAR(20) NOT NULL UNIQUE,
 email VARCHAR(50) NOT NULL UNIQUE,
 password_hash VARCHAR(255) NOT NULL,
 /*groupID INT REFERENCES groups(group_id),*/
-HasActiveGroupRequest BOOLEAN DEFAULT false
+HasActiveGroupRequest BOOLEAN DEFAULT false,
+favourites_is_shared BOOLEAN DEFAULT false,
+favourites_shared_at TIMESTAMP
 ); 
 
 create table reviews ( 
@@ -96,7 +98,9 @@ ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
 ALTER TABLE users ADD CONSTRAINT unique_email UNIQUE (email);
 ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (user_name);
 
-
+/* Users tauluun lisättävät suosikkilistan jakamiseen tarvittavat kentät */
+ALTER TABLE users ADD favourites_is_shared BOOLEAN DEFAULT false;
+ALTER TABLE users ADD favourites_shared_at TIMESTAMP;
 
 
 /*ALTER TABLE groups DROP CONSTRAINT group_owner_id_fkey, ADD CONSTRAINT group_owner_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
@@ -112,10 +116,3 @@ ALTER TABLE sharedMovies DROP CONSTRAINT sharedMovies_sharer_id_fkey, ADD CONSTR
 ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_group_id_fkey, ADD CONSTRAINT sharedShowtimes_group_id_fkey FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE;
 
 ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_sharer_id_fkey, ADD CONSTRAINT sharedShowtimes_sharer_id_fkey FOREIGN KEY (sharer_id) REFERENCES users(user_id) ON DELETE CASCADE;*/
-
-
-
-
-
-
-
