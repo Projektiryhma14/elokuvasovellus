@@ -180,7 +180,8 @@ export default function GroupProfile() {
     const confirmed = window.confirm("Do you really want to delete the group?")
     if(!confirmed) return
     
-    axios.put(`${url}/group/${id}`, {
+    // Tämä vaihdettu put -> delete
+    axios.delete(`${url}/group/${id}`, {
       
       
     })
