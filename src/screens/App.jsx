@@ -49,8 +49,9 @@ function App() {
                             <Header />
                             <PopularMovies />
                             <FinnkinoSearch />
-                            <SharedFavourites />
                             <TmdbSearch />
+                            <SharedFavourites />
+                            
 
 
                         </>

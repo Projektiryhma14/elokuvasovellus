@@ -111,7 +111,7 @@ export default function ReviewForm() {
                 navigate("/signin", { replace: true, state: { flash: "Session expired. Please sign in again." } });
                 return;
             }
-            setMsg({ type: "error", text: "Tallennus epäonnistui." });
+            setMsg({ type: "error", text: "Adding review failed, you have already reviewed this movie" });
         } finally {
             setSubmitting(false);
         }
