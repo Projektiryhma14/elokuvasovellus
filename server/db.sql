@@ -90,6 +90,11 @@ ALTER TABLE IF EXISTS sharedMovies DROP CONSTRAINT IF EXISTS unique_movie;
 ALTER TABLE IF EXISTS sharedMovies ADD CONSTRAINT unique_movie UNIQUE (movie_name, group_id);
 /* jos ylläolevan rajoituksen lisääminen ei onnistu, tietokannassa on duplikaatteja rivejä, jotka pitää poistaa */
 
+/* ESTETÄÄN DUPLIKAATTIEN ARVOSTELUIDEN LISÄÄMINEN TIETOKANTAAN: */
+/* jos unique_review rajoitus on jo olemassa, poista se */
+ALTER TABLE IF EXISTS reviews DROP CONSTRAINT IF EXISTS unique_review;
+/* lisätään reviews tauluun rajoitus, joka estää duplikaatit arvostelut (samalle elokuvalle arvostelu samalta käyttäjältä) */
+ALTER TABLE IF EXISTS reviews ADD CONSTRAINT unique_review UNIQUE (user_id, movie_id);
 
 /* jos et halua menettää tietokannassa olemassaolevaa dataa, aja koko scriptin sijaan vain allaolevat rivit pgAdminissa */
 ALTER TABLE reviews ADD COLUMN IF NOT EXISTS movie_id INT NOT NULL;
