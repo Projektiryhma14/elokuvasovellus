@@ -13,8 +13,7 @@ export default function CreateGroup() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const url = "http://localhost:3001/group"
-
+        const url = import.meta.env.VITE_API_BASE_URL + "/group"
 
         if (!group) {
             setStatusMessage('Ryhmän nimeä ei ole annettu')
