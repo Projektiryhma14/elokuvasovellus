@@ -163,6 +163,12 @@ export default function TmdbSearch() {
         }
     }
 
+    useEffect(() => {
+        if (sessionStorage.getItem("selected_movie")) {
+            setSelectedMovie(JSON.parse(sessionStorage.getItem("selected_movie")))
+        }
+    }, [])
+
     return (
         <>
 
