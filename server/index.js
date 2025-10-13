@@ -1,7 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 // import pkg from 'pg'
-// import dotenv from 'dotenv'
+import dotenv from 'dotenv'
 //import { compare, hash } from 'bcrypt'
 //import jwt from 'jsonwebtoken'
 
@@ -20,9 +20,9 @@ import moviesRouter from './routes/sharedMoviesRouter.js'
 
 //const { sign } = jwt
 
-// dotenv.config()
+dotenv.config()
 
-const port = 3001
+const port = process.env.PORT
 //const { Pool } = pkg
 
 const app = express()
@@ -1033,5 +1033,5 @@ app.use((err, req, res, next) => {
 
 
 app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`)
+    console.log(`Server is running on port ${port}`)
 })
