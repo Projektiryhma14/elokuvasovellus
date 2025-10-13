@@ -13,6 +13,7 @@
 
 /* Vain tämän komponentin form (EI globaali) */
 .review_wrap_container form {
+  /*
   border: none;
   margin-top: 16px;
   width: 100%;
@@ -20,9 +21,28 @@
   height: auto;
   padding: 25px;
   border-radius: 5px;
-  background-color: aqua;
+  background-color: rgba(216, 216, 216, 0.37);
+  */
+  list-style: none;
+  margin: 0 auto 24px auto;   /* keskitys ja väli ennen nappeja */
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  /*max-width: 400px;*/
+  /*box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;*/
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  padding: 30px;
   
   
+}
+
+.headline {
+  margin-bottom: 40px;
 }
 
 /* Labelien perus-tyyli */
@@ -34,12 +54,16 @@
 
 /* Readonly kenttä (Bootstrapin form-controlin päällä) */
 .form_readonly {
-  background-color: #f8f9fa; /* kevyt harmaa tausta */
+  background-color: #f8f9fa;
 }
 
 /* Selectin lisäsäätö (Bootstrapin form-selectin päällä) */
 .review_form_select {
   width: 100%;
+}
+
+.btn-primary {
+  font-weight: 600;
 }
 
 /* Tekstialueen lisäsäätö (Bootstrapin form-controlin päällä) */

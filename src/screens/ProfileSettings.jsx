@@ -37,6 +37,8 @@ export default function ProfileSettings() {
       .then((response) => {
         setFavourite(response.data)
       })
+    //Muistaa aloittaa sivun näyttämisen heti yläreunasta
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, [])
 
   //SUOSIKIN LISÄÄMINEN
@@ -220,7 +222,7 @@ export default function ProfileSettings() {
 
 
       <div className={styles.profile}>
-        <h2>My profile</h2>
+        <h3>My profile</h3>
         <p><span className={styles.label}>Username:</span> {user?.username}</p>
         <p><span className={styles.label}>Email:</span> {user?.email}</p>
 
@@ -228,7 +230,7 @@ export default function ProfileSettings() {
       </div>
 
       <div className={styles.myfavourites}>
-        <h2>My Favourites List</h2>
+        <h3>My Favourites List</h3>
 
         <input className={styles.input}
           placeholder='My New Favourite Movie'

@@ -125,7 +125,7 @@ export default function ReviewForm() {
 
     return (
         <div className={`container mt-5 ${styles.review_wrap_container}`}>
-            <h2 className='mb-4'>Add a review:</h2>
+            <h2 className={styles.headline}>Add a review:</h2>
 
             <form onSubmit={handleSubmit}>
                 {/* Movie title (read-only) */}

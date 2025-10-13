@@ -135,12 +135,12 @@
 /*============= MEDIA =================0*/
 
 @media (max-width: 768px) {
-    .finnkino_showtimes {
+    .container_finnkino {
         
+        padding: 10px;
     }
-}
 
-
-@media (max-width: 480px) {
-
+    .finnkino_showtimes {
+        padding: 10px;
+    }
 }

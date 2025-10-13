@@ -327,9 +327,10 @@ export default function TmdbSearch() {
 
                                     <div id="leave_review" className={styles.actions}>
                                         <button
+                                            className={styles.rateButton}
                                             onClick={() => {
                                                 if (!selectedMovie || !selectedMovie.id) {
-                                                    setMsg("Valitse ensin elokuva ennen kuin voit antaa arvostelun.");
+                                                    setMsg("Choose a movie first before you can submit a review.");
                                                     return
                                                 }
 
@@ -349,15 +350,22 @@ export default function TmdbSearch() {
                                                 navigate("/reviewform")
                                             }}
                                         >
-                                            Arvostele leffa
+                                            Rate the movie
                                         </button>
+
+                                        <button
+                                            className={styles.shareButton}
+                                            onClick={() => { shareMovie(selectedMovie) }}>
+                                            Share to group page
+                                        </button>
+
+                                    </div>
+                                    <div>
                                         {msg && (
                                             <p style={{ color: "red", marginTop: "0.5rem", fontStyle: "bold" }}>
                                                 {msg}
                                             </p>
                                         )}
-
-                                        <button onClick={() => { shareMovie(selectedMovie) }}>Share to group page</button>
                                     </div>
 
 

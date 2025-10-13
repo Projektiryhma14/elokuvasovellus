@@ -39,7 +39,7 @@ export default function MyProfile() {
     }
     load()
   }, [])
-  
+
   //useEffect(() => {
   //   const userId = sessionStorage.getItem("user_id")
   // if (!userId) return
@@ -54,10 +54,10 @@ export default function MyProfile() {
   return (
     <div className={styles.profile}>
 
-      <h1>{routeUsername}'s profile</h1>
+      <h2>{routeUsername}'s profile</h2>
 
       <div className={styles.inner}>
-        <h2>My Favourites List:</h2>
+        <h3>My Favourites List:</h3>
 
         <ul className={styles.list}>
           {/*Näyttää backendistä favourites taulukon Axioksen avulla, map käy jokaisen alkion taulukosta. Tallennetaan muuttujaan f*/}

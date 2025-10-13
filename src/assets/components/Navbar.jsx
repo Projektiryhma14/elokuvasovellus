@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink, } from 'react-router-dom'
 import { HashLink } from 'react-router-hash-link';
 import { useLocation, useNavigate } from 'react-router-dom';
-import logo from '../../pics/logo2.png'
+import logo from '../../pics/logo_versio2.png'
 import SettingsLogo from '../../pics/SettingsLogo.png'
 import styles from "./Navbar.module.css"
 import { useAuth } from '../../context/AuthContext.jsx'
@@ -67,7 +67,7 @@ export default function Navbar() {
                 <li>
                     <HashLink smooth to="/#sharedFavourites" className={styles.link}>
                         Shared Favourites
-                   </HashLink>
+                    </HashLink>
                 </li>
                 <li>
                     <HashLink smooth to="/#popular_movies" className={styles.link}>
@@ -212,7 +212,7 @@ export default function Navbar() {
                     <ul className={styles.drawerList} onClick={closeMenu}>
                         <li><HashLink smooth to="/#movie_search" className={styles.drawerLink}>Movie Search</HashLink></li>
                         <li><HashLink smooth to="/#finnkino" className={styles.drawerLink}>Finnkino showtimes</HashLink></li>
-                        <li><NavLink to="#" className={styles.drawerLink}>Jotain muuta</NavLink></li>
+                        <li><HashLink to="/#sharedFavourites" className={styles.drawerLink}>Shared Favourites</HashLink></li>
                         <li><HashLink smooth to="/#popular_movies" className={styles.drawerLink}>Popular movies</HashLink></li>
                         <li><NavLink to="/reviews" className={styles.drawerLink}>Reviews</NavLink></li>
                     </ul>

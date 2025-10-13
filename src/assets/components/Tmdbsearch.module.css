@@ -145,7 +145,8 @@ grid-template-areas: "filters results detail";
   padding:5px 0;
   border:none;
   border-radius: 3px;
-  background:#2a7be4;
+  background: #2a7be4;
+  box-shadow: 0 8px 18px rgba(42,123,228,.35);
   color:#fff;
   font-weight:600;
   cursor:pointer;
@@ -219,7 +220,23 @@ grid-template-areas: "filters results detail";
   display: flex;
   gap: 12px;
   margin-top: 12px;
+  
 }
+
+.rateButton,
+.shareButton {
+  background: #2a7be4;
+  box-shadow: 0 8px 18px rgba(42,123,228,.35);
+  padding:8px 8px;
+  border:none;
+  border-radius: 3px;
+  cursor: pointer;
+  color: #fff;
+  font-weight: 600;
+}
+
+.rateButton:hover,
+.shareButton:hover{ background:#1d5fc1; }
 
 
 @media (max-width:1024px) and (min-width:769px){

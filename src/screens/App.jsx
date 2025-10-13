@@ -26,6 +26,8 @@ import ReviewForm from './ReviewForm.jsx';
 
 import GroupProfile from './GroupProfile.jsx';
 
+import Footer from '../assets/components/Footer.jsx';
+
 
 import TestAuthStatus from './TestAuthStatus.jsx';
 
@@ -42,79 +44,82 @@ function App() {
             <InfoBanner />
             <Navbar />
 
-            <Routes>
-                <Route path="/"
-                    element={
-                        <>
-                            <Header />
-                            <PopularMovies />
-                            <FinnkinoSearch />
-                            <TmdbSearch />
-                            <SharedFavourites />
-                            
+            {/* Tämä wrapper tekee sticky footer -layout*/}
+            <main className='content'>
+                <Routes>
+                    <Route path="/"
+                        element={
+                            <>
+                                <Header />
+                                <PopularMovies />
+                                <FinnkinoSearch />
+                                <TmdbSearch />
+                                <SharedFavourites />
 
+                            </>
+                        }
+                    />
 
-                        </>
-                    }
-                />
+                    {/*Julkiset linkit*/}
+                    <Route path="/signin" element={<SignIn />} />
+                    <Route path="/signup" element={<SignUp />} />
+                    <Route path="/reviews" element={<Reviews />} />
+                    <Route path="/profile/:username" element={<MyProfile />} />
 
-                {/*Julkiset linkit*/}
-                <Route path="/signin" element={<SignIn />} />
-                <Route path="/signup" element={<SignUp />} />
-                <Route path="/reviews" element={<Reviews />} />
-                <Route path="/profile/:username" element={<MyProfile />} />
+                    {/* Suojatut linkit */}
 
-                {/* Suojatut linkit */}
+                    <Route
+                        path="/profileSettings"
+                        element={
+                            <ProtectedRoute returnTo="/profileSettings">
+                                <ProfileSettings />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/group"
+                        element={
+                            <ProtectedRoute returnTo="/group">
+                                <Group />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/reviewform"
+                        element={
+                            <ProtectedRoute returnTo="/reviewform">
+                                <ReviewForm />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                <Route
-                    path="/profileSettings"
-                    element={
-                        <ProtectedRoute returnTo="/profileSettings">
-                            <ProfileSettings />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/group"
-                    element={
-                        <ProtectedRoute returnTo="/group">
-                            <Group />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/reviewform"
-                    element={
-                        <ProtectedRoute returnTo="/reviewform">
-                            <ReviewForm />
-                        </ProtectedRoute>
-                    }
-                />
+                    <Route
+                        path="/group/create"
+                        element={
+                            <ProtectedRoute returnTo="/group/create">
+                                <CreateGroup />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                <Route
-                    path="/group/create"
-                    element={
-                        <ProtectedRoute returnTo="/group/create">
-                            <CreateGroup />
-                        </ProtectedRoute>
-                    }
-                />
+                    <Route
+                        path="/group/:id"
+                        element={
+                            <ProtectedRoute returnTo="/group/:id">
+                                <GroupProfile />
+                            </ProtectedRoute>
+                        }
+                    />
 
-                <Route
-                    path="/group/:id"
-                    element={
-                        <ProtectedRoute returnTo="/group/:id">
-                            <GroupProfile />
-                        </ProtectedRoute>
-                    }
-                />
-
-                {/*    
+                    {/*    
                 <Route path="*" element={<NotFound />} />
                 */}
-            </Routes>
+                </Routes>
 
-        </div>
+
+            </main>
+            <Footer />
+        </div >
 
 
     ); // end of return

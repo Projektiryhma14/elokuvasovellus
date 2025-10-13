@@ -5,6 +5,15 @@
   --gap: 32px;              /* valinnainen: pystygappi osioille */
 }
 
+/*Sticky footer layout*/
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
 /* Ankkuriskrollin perusoffset ja smooth-scroll */
 html {
   scroll-padding-top: var(--nav-h);
@@ -12,4 +21,15 @@ html {
 }
 html:focus-within{
   scroll-behavior: smooth;
+}
+
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  display: block;
 }

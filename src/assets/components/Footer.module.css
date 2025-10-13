@@ -1,0 +1,124 @@
+.footer {
+    background-color: #000;
+    height: auto;
+    background: #0b0b0b;
+    display: grid;
+    flex-direction: column;
+   /*border: 1px solid yellow;*/
+    padding: 10px;
+    
+    grid-template-columns: 0.25fr 0.50fr 0.25fr;
+
+    grid-template-areas:
+    "headline project_name repoAddress";
+
+    align-items: stretch;
+    grid-template-rows: auto 1fr auto;
+}
+
+.headline,
+.project_name {
+    color: #fff;
+}
+
+.headline {
+    grid-area: headline;
+    /*border: 3px solid rgb(16, 13, 223);*/
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 35px;
+    
+}
+
+.headline p {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.project_name {
+    grid-area: project_name;
+    /*border: 3px solid rgb(13, 223, 41);*/
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.project_name p {
+    font-size: 13px;
+    color: rgba(211, 211, 211, 0.63);
+}
+
+.firstPara {
+    margin-bottom: 0px;
+    line-height: 2.5;
+}
+
+.repoAddress {
+    grid-area: repoAddress;
+    /*border: 3px solid rgb(223, 13, 178);*/
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-right: 35px;  
+}
+
+.repoAddress ul li a {
+    list-style: none;
+    text-decoration: none;
+}
+
+
+@media (max-width: 768px) {
+    .project_name {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .footer {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+        "headline"
+        "project_name"
+        "repoAddress";
+        gap:24px;
+       
+    }
+
+    .headline {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin: 0;
+    }
+
+    .project_name {
+         display: flex;
+        justify-content: center;
+        width: 100%;
+    }
+
+    .repoAddress {
+         display: flex;
+        justify-content: center;
+        width: 100%;
+        margin: 0;
+    }
+}
+
+/*
+@media (max-width:768px){
+  .tmdb_container{
+    grid-template-columns:1fr;
+    grid-template-areas:
+      "filters"
+      "results"
+      "detail";
+    gap:24px; padding-inline:8px;
+  }
+    */
