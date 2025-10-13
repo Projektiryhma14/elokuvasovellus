@@ -111,7 +111,7 @@ export default function ReviewForm() {
                 navigate("/signin", { replace: true, state: { flash: "Session expired. Please sign in again." } });
                 return;
             }
-            setMsg({ type: "error", text: "Tallennus epäonnistui." });
+            setMsg({ type: "error", text: "Adding review failed, you have already reviewed this movie" });
         } finally {
             setSubmitting(false);
         }
@@ -125,7 +125,7 @@ export default function ReviewForm() {
 
     return (
         <div className={`container mt-5 ${styles.review_wrap_container}`}>
-            <h2 className='mb-4'>Add a review:</h2>
+            <h2 className={styles.headline}>Add a review:</h2>
 
             <form onSubmit={handleSubmit}>
                 {/* Movie title (read-only) */}

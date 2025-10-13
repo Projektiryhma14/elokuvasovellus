@@ -25,14 +25,14 @@ export default function Reviews() {
         }
         console.log(tmdb_api_url)
         axios.get(tmdb_api_url, params)
-           .then(response => {
-               console.log(response.data)
-               sessionStorage.setItem("selected_movie", JSON.stringify(response.data))
-               //return response.data
-           })
-           .catch(err => {
-               console.error(err)
-           })
+            .then(response => {
+                console.log(response.data)
+                sessionStorage.setItem("selected_movie", JSON.stringify(response.data))
+                //return response.data
+            })
+            .catch(err => {
+                console.error(err)
+            })
     }
 
     const ratingStars = (movieRating) => {
@@ -46,11 +46,11 @@ export default function Reviews() {
         }
         const filledStars = movieRating
         //const emptyStars = maxStars - filledStars
-        
+
         return (
             <div className='vote_stars'>
-                {Array.from({length: maxStars}, (_, i) => {
-                    if (i<filledStars) {
+                {Array.from({ length: maxStars }, (_, i) => {
+                    if (i < filledStars) {
                         return <FaStar key={i} color="gold" />
                     }
                     else {
@@ -133,6 +133,8 @@ export default function Reviews() {
                 .catch(err => {
                     console.error(err)
                 })
+            //Muistaa aloittaa sivun näyttämisen heti yläreunasta
+            window.scrollTo({ top: 0, left: 0, behavior: "auto" });
         }
 
         fetchReviews()
@@ -141,13 +143,13 @@ export default function Reviews() {
     }, [])
 
     return (
-        <div>
+        <div className={styles.wrapper}>
             <h1>Reviews</h1>
             <br></br>
             {/* arvostelujen filtteröinti elokuvan perusteella */}
-            <select 
+            <select
                 className={styles.movie_select}
-                onChange={e => {console.log(e.target.value); filterReviews(e.target.value)}}
+                onChange={e => { console.log(e.target.value); filterReviews(e.target.value) }}
             >
                 <option value="">All movies</option>
                 {movies.map(movie => (
@@ -164,14 +166,14 @@ export default function Reviews() {
                             <li key={item.review_id + item.created_at}>
                                 {item.created_at}
                             </li>
-                            <li key={item.review_id + item.movie_name} 
-                            onClick={
-                                (e) => {
-                                    e.preventDefault()
-                                    console.log(item.movie_id)
-                                    fetchMovieDetails(item.movie_id)
-                                }
-                            }>
+                            <li key={item.review_id + item.movie_name}
+                                onClick={
+                                    (e) => {
+                                        e.preventDefault()
+                                        console.log(item.movie_id)
+                                        fetchMovieDetails(item.movie_id)
+                                    }
+                                }>
                                 <HashLink smooth to="/#movie_search">
                                     {item.movie_name}
                                 </HashLink>

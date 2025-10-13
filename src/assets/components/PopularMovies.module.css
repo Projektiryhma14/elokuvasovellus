@@ -1,0 +1,220 @@
+/* ===== Kehys ja 100vh-osio */
+
+/* Desktop (≥1280px): lista ~38% | detail ~62% */
+.wrapper {
+  display: grid;
+  flex-direction: column;
+  gap: 20px;
+  /*background-color: cadetblue;*/
+  min-height: calc(100vh - var(--nav-h));
+
+  /*Sarakket (fr-suhteet: vasen lista | oikea detail)*/
+  grid-template-columns: 0.6fr 0.4fr;
+
+  /*Aluekartta: otsikko yli kahden sarakkeen, sitten lista+detail*/
+  grid-template-areas:
+  "title title"
+  "list detail";
+
+  align-items: start; /*Sarakkeiden yläreunat linjaan*/
+}
+
+/*Kohdistukset alueisiin*/
+.title {grid-area: title;}
+.listArea {grid-area: list;}
+.detailPanel {grid-area: detail;}
+
+.title {
+  text-align: center;
+  margin-top: 60px;
+}
+
+/* Lista rullaa tarvittaessa */
+.resultList {
+  list-style: none;
+  margin: 0 auto 24px auto;   /* keskitys ja väli ennen nappeja */
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  padding: 30px;
+ 
+}
+
+/* Painike toimii koko rivinä */
+.resultButton {
+  width: 100%;
+  text-align: left;
+  padding: 10px 14px;
+  border: none;
+  /*border-radius: 6px;*/
+  background: #fff;
+  color: #222;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  cursor: pointer;
+  border-bottom: 1px solid #e0e0e0;
+  
+}
+
+/* Hover: kevyt korostus */
+.resultButton:hover {
+  background: #f0f0f0;
+  border-color: #ccc;
+}
+
+/* Aktiivinen / valittu */
+.resultButtonActive {
+  background: #2a7be4;
+  color: #fff;
+  border-color: #1d5fc1;
+}
+
+
+/* Napit pysyvät listan alla */
+.next_prev {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: auto; /* pakottaa napit alas */
+  margin: 0 auto;
+  width: 100%;
+  max-width: 400px;
+  
+}
+
+.prev_button,
+.next_button {
+  flex: 1;                    /* napit venyvät tasan vierekkäin */
+  padding: 8px 0;
+  border: none;
+  border-radius: 6px;
+  background: #2a7be4;
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.prev_button:hover,
+.next_button:hover {
+  background: #1d5fc1;
+}
+
+.prev_button:disabled,
+.next_button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+
+.poster {
+  width: 230px;
+  height: auto;
+  padding: 10px;
+   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
+
+.vote_stars {
+  font-size: 30px;
+  display: flex;
+  justify-content: flex-start;
+  gap: 5px;
+  color: gold
+}
+
+.overview_box {
+  margin-top: 25px;
+  max-width: 90%;
+  
+}
+
+.overview_heading {
+  margin-bottom: 8px;
+  font-weight: 600;
+
+}
+
+.overview_text {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  white-space: pre-line; /* jos tekstissä on rivejä*/
+}
+
+
+
+
+
+
+/*=========== MEDIA =============*/
+
+/* TABLET: kaikki allekkain*/
+
+@media (max-width: 768px) {
+  .wrapper {
+    grid-template-columns: 1fr;
+    grid-template-areas: 
+    "title"
+    "list"
+    "detail";
+    gap: 24px;
+    padding-inline: 12px; /*Sisämarginaalia reunoihin*/
+    margin-bottom: 30px;
+   
+  }
+
+  .listArea {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: none;
+  }
+
+  .resultList {
+    width: 95%;
+    max-width: 100%;
+    overflow: visible;
+    gap: 10px;
+   
+  }
+
+  .movieResult_box {
+   
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .poster {
+    width: 250px;
+    max-width: 100%;
+    height: auto;
+  }
+
+  .overview_box {
+    max-width: 95%;
+    margin-inline: auto;  
+  }
+  
+
+  .overview_text {
+    font-size: 1rem;
+  }
+}
+
+
+/*====== Puhelin <= 480px*/
+@media (max-width: 480px) {
+  .wrapper {
+    gap: 20px;
+    padding-inline: 5px;
+  }
+}

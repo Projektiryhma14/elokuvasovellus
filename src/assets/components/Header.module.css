@@ -9,7 +9,7 @@
 .header {
     width: 100%;
     min-height: calc(100vh - var(--nav-h));
-    background-color: #000;
+    background: #0b0b0b;
     color: #fff;
     display: flex;
     flex-direction: column;

@@ -5,16 +5,31 @@
   --gap: 32px;              /* valinnainen: pystygappi osioille */
 }
 
+/*Sticky footer layout*/
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
 /* Ankkuriskrollin perusoffset ja smooth-scroll */
 html {
-  scroll-padding-top: calc(var(--nav-h) + 16px);
+  scroll-padding-top: var(--nav-h);
+ 
+}
+html:focus-within{
   scroll-behavior: smooth;
 }
 
-/* Jos nav kasvaa mobiilissa, päivitetään muuttuja media-kyselyssä */
-@media (max-width: 768px) {
-  :root {
-    --nav-h: 140px; /* esimerkki: jos navi wrapataan kahdelle riville */
-  }
-  
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  display: block;
 }

@@ -217,7 +217,7 @@ export default function FinnkinoSearch() {
                         onSubmit={e => { e.preventDefault(); searchShowtimes(); }}>
 
 
-                        <h4>Select movie, theatre and date</h4>
+                        <span><h4>Select movie, theatre and date</h4></span>
 
 
                         <select
