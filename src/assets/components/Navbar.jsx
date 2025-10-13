@@ -233,7 +233,7 @@ export default function Navbar() {
 
                     {status === "USER" && (
                         <ul className={styles.drawerList} onClick={closeMenu}>
-                            <li><NavLink to="/profile" className={styles.drawerLink}>My Profile</NavLink></li>
+                            <li><NavLink to={`/profile/${user?.username ?? ""}`} className={styles.drawerLink}>My Profile</NavLink></li>
                             <li><NavLink to="/profileSettings" className={styles.drawerLink}>My Profile Settings</NavLink></li>
                             <li><NavLink to="/group" className={styles.drawerLink}>Group Page</NavLink></li>
                             {location.pathname === "/group" && (
