@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import styles from './profileSettings.module.css'
+import styles from './ProfileSettings.module.css'
 import { useAuth } from "../context/AuthContext.jsx"
 import { useNavigate } from 'react-router-dom'
 import { useMemo } from "react"
