@@ -12,13 +12,30 @@
   display: flex;
   align-items: center;
   flex-direction: column;
-  width: 60%;
+  width: 800px;
+  max-width: 100%;
   height: auto;
   margin: 30px;
-  border-radius: 10px;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  background-color:rgba(216, 216, 216, 0.178);
+  /*border-radius: 10px;*/
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  /*box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;*/
+  /*background-color: rgba(216, 216, 216, 0.37);*/
 
+/*
+list-style: none;
+  margin: 0 auto 24px auto;   /* keskitys ja väli ennen nappeja */
+  /*
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  width: 100%;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  padding: 30px;
+  */
 }
 
 .list{
@@ -27,13 +44,13 @@
   margin-bottom: 50px;
 }
 
-.profile h1 {
+.profile h2 {
   margin: 40px;
-  font-size: 48px;
+  font-size: 40px;
   font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
-.inner h2 {
+.inner h3 {
   margin: 50px;
   font-size: 32px;
   font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -48,4 +65,11 @@
 
 .listItem:last-child {
   border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .profile {
+    max-width: 90%;
+    
+  }
 }

@@ -1,14 +1,35 @@
+
+h1 {
+    text-align: center;
+    margin-top: 60px;
+    font-size: 40px;
+}
+
+
+.movie_select {
+   width: 240px;
+  background: #fcfcfd;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  color: #1f1f1f;
+  font-weight: 600;
+}
+
 .review_div a {
     text-decoration: none;
     color: black;
+   
 }
 
 .review_div {
     display: flex;
     flex-direction: row;
-    border: 1px solid black;
+    border: 1px solid lightgray;
     padding: 1em;
     margin: 1em;
+    border-radius: 5px;
 }
 
 .review_ul {

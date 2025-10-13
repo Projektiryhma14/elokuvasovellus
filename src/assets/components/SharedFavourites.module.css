@@ -13,6 +13,7 @@
   flex-direction: column;
   align-items: center;
   max-width: 820px;
+  /*max-width: 100%;*/
   width: 100%; 
   border: 1px solid rgba(255,255,255,.08);
   background: #141414;
@@ -22,10 +23,14 @@
 }
 
 .sharedList ul {
-  display: grid;
-  grid-template-columns: max-content; /*palsta venyy pisimmän nimen mukaan*/
-  justify-content: center;            /*keskitetään palsta kortin sisällä*/
+  
+  /*display: grid;*/
+  /*grid-template-columns: max-content; *//*palsta venyy pisimmän nimen mukaan*/
+  /*justify-content: center;*/            /*keskitetään palsta kortin sisällä*/
+  
+  
   width: 100%;
+  max-width: 500px;
 }
 
 .sharedFavourites_wrapper h1 {
@@ -41,15 +46,20 @@
     align-items: center;
 }
 
+
+
 .li {
-  justify-self: stretch;              /*venytä li palstan leveyteen*/
-  box-sizing: content-box;            /*padding ei syö leveyttä*/
-  padding-inline: 200px;
+  /*justify-self: stretch;*/              /*venytä li palstan leveyteen*/
+  box-sizing: content-box;          /*padding ei syö leveyttä*/
+  /*box-sizing: border-box;*/
+  /*padding-inline: 200px;*/
   text-align: center;
   border-bottom: 1px solid #e0e0e028;
   cursor: pointer;
   font-size: 18px;
   margin: 5px;
+  display: flex;
+  justify-content: center;
 }
 
 .li:hover {
@@ -87,3 +97,14 @@
 .nextbutton:hover {
   background: #236bc7;
 }
+
+
+/*====== MEDIA ======= */
+@media (max-width: 768px) {
+
+  .container_sharedFavourites {
+    padding: 10px;
+  }
+
+}
+
