@@ -40,15 +40,6 @@ export default function MyProfile() {
     load()
   }, [])
 
-  //useEffect(() => {
-  //   const userId = sessionStorage.getItem("user_id")
-  // if (!userId) return
-
-  //axios
-  //  .get(`${API_BASE_URL}/favourites?user_id=${userId}`)
-  //.then((res) => setFavourites(res.data))
-  //}, [])
-
 
 
   return (

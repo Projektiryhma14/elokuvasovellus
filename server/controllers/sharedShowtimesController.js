@@ -5,7 +5,6 @@ const addSharedShowtime = async (req, res, next) => {
         if (!req.body) {
             return res.status(400).json({ error: 'Missing request body' })
         }
-        //console.log(req.body)
         const { theatre, movieName, startTime, groupId, sharerId } = req.body
 
         if (!theatre || !movieName || !startTime || !groupId || !sharerId) {

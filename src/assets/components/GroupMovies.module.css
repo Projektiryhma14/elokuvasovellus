@@ -1,27 +1,36 @@
 div.movie_recs {
-    border-top: 1px solid black;
-    padding: 1em;
-    margin: 1em;
-    line-height: 200%;
+  border-top: 1px solid black;
+  padding: 1em;
+  margin: 1em;
+  line-height: 200%;
 }
 
 div.movie_recs_empty {
-    padding: 1em;
-    margin: 1em;
-    line-height: 200%;
+  padding: 1em;
+  margin: 1em;
+  line-height: 200%;
 }
 
 .shared_movies_header {
-    text-align: center;
+  text-align: center;
 }
 
 .movie_rec_line {
-    text-align: center;
-    list-style: inside;
+  text-align: center;
+  list-style: inside;
 }
 
 .movies_delete_button {
-    margin-left: 1em;
-    padding-inline: 0.5em;
-    line-height: 150%;
+  margin-left: 1em;
+  line-height: 150%;
+  background-color: rgba(180, 36, 36, 0.904);
+  color: #c4c9d1;
+  border: none;
+  padding: 5px 8px;
+  font-weight: 600;
+  border-radius: 5px;
+}
+
+.movies_delete_button:hover {
+    background-color:rgba(153, 9, 9, 0.904);
 }

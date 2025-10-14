@@ -3,7 +3,10 @@
   flex-direction: column;
   align-items: center;      
   max-width: 600px;         /* sama kuin aiempi width: 800px */
-  margin: 0 auto;    
+  margin: 0 auto;
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;    
 }
 
 .sign_in_form {

@@ -26,7 +26,6 @@ export default function Reviews() {
         console.log(tmdb_api_url)
         axios.get(tmdb_api_url, params)
             .then(response => {
-                console.log(response.data)
                 sessionStorage.setItem("selected_movie", JSON.stringify(response.data))
                 //return response.data
             })
@@ -45,7 +44,6 @@ export default function Reviews() {
             return (<div>N/A</div>)
         }
         const filledStars = movieRating
-        //const emptyStars = maxStars - filledStars
 
         return (
             <div className='vote_stars'>
@@ -79,8 +77,6 @@ export default function Reviews() {
             if (review.movie_id == movieId) {
                 tempArray.push(review)
             }
-            //console.log(review.movie_id)
-            //console.log(movieId)
         })
         setReviews(tempArray)
     }
@@ -95,8 +91,6 @@ export default function Reviews() {
         if (!movieId) {
             axios.get(base_url + "/reviews")
                 .then(response => {
-                    //console.log(response)
-                    console.log(response.data)
                     setReviews(response.data)
                 })
                 .catch(err => {
@@ -106,7 +100,6 @@ export default function Reviews() {
         else {
             axios.get(base_url + "/reviews/" + movieId)
                 .then(response => {
-                    console.log(response.data)
                     setReviews(response.data)
                 })
                 .catch(err => {
@@ -174,7 +167,7 @@ export default function Reviews() {
                                         fetchMovieDetails(item.movie_id)
                                     }
                                 }>
-                                <HashLink smooth to="/#movie_search">
+                                <HashLink className={styles.hashLink} smooth to="/#movie_search">
                                     {item.movie_name}
                                 </HashLink>
                             </li>

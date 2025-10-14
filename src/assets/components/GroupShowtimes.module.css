@@ -24,4 +24,14 @@ div.movie_dates_empty {
     margin-left: 1em;
     padding-inline: 0.5em;
     line-height: 150%;
+    background-color: rgba(180, 36, 36, 0.904);
+    border: none;
+    padding: 5px 8px;
+    color: #c4c9d1;
+    font-weight: 600;
+    border-radius: 5px;
+}
+
+.showtimes_delete_button:hover {
+    background-color:rgba(153, 9, 9, 0.904);
 }
