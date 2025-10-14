@@ -21,7 +21,6 @@ user_id SERIAL PRIMARY KEY,
 user_name VARCHAR(20) NOT NULL UNIQUE,
 email VARCHAR(50) NOT NULL UNIQUE,
 password_hash VARCHAR(255) NOT NULL,
-/*groupID INT REFERENCES groups(group_id),*/
 HasActiveGroupRequest BOOLEAN DEFAULT false,
 favourites_is_shared BOOLEAN DEFAULT false,
 favourites_shared_at TIMESTAMP
@@ -29,7 +28,6 @@ favourites_shared_at TIMESTAMP
 
 create table reviews ( 
 review_id SERIAL PRIMARY KEY, 
-/*user_id INT NOT NULL REFERENCES users(user_id),*/
 movie_name VARCHAR(50) NOT NULL,
 movie_id INT NOT NULL,
 movie_rating INT NOT NULL CHECK(movie_rating BETWEEN 1 AND 5),
@@ -39,32 +37,26 @@ created_at TIMESTAMP DEFAULT NOW()
 
 create table favourites ( 
 favourites_id SERIAL PRIMARY KEY, 
-/*user_id INT NOT NULL REFERENCES users(user_id),*/
 movie_name VARCHAR(50) NOT NULL
 ); 
 
 
 create table groups ( 
 group_id SERIAL PRIMARY KEY,
-/*owner_id INT NOT NULL REFERENCES users(user_id),*/
 group_name VARCHAR(20) NOT NULL UNIQUE,
 group_description VARCHAR(255)
 ); 
 
 create table sharedMovies ( 
 shared_movie_id SERIAL PRIMARY KEY,
-/*group_id INT NOT NULL REFERENCES groups(group_id),*/
 movie_name VARCHAR(50) NOT NULL
-/*sharer_id INT NOT NULL REFERENCES users(user_id)*/
 ); 
 
 create table sharedShowtimes ( 
 shared_showtime_id SERIAL PRIMARY KEY,
-/*group_id INT NOT NULL REFERENCES groups(group_id),*/
 theatre VARCHAR(50) NOT NULL,
 movie_name VARCHAR(50) NOT NULL,
 dateAndTime TIMESTAMP NOT NULL
-/*sharer_id INT NOT NULL REFERENCES users(user_id)*/
 ); 
 
 ALTER TABLE users ADD groupID INT REFERENCES groups(group_id) ON DELETE CASCADE;
@@ -106,18 +98,3 @@ ALTER TABLE users ADD CONSTRAINT unique_username UNIQUE (user_name);
 /* Users tauluun lisättävät suosikkilistan jakamiseen tarvittavat kentät */
 ALTER TABLE users ADD favourites_is_shared BOOLEAN DEFAULT false;
 ALTER TABLE users ADD favourites_shared_at TIMESTAMP;
-
-
-/*ALTER TABLE groups DROP CONSTRAINT group_owner_id_fkey, ADD CONSTRAINT group_owner_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
-
-ALTER TABLE reviews DROP CONSTRAINT reviews_user_id_fkey, ADD CONSTRAINT reviews_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
-
-ALTER TABLE favourites DROP CONSTRAINT favourites_user_id_fkey, ADD CONSTRAINT favourites_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE;
-
-ALTER TABLE sharedMovies DROP CONSTRAINT sharedMovies_group_id_fkey, ADD CONSTRAINT sharedMovies_group_id_fkey FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE;
-
-ALTER TABLE sharedMovies DROP CONSTRAINT sharedMovies_sharer_id_fkey, ADD CONSTRAINT sharedMovies_sharer_id_fkey FOREIGN KEY (sharer_id) REFERENCES users(user_id) ON DELETE CASCADE;
-
-ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_group_id_fkey, ADD CONSTRAINT sharedShowtimes_group_id_fkey FOREIGN KEY (group_id) REFERENCES groups(group_id) ON DELETE CASCADE;
-
-ALTER TABLE sharedShowtimes DROP CONSTRAINT sharedShowtimes_sharer_id_fkey, ADD CONSTRAINT sharedShowtimes_sharer_id_fkey FOREIGN KEY (sharer_id) REFERENCES users(user_id) ON DELETE CASCADE;*/

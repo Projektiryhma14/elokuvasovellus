@@ -5,10 +5,8 @@ import {
 } from '../models/userModel.js'
 import { compare, hash } from 'bcrypt'
 import jwt from 'jsonwebtoken'
-import {selectOwner} from '../models/groupModel.js'
-//import {connectClient, releaseClient, beginTransaction, commitTransaction, rollbackTransaction} from '../helper/transactions.js'
+import { selectOwner } from '../models/groupModel.js'
 import { connectClient } from '../helper/transactions.js'
-//import { pool } from '../helper/db.js'
 
 const getUsers = async (req, res, next) => {
     try {
@@ -70,7 +68,6 @@ const signIn = async (req, res, next) => {
 }
 
 const deleteUser = async (req, res, next) => {
-    //const client = await pool.connect()
     const client = await connectClient()
 
     try {
@@ -78,7 +75,6 @@ const deleteUser = async (req, res, next) => {
         const userId = req.params.id
 
         await client.query('BEGIN')
-        //beginTransaction(client)
         // Katsotaan onko poistettava käyttäjä ryhmän omistaja
         const ownedGroupResult = await selectOwner(userId)
 
@@ -86,25 +82,20 @@ const deleteUser = async (req, res, next) => {
             const groupId = ownedGroupResult.rows[0].group_id
 
             await removeAllUsersFromGroup(groupId)
-        
+
         }
 
         await deleteUserById(userId)
         res.status(200).json({ message: 'User deleted' })
         await client.query('COMMIT')
-        //commitTransaction(client)
     }
     catch (err) {
-        //console.log("error haara")
         await client.query('ROLLBACK')
-        //rollbackTransaction(client)
         console.error('Transaction failed', err)
         next(err)
     }
     finally {
-        //console.log("finally haara")
         client.release()
-        //releaseClient(client)
     }
 }
 

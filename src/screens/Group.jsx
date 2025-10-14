@@ -10,8 +10,8 @@ export default function Group() {
     const url = import.meta.env.VITE_API_BASE_URL
     const Currentuserid = sessionStorage.getItem("user_id")
 
-    
-    
+
+
 
 
     useEffect(() => {
@@ -20,38 +20,38 @@ export default function Group() {
                 'userid': Currentuserid
             }
         })
-        .then(response => {
-            setGroups(response.data)
-            
-            
-        })
-        .catch(err => {
-            console.error('Virhe ryhmien haussa:', err)
-        })
+            .then(response => {
+                setGroups(response.data)
+
+
+            })
+            .catch(err => {
+                console.error('Virhe ryhmien haussa:', err)
+            })
 
     }, [])
 
 
     return (
-        <div>
-        <h1 className={styles.title}>Groups</h1>
-        <div className={styles.groupList}>
-        <ul>
-            {
-                groups.map(group => (           
-                    <li key={group.group_id}>
-                        <Link to={`/group/${group.group_id}`}>
-                        {group.group_name}              
-                        </Link>
-                        {group.isUserGroup && <span>(Your group)</span>}
+        <div className={styles.wrapper}>
+            <h2 className={styles.title}>Groups</h2>
+            <div className={styles.groupList}>
+                <ul>
+                    {
+                        groups.map(group => (
+                            <li key={group.group_id}>
+                                <Link to={`/group/${group.group_id}`}>
+                                    {group.group_name}
+                                </Link>
+                                {group.isUserGroup && <span>(Your group)</span>}
 
-                    </li>
-                ))
-            }
-        </ul>
-        </div>
-        
-        
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+
+
 
         </div>
     )

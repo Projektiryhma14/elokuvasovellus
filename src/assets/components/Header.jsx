@@ -7,7 +7,7 @@ export default function Header() {
         <div className={styles.header}>
 
             <h1>MovieGeegs</h1>
-            <h3>Ultimate movie site</h3>
+            <h4>Ultimate movie site</h4>
 
         </div>
 

@@ -38,7 +38,7 @@ export default function sharedFavourites() {
 
     <section id="sharedFavourites" className={styles.sharedFavourites_wrapper}>
       <div className={styles.container_sharedFavourites}>
-        <h1>Shared Favourites Lists</h1>
+        <h2>Shared Favourites Lists</h2>
 
         <div className={styles.sharedList}>
 

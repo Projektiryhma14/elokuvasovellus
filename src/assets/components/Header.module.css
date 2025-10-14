@@ -15,7 +15,10 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 900;
+    font-style: normal;
     line-height: 1.8;
 
 }

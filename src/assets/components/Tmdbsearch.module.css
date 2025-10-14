@@ -1,12 +1,15 @@
 
 /* ===== Kehys ja 100vh-osio */
 .wrapper{
- min-height: calc(100vh - var(--nav-h));
+  min-height: calc(100vh - var(--nav-h));
   display: flex;
- justify-content: center;
+  justify-content: center;
   align-items: stretch;
   box-sizing: border-box;
   margin-bottom: 20px;
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
 
@@ -22,6 +25,7 @@
 .headline {
   margin: 48px;
   text-align: center;
+  font-weight: 600;
 }
 
 /* Grid: desktop 3-col, tablet filters full-row, mobile stack */
@@ -92,6 +96,7 @@ grid-template-areas: "filters results detail";
   margin: 0 0 8px;
   font-size: 1.05rem;
   text-align: center;
+  font-weight: 600;
 }
 
 .resultsList {
@@ -204,13 +209,13 @@ grid-template-areas: "filters results detail";
 }
 .overview_heading {
   margin: 0 0 6px 0;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
 .overview_text {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 0.98rem;
+  font-size: 0.99rem;
   line-height: 1.65;
   color: #333;
   white-space: pre-line;

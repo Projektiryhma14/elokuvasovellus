@@ -3,9 +3,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import styles from './FinnkinoSearch.module.css'
 
-
 export default function FinnkinoSearch() {
-
 
     // finnkino hakuun tarvittavat tilamuuttujat
     const [finnkinoMovies, setFinnkinoMovies] = useState([])
@@ -14,8 +12,6 @@ export default function FinnkinoSearch() {
     const [selectedTheatre, setSelectedTheatre] = useState('')
     const [selectedDate, setSelectedDate] = useState('')
     const [finnkinoShowtimes, setFinnkinoShowtimes] = useState([])
-
-    const [infotext, setInfotext] = useState("")
 
     //finnkino-hakuun tarvittavat funktiot
     const getFinnkinoTheatres = async () => {
@@ -78,7 +74,6 @@ export default function FinnkinoSearch() {
         const theatreId = selectedTheatre
         const movieId = selectedFinnkinoMovie
         const dt = selectedDate
-        //console.log(dt)
         const base_url = "https://www.finnkino.fi/xml/Schedule/"
         let full_url = base_url + "?area=" + theatreId + "&dt=" + dt + "&eventID=" + movieId
         if (dt === "") {
@@ -98,13 +93,11 @@ export default function FinnkinoSearch() {
                     console.log("0 showtimes with chosen filters")
                     return
                 }
-                //console.log(showtimes)
-                //console.log(showtimes.children.length)
                 //console.log(showtimes.children[0])
-                //console.log(showtimes.children[0].children[2].innerHTML)
-                //console.log(showtimes.children[0].children[15].innerHTML) //movie name
-                //console.log(showtimes.children[0].children[14].innerHTML) //event id
-                //console.log(showtimes.children[0].children[27].innerHTML) //theatre
+                //  movie name  --> showtimes.children[i].children[15].innerHTML
+                //  start time  --> showtimes.children[i].children[2].innerHTML
+                //  show id    --> showtimes.children[i].children[0].innerHTML
+                //  theatre     --> showtimes.children[i].children[27].innerHTML
                 const tempArray = []
                 for (let i = 0; i < showtimes.children.length; i++) {
                     const showId = showtimes.children[i].children[0].innerHTML
@@ -126,18 +119,17 @@ export default function FinnkinoSearch() {
     }
 
     const addToGroupPage = async (showtime) => {
-        console.log(showtime)
+        //console.log(showtime)
         let responseGroupId = null
         //check if user is logged in
         if (!sessionStorage.getItem("user_id")) {
             console.log("sessionStoragesta ei löytynyt kenttää 'user_id' (kirjaudu sisään jatkaaksesi)")
             alert("You must be logged in to use this feature")
-            //setInfotext("You must be logged in to use this feature")
             return
         }
         //check if user belongs to a group
         const get_url = import.meta.env.VITE_API_BASE_URL + "/users/" + sessionStorage.getItem("user_id")
-        console.log(get_url)
+        //console.log(get_url)
         try {
             const response = await axios.get(get_url)
             console.log(response.data)
@@ -166,11 +158,7 @@ export default function FinnkinoSearch() {
             }
 
             const responseFromPost = await axios.post(post_url, params)
-            console.log(responseFromPost)
-            //console.log("responsefrompost start time:" + responseFromPost.data.dateandtime)
-            //console.log("responsefrompost theater: " + responseFromPost.data.theatre)
-            //console.log("responsefrompost movie name: " + responseFromPost.data.movie_name)
-            //console.log("responsefrompost sharer id: " + responseFromPost.data.sharer_id)
+            //console.log(responseFromPost)
             if (responseFromPost.status === 201) {
                 const formattedStartTime = new Date(responseFromPost.data.dateandtime).toLocaleString("en-US")
                 alert(`You have successfully added the following showtime to your group page:
@@ -204,21 +192,16 @@ export default function FinnkinoSearch() {
 
     return (
         <>
-
-
             {/* FINNKINO SHOWTIMES -OSIO */}
             <section id="finnkino" className={styles.finnkino_wrapper}>
                 <section className={styles.container_finnkino}>
                     <h2>Finnkino search</h2>
 
-
                     <form
                         className={styles.finnkino_form}
                         onSubmit={e => { e.preventDefault(); searchShowtimes(); }}>
 
-
                         <span><h4>Select movie, theatre and date</h4></span>
-
 
                         <select
                             className={styles.finnkino_select}
@@ -261,38 +244,29 @@ export default function FinnkinoSearch() {
                             })}
                         </select>
 
-
                         <button className={styles.finnkino_button} type="submit" id="finnkinoSearch_button">Search</button>
-
 
                     </form>
 
-
                 </section >
+
                 {/* Näytösajat */}
                 <section className={styles.finnkino_showtimes} id="showtimes" aria-labelledby="showtimes-heading">
                     <h3 id="showtimes-heading">Showtimes</h3>
                     <ul className={styles.showtimes_ul}>
                         {finnkinoShowtimes ? finnkinoShowtimes.map(showtime => {
-                            //console.log(finnkinoShowtimes)
+                            console.log(showtime)
                             const datetime = new Date(showtime.startTime)
                             return (
-                                <li className={styles.showtimes_li} key={showtime.startTime + showtime.location + showtime.movieName}>
+                                <li className={styles.showtimes_li} key={showtime.showId}>
                                     {datetime.toLocaleString("en-US")} -- {showtime.location} -- {showtime.movieName}
                                     <button className={styles.showtime_button} onClick={() => { addToGroupPage(showtime) }}>Add to group page</button>
                                 </li>
                             )
                         }) : "No showtimes matching search criteria"}
                     </ul>
-                    {/*<p>{infotext}</p>*/}
                 </section>
             </section >
         </>
     );
-
-
 }
-
-
-
-

@@ -173,13 +173,13 @@ function SignUp() {
         setStatusMessage('')
 
         if (!canSubmit) {
-            setErrorMessage("Täytä vaatimukset ja varmista, että email ja käyttäjänimi ovat vapaita")
+            setErrorMessage("Make sure to meet the requirements and also that the email and username are free.")
             return
         }
 
         try {
             const res = await axios.post(`${API_BASE}/signup`, user)
-            setStatusMessage("Rekisteröityminen onnistui! siirrytään sign in -sivulle...")
+            setStatusMessage("Registration successful! Moving to the sign in page...")
             // tyhjennys
             setUser({ email: "", username: "", password: "" })
             setConfirm("")
@@ -191,11 +191,11 @@ function SignUp() {
                     // replace: true -> “korvaa” historiaan tämä sivu; Back ei palaa signup-sivulle
                     replace: true,
                     // flash-viestin voi lukea SignIn.jsx:ssä location.state:sta
-                    state: { flash: "Sign up onnistui - kirjaudu sisään" },
+                    state: { flash: "Sign up successful - log in" },
                 })
             }, 1500)
         } catch (err) {
-            const msg = err?.response?.data?.error || "Rekisteröityminen epäonnistui"
+            const msg = err?.response?.data?.error || "Registration failed"
             setErrorMessage(msg)
 
         }
@@ -219,11 +219,11 @@ function SignUp() {
                     />
                     <small class={styles.sign_up_help} id="email-help">
                         {checkingEmail
-                            ? "…tarkistetaan"
+                            ? "…checking"
                             : emailAvailable === true
-                                ? "✅ Email on vapaa"
+                                ? "✅ Email is available"
                                 : emailAvailable === false
-                                    ? "❌ Email on jo käytössä"
+                                    ? "❌ Email is already in use"
                                     : ""}
                     </small>
                 </div>
@@ -239,11 +239,11 @@ function SignUp() {
                     <div>
                         <small class={styles.sign_up_help} id="username-help">
                             {checkingUsername
-                                ? "…tarkistetaan"
+                                ? "…checking"
                                 : usernameAvailable === true
-                                    ? "✅ Käyttäjätunnus on vapaa"
+                                    ? "✅ Username is available"
                                     : usernameAvailable === false
-                                        ? "❌ Käyttäjätunnus on jo käytössä"
+                                        ? "❌ Username is already in use"
                                         : ""}
                         </small>
                     </div>
@@ -259,10 +259,10 @@ function SignUp() {
 
                     {/* Checklist (reaaliaikainen) */}
                     <ul className={styles.sign_up_ul} id="password-help" style={{ marginTop: 6 }}>
-                        <li style={{ opacity: lengthOk ? 1 : 0.6 }}>{lengthOk ? '✓' : '•'} vähintään 8 merkkiä</li>
-                        <li style={{ opacity: upperOk ? 1 : 0.6 }}>{upperOk ? '✓' : '•'} vähintään yksi ISO kirjain (A–Z)</li>
-                        <li style={{ opacity: digitOk ? 1 : 0.6 }}>{digitOk ? '✓' : '•'} vähintään yksi numero (0–9)</li>
-                        <li style={{ opacity: specialOk ? 1 : 0.6 }}>{specialOk ? '✓' : '•'} vähintään yksi erikoismerkki (!@#$…)</li>
+                        <li style={{ opacity: lengthOk ? 1 : 0.6 }}>{lengthOk ? '✓' : '•'} atleast 8 characters</li>
+                        <li style={{ opacity: upperOk ? 1 : 0.6 }}>{upperOk ? '✓' : '•'} atleast ONE uppercase letter (A–Z)</li>
+                        <li style={{ opacity: digitOk ? 1 : 0.6 }}>{digitOk ? '✓' : '•'} atleast ONE number (0–9)</li>
+                        <li style={{ opacity: specialOk ? 1 : 0.6 }}>{specialOk ? '✓' : '•'} atleast ONE special character (!@#$…)</li>
                     </ul>
                 </div>
 
@@ -276,7 +276,7 @@ function SignUp() {
                     />
                     {!matchOk && confirm.length > 0 && (
                         <small id="confirm-help" style={{ color: 'crimson' }}>
-                            Salasanat eivät täsmää
+                            Passwords do not match
                         </small>
                     )}
                 </div>
@@ -290,7 +290,7 @@ function SignUp() {
                         className="btn btn-primary"
                         type="submit"
                         disabled={!(allOk && matchOk)}
-                        title={!(allOk && matchOk) ? 'Täytä vaatimukset ennen jatkamista' : 'Lähetä'}
+                        title={!(allOk && matchOk) ? 'Please meet the requirements before continuing' : 'Send'}
                     >
                         Sign up
                     </button>

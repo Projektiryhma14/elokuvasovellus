@@ -1,6 +1,5 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
-import { NavLink } from 'react-router-dom'
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
 import placeholder from '../../pics/movie_poster_not_available.png'
@@ -13,9 +12,6 @@ export default function TmdbSearch() {
 
     const navigate = useNavigate()
     const [msg, setMsg] = useState(null)                    // Onnistuminen / virhe
-
-    //const [query, setQuery] = useState("")                  // ei käytössä
-    //const [output, setOutput] = useState("")                // Näytetään <pre>-tagissä. APIN raaka-data (debug)
 
     // Filtterit (dropdown)
     const [genre, setGenre] = useState("")                  // TMDb genre-ID (esim. "28" = Action). Tyhjä = ei genrefiltteriä
@@ -34,13 +30,10 @@ export default function TmdbSearch() {
     const startIndex = (page - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
 
-    //const currentMovies = source.slice(startIndex, endIndex)
     const currentMovies = movies.slice(startIndex, endIndex);
-    //const [movieDetails, setMovieDetails] = useState([]);
 
 
     // Leikataan näkyviin tuleva pätkä popularMovies-taulukosta
-    //const currentMovies = source.slice(startIndex, endIndex)
 
     //Funktio jolla muutetaan TMDB- vote_average tähdiksi
     function NaytaTahdet({ vote_average, maxStars = 5 }) {
@@ -90,8 +83,6 @@ export default function TmdbSearch() {
                 setSelectedMovie({})
             }
 
-            //setIsSearchActive(true)                 // asetetaan hakutila päälle
-
         } catch (err) {
             console.log("Search failed:", err)
         }
@@ -111,7 +102,7 @@ export default function TmdbSearch() {
         console.log(get_url)
         try {
             const response = await axios.get(get_url)
-            console.log(response.data)
+            //console.log(response.data)
             if (!response.data.groupid) {
                 console.log("user is not a in a group")
                 alert("You must belong to a group to use this feature")
@@ -128,17 +119,12 @@ export default function TmdbSearch() {
         try {
             //tässä kohtaa on varmistettu, että käyttäjä on kirjautunut sisään ja kuuluu ryhmään
             const post_url = import.meta.env.VITE_API_BASE_URL + "/sharedmovies"
-            console.log(post_url)
-            //console.log(movie.title)
-            //console.log(sessionStorage.getItem("user_id"))
-            //console.log(responseGroupId)
             const params = {
                 movieName: movie.title,
                 groupId: responseGroupId,
                 sharerId: sessionStorage.getItem("user_id")
             }
             const responseFromPost = await axios.post(post_url, params)
-            console.log(responseFromPost)
 
             if (responseFromPost.status === 201) {
                 alert(`The following movie has been shared to your group page:
@@ -150,7 +136,6 @@ export default function TmdbSearch() {
         }
         catch (err) {
             console.error(err)
-            //console.log(err.response.data)
             if (!err || !err.response || !err.response.data || !err.response.data.error) {
                 alert("An error occurred")
             }
@@ -387,97 +372,3 @@ export default function TmdbSearch() {
         </>
     )
 }
-
-
-
-// MOVIE SEARCH OSIO !!!!!
-// Suoritetaan kun käyttäjä painaa "Search" (form on submit)
-
-/* VANHA HAKUFUNKTIO
-const searchMovie = async () => {
-    try {
-        const res = await axios.get("https://api.themoviedb.org/3/discover/movie", {
-                    params: {
-                    api_key: import.meta.env.VITE_API_KEY,        // v3 API key
-                include_adult: false,
-                language: "en-US",      // UI-teksti suomeksi, jos on saatavilla
-                page: 1,
-                with_original_language: language || undefined,
-                with_genres: genre || undefined,
-                primary_release_year: year || undefined,
-            },
-
-        });
-                //setMovies(res.data.results || []);                      // Tallennetaan dropdown valinnat listaan.
-                //setPopularMovies(res.data.results || []);
-
-                // Kirjoitetaan hakutulokset VAIN movies-tilaan (popularMovies pidetään erikseen muistissa)
-                setMovies(res.data.results || [])
-                setPage(1)                                              // Sivustus alkaa alusta hakutilassa
-
-                console.log(res.data.results);                          // debug (näkyy konsolissa)
-                setOutput(JSON.stringify(res.data.results, null, 2));   // raakadata <pre>-näyttöön (debugia varten)
-    } catch (err) {
-                        console.error(err);
-    }
-}
-                    */
-
-/*
-// RESET / SHOW TRENDING
-const resetToTrending = async () => {
-                        setGenre("");
-                    setYear("");
-                    setLanguage("");
-                    setMovies([]);
-                    setPage(1);
-                    setIsSearchActive(false)        // Palaaminen trendingiin
-
-                    try {
-        // Haetaan uudelleen trending-lista, jotta on ajantasainen
-        const {data} = await axios.get("https://api.themoviedb.org/3/trending/movie/day", {
-                        params: {
-                        api_key: import.meta.env.VITE_API_KEY,
-                    language: "en-US",
-            },
-        });
-                    setPopularMovies(data.results || []);
-                    console.log("Trending refreshed:", data.results?.length);
-    } catch (err) {
-                        console.error("Trending refresh failed:", err);
-    }
-}
-                    */
-
-// Käytetään useEfectiä, eli haetaan vain kerran, kun komponentti ladataan
-// Ladataan popular movies listaan
-{/*
-    useEffect(() => {
-        const noudaPopular = async () => {
-            try {
-                const { data } = await axios.get(
-                    "https://api.themoviedb.org/3/trending/movie/day",
-                    {
-
-                        params: {
-                            api_key: import.meta.env.VITE_API_KEY,
-                            language: "en-US",
-                        },
-                    }
-                );
-                setPopularMovies(data.results || []);           // tallennetaan popular-lista stateen, palauttaa max 20 itemiä
-            } catch (err) {
-                console.error("Popular-elokuvien haku epäonnistui:", err);
-            }
-        };
-
-        noudaPopular();     // kutsutaan heti
-
-
-        if (sessionStorage.getItem("selected_movie")) {
-            console.log("elokuva haettu sessionstoragesta")
-            setSelectedMovie(JSON.parse(sessionStorage.getItem("selected_movie")))
-        }
-    }, []);                 // Ei uudelleen hae state-muutoksissa
-
-    */}

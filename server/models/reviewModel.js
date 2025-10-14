@@ -17,7 +17,7 @@ const selectAllReviews = async () => {
 
 const selectDistinctMovies = async () => {
     return await pool.query(
-            `
+        `
         SELECT DISTINCT ON (movie_name) 
         movie_name, movie_id FROM reviews;
         `)
@@ -40,6 +40,7 @@ const selectReviewsByMovieId = async (movieId) => {
 }
 
 const insertReview = async (values) => {
+    // SQL-kysely: lisätään arvostelu ja palautetaan luodun rivin id + aikaleima
     const query = `
             INSERT INTO reviews (movie_name, movie_rating, movie_review, user_id, movie_id)
             VALUES ($1, $2, $3, $4, $5)

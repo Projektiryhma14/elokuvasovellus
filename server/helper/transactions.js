@@ -1,7 +1,6 @@
-import {pool} from './db.js'
+import { pool } from './db.js'
 
 const beginTransaction = async (client) => {
-    //console.log("begintransaction")
     return await client.query('BEGIN')
 }
 
@@ -14,7 +13,6 @@ const rollbackTransaction = async (client) => {
 }
 
 const connectClient = async () => {
-    //console.log("Mentiin connectClienttiin")
     return await pool.connect()
 }
 
@@ -22,7 +20,4 @@ const releaseClient = async (client) => {
     return client.release()
 }
 
-//const connectClient = await pool.connect()
-//const releaseClient = connectClient.release()
-
-export {connectClient, releaseClient, beginTransaction, commitTransaction, rollbackTransaction}
+export { connectClient, releaseClient, beginTransaction, commitTransaction, rollbackTransaction }
