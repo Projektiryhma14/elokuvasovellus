@@ -71,6 +71,12 @@ Key features include sign up and login, multi-criteria search, showtimes, groups
 
 ---
 
+## Database ER Diagram
+
+<img src="documents/ER-diagram.png" width="600" alt="database ER diagram">
+
+---
+
 ## Authors
 
 Timo Tikkanen, Mikko Haapea, Ville Kähkönen, and Sari Ervasti
