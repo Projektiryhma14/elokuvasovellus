@@ -112,7 +112,7 @@ export default function PopularMovies() {
                                             }`}
                                         onClick={() => {
                                             setSelectedMovie(m);
-                                            sessionStorage.setItem("selected_movie", JSON.stringify(m));
+                                            //sessionStorage.setItem("selected_movie", JSON.stringify(m)); //<-- tätä ei tarvita popularmoviesissa
                                         }}
                                     >
                                         {m.title} ({year})

@@ -55,8 +55,8 @@ export default function Navbar() {
             {/* Keskilinkit */}
             <ul className={`${styles.links} ${styles.center}`}>
                 <li>
-                    <HashLink smooth to="/#movie_search" className={styles.link}>
-                        Movie Search
+                    <HashLink smooth to="/#popular_movies" className={styles.link}>
+                        Popular movies
                     </HashLink>
                 </li>
                 <li>
@@ -65,15 +65,17 @@ export default function Navbar() {
                     </HashLink>
                 </li>
                 <li>
+                    <HashLink smooth to="/#movie_search" className={styles.link}>
+                        Movie Search
+                    </HashLink>
+                </li>
+
+                <li>
                     <HashLink smooth to="/#sharedFavourites" className={styles.link}>
                         Shared Favourites
                     </HashLink>
                 </li>
-                <li>
-                    <HashLink smooth to="/#popular_movies" className={styles.link}>
-                        Popular movies
-                    </HashLink>
-                </li>
+
                 <li>
                     <NavLink to="/reviews" className={styles.link}>Reviews</NavLink>
                 </li>
@@ -210,10 +212,11 @@ export default function Navbar() {
                 <nav className={styles.drawerSection}>
                     <div className={styles.drawerTitle}>Navigation</div>
                     <ul className={styles.drawerList} onClick={closeMenu}>
-                        <li><HashLink smooth to="/#movie_search" className={styles.drawerLink}>Movie Search</HashLink></li>
-                        <li><HashLink smooth to="/#finnkino" className={styles.drawerLink}>Finnkino showtimes</HashLink></li>
-                        <li><HashLink to="/#sharedFavourites" className={styles.drawerLink}>Shared Favourites</HashLink></li>
                         <li><HashLink smooth to="/#popular_movies" className={styles.drawerLink}>Popular movies</HashLink></li>
+                        <li><HashLink smooth to="/#finnkino" className={styles.drawerLink}>Finnkino showtimes</HashLink></li>
+                        <li><HashLink smooth to="/#movie_search" className={styles.drawerLink}>Movie Search</HashLink></li>
+                        <li><HashLink to="/#sharedFavourites" className={styles.drawerLink}>Shared Favourites</HashLink></li>
+
                         <li><NavLink to="/reviews" className={styles.drawerLink}>Reviews</NavLink></li>
                     </ul>
                 </nav>
@@ -233,7 +236,7 @@ export default function Navbar() {
 
                     {status === "USER" && (
                         <ul className={styles.drawerList} onClick={closeMenu}>
-                            <li><NavLink to="/profile" className={styles.drawerLink}>My Profile</NavLink></li>
+                            <li><NavLink to={`/profile/${user?.username ?? ""}`} className={styles.drawerLink}>My Profile</NavLink></li>
                             <li><NavLink to="/profileSettings" className={styles.drawerLink}>My Profile Settings</NavLink></li>
                             <li><NavLink to="/group" className={styles.drawerLink}>Group Page</NavLink></li>
                             {location.pathname === "/group" && (

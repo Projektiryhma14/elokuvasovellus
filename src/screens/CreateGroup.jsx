@@ -13,26 +13,24 @@ export default function CreateGroup() {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-        const url = "http://localhost:3001/group"
-
+        const url = import.meta.env.VITE_API_BASE_URL + "/group"
 
         if (!group) {
-            setStatusMessage('Ryhmän nimeä ei ole annettu')
+            setStatusMessage('Group name missing')
             console.log("Ryhmän nimeä ei ole annettu")
             return
         }
 
-        //axios.post(url, group)
         axios.post(url, { groupName: group, userId: userId, description: groupDescription })
             .then(response => {
 
 
                 console.log(`Ryhmän luonti onnistui. Luodun ryhmän id: ${response.data.group_id}, ja nimi: ${response.data.group_name}`)
-                setStatusMessage('Ryhmän luonti onnistui')
+                setStatusMessage('Group created')
                 e.target.reset()
             })
             .catch(err => {
-                const errorMessage = err.response?.data?.error || 'Ryhmän luonti epäonnistui'
+                const errorMessage = err.response?.data?.error || 'Creating group failed'
                 setStatusMessage(errorMessage)
             })
 

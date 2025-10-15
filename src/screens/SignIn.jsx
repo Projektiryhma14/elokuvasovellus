@@ -65,17 +65,6 @@ export default function SignIn() {
             if (result?.error) setLocalError(result.error)
         }
 
-        //if (result.ok) {
-        //    // Jos login onnistui:
-        //    sessionStorage.removeItem("returnTo");      // poistetaan paluuosoite
-        //    navigate("/", { replace: true });           // Ohjataan takaisin etusivulle
-        //} else {
-        //    // Jos login epäonnistui: näytetään virhe
-        // authError tulee Contextista (esim. backendistä), 
-        // localError on omalle validoinnille
-        //    if (result.error) setLocalError(result.error);
-        //}
-
     };
 
 

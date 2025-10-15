@@ -1,10 +1,11 @@
-
-
 /* Osion tumma tausta + valkoinen teksti */
 .finnkino_wrapper {
     min-height: calc(100vh - var(--nav-h));
     background: #0b0b0b;
     color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-style: normal;
 }
 
 .finnkino_wrapper h2 {
@@ -12,6 +13,7 @@
     margin-bottom: 60px;
     text-align: center;
     color: #ffffff;
+    font-weight: 600;
 }
 
 .finnkino_form h4 {

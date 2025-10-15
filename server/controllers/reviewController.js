@@ -41,7 +41,7 @@ const postReview = async (req, res) => {
     try {
         console.log("post /reviews body:", req.body)
         console.log("post /reviews user:", req.user)
-        
+
         // Poimitaan kentät bodystä
         const { movie_name, movie_rating, movie_review, movie_id } = req.body
 
@@ -69,15 +69,7 @@ const postReview = async (req, res) => {
         // Parametrit turvallisesti taulukossa (estää SQL-injektiot)
         const values = [movie_name, rating, movie_review, user_id, movie_id];
 
-        // SQL-kysely: lisätään arvostelu ja palautetaan luodun rivin id + aikaleima
-        /*const query = `
-            INSERT INTO reviews (movie_name, movie_rating, movie_review, user_id, movie_id)
-            VALUES ($1, $2, $3, $4, $5)
-            RETURNING review_id, created_at
-        `;*/
-
         // Suoritetaan kysely tietokantaan
-        //const result = await pool.query(query, values)
         const result = await insertReview(values)
 
         // Palautetaan 201 Created + pätkä luodusta rivistä

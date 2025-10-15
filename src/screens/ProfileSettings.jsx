@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
-import styles from './profileSettings.module.css'
+import styles from './ProfileSettings.module.css'
 import { useAuth } from "../context/AuthContext.jsx"
 import { useNavigate } from 'react-router-dom'
 import { useMemo } from "react"
@@ -103,7 +103,7 @@ export default function ProfileSettings() {
 
       const userId = sessionStorage.getItem("user_id");
       const response = await axios.delete(`${API_BASE_URL}/deleteuser/${userId}`)
-      alert("Käyttäjä poistettu")
+      alert("User has been deleted")
       signOut()
       navigate("/", { replace: true, state: { flash: "User has been deleted", from: "profile" } })
 
@@ -218,7 +218,7 @@ export default function ProfileSettings() {
     <div className={styles.wrapper}>
 
 
-      <h1 className={styles.title}>Profile settings</h1>
+      <h2 className={styles.title}>Profile settings</h2>
 
 
       <div className={styles.profile}>

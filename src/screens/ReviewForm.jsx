@@ -74,7 +74,7 @@ export default function ReviewForm() {
         }
 
         if (!valitut) {
-            setMsg({ type: "error", text: "Valitse ensin elokuva" })
+            setMsg({ type: "error", text: "Choose movie first" })
             return
         }
 
@@ -86,7 +86,7 @@ export default function ReviewForm() {
         }
 
         if (!backendData.movie_name || !backendData.movie_review || !rating) {
-            setMsg({ type: "error", text: "Täytä arvostelun kentät" })
+            setMsg({ type: "error", text: "Please fill the review text" })
             return
         }
 
@@ -98,7 +98,7 @@ export default function ReviewForm() {
             await axios.post(`${api}/reviews`, backendData, {
                 headers: { Authorization: `Bearer ${token}` },
             });
-            setMsg({ type: "success", text: "Arvostelu tallennettu. Kiitos!" });
+            setMsg({ type: "success", text: "Review has been published!" });
             setText("");
             setRating("");
             sessionStorage.removeItem("pending_review")
@@ -118,7 +118,7 @@ export default function ReviewForm() {
     };
 
     if (!valitut) {
-        return <p>Valitse elokuva Movie Search -osiosta.</p>;
+        return <p>Choose movie from movie search.</p>;
     }
 
 

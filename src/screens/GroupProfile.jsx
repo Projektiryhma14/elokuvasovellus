@@ -15,7 +15,6 @@ export default function GroupProfile() {
 
   // Tilamuuttujat
   const [group, setGroup] = useState(null)
-  //const [description, setDescription] = useState(null)
   const url = import.meta.env.VITE_API_BASE_URL
   const [members, setMembers] = useState([])
   const [pendingRequests, setPendingRequests] = useState([])
@@ -48,19 +47,19 @@ export default function GroupProfile() {
 
   // Haetaan ryhmän tiedot uudestaan aina kun liittymispyyntö on lähetetty tai se perutaan
   const fetchGroup = async () => {
-  try {
-    const response = await axios.get(`${url}/group/${id}`)
-    setGroup(response.data)
+    try {
+      const response = await axios.get(`${url}/group/${id}`)
+      setGroup(response.data)
 
-    const joinRequests = response.data.members.filter(m => m.hasactivegrouprequest === true)
-    const confirmedMembers = response.data.members.filter(m => m.hasactivegrouprequest === false)
+      const joinRequests = response.data.members.filter(m => m.hasactivegrouprequest === true)
+      const confirmedMembers = response.data.members.filter(m => m.hasactivegrouprequest === false)
 
-    setMembers(confirmedMembers)
-    setPendingRequests(joinRequests)
-  } catch (err) {
-    console.error('Virhe ryhmän haussa:', err)
+      setMembers(confirmedMembers)
+      setPendingRequests(joinRequests)
+    } catch (err) {
+      console.error('Virhe ryhmän haussa:', err)
+    }
   }
-}
 
   // Vieras-käyttäjä lähettää liittymispyynnön
   const handleClick = async (e) => {
@@ -153,7 +152,7 @@ export default function GroupProfile() {
   }
 
 
-    // Käyttäjä poistuu ryhmästä (Käytetään samaa endpointtia kuin Omistaja poistaa käyttäjän ryhmästä)
+  // Käyttäjä poistuu ryhmästä (Käytetään samaa endpointtia kuin Omistaja poistaa käyttäjän ryhmästä)
   const handleLeaveGroup = async (e) => {
     e.preventDefault()
 
@@ -161,29 +160,29 @@ export default function GroupProfile() {
       userId: userid,
       groupId: id
     })
-    .then(response => {
-      setStatusMessage(response.data.message)
-      // Ohjataan käyttäjä pois ryhmän sivulta jotta käyttäjä ei enää näe käyttäjille tarkoitettua sisältöä
-      navigate("/group", { replace: true, state: { flash: "You have left from the group", from: "group" } });
-    })
-    .catch(err => {
-      const error = err.response.data.error
-      setStatusMessage(error)
-      console.error(err)
-    })
+      .then(response => {
+        setStatusMessage(response.data.message)
+        // Ohjataan käyttäjä pois ryhmän sivulta jotta käyttäjä ei enää näe käyttäjille tarkoitettua sisältöä
+        navigate("/group", { replace: true, state: { flash: "You have left from the group", from: "group" } });
+      })
+      .catch(err => {
+        const error = err.response.data.error
+        setStatusMessage(error)
+        console.error(err)
+      })
   }
 
 
   // Omistaja poistaa ryhmän
   const deleteGroup = async () => {
-  
+
     const confirmed = window.confirm("Do you really want to delete the group?")
-    if(!confirmed) return
-    
-    // Tämä vaihdettu put -> delete
+    if (!confirmed) return
+
+
     axios.delete(`${url}/group/${id}`, {
-      
-      
+
+
     })
       .then(response => {
         // Ohjataan omistaja pois ryhmän sivulta
@@ -202,59 +201,59 @@ export default function GroupProfile() {
   const isGuest = !isOwner && !isMember && !hasJoinRequest
 
   if (!group) {
-  return <p>Ladataan ryhmän tiedot...</p>
-}
+    return <p>Ladataan ryhmän tiedot...</p>
+  }
 
   return (
-    <div>
-     
+    <div className={styles.wrapper}>
+
       <h1 className={styles.title}>{group.group_name}</h1>
       <div className={styles.description}>
         <h4>Group description:</h4>
-      <h5>{group.group_description}</h5>
+        <h5>{group.group_description}</h5>
       </div>
       {/*<p className={styles.p}>Group owner: {group.owner_name}</p>*/}
-      
+
 
 
       {isOwner && ( // Ryhmän omistajan näkymä
         <div>
           <div className={styles.deleteAndJoin}>
-          <button onClick={() => deleteGroup()}>Delete group</button>
+            <button className={styles.dltGroupButton} onClick={() => deleteGroup()}>Delete group</button>
           </div>
           <div>
             <div className={styles.membersAndRequests}>
               <div className={styles.members}>
                 <h3>Group members:</h3>
-            <ul>  
-              {
-                members.map(member => ( // Listataan ryhmän jäsenet
-                  <li key={member.member_name}>        
-                    <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
-                    {member.member_name === group.owner_name && <span> (Owner)</span>}
-                    {String(member.member_id) === userid && <span> (You)</span>}  
-                    {member.member_name !== group.owner_name && ( // Lisätään käyttäjän poisto-nappi JOS se ei ole ryhmän omistaja
-                      <button onClick={() => removeMember(member.member_id)}>Remove member</button>)}
-                  </li>
-                ))
-              }
-            </ul>
+                <ul>
+                  {
+                    members.map(member => ( // Listataan ryhmän jäsenet
+                      <li key={member.member_name}>
+                        <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
+                        {member.member_name === group.owner_name && <span> (Owner)</span>}
+                        {String(member.member_id) === userid && <span> (You)</span>}
+                        {member.member_name !== group.owner_name && ( // Lisätään käyttäjän poisto-nappi JOS se ei ole ryhmän omistaja
+                          <button className={styles.removeButton} onClick={() => removeMember(member.member_id)}>Remove member</button>)}
+                      </li>
+                    ))
+                  }
+                </ul>
               </div>
-              
 
-            <div className={styles.requests}>
-            <h3>Join requests</h3>
-            <ul>
-              {pendingRequests.map((member, index) => ( // Listataan liittymispyynnöt
-                <li key={index}>
-                  {member.member_name}
-                  <button onClick={() => acceptRequest(member.member_id)}>Accept</button>
-                  <button onClick={() => rejectRequest(member.member_id)}>Reject</button>
-                </li>
-              ))}
-            </ul>
-            </div>
+
+              <div className={styles.requests}>
+                <h3>Join requests</h3>
+                <ul>
+                  {pendingRequests.map((member, index) => ( // Listataan liittymispyynnöt
+                    <li key={index}>
+                      {member.member_name}
+                      <button onClick={() => acceptRequest(member.member_id)}>Accept</button>
+                      <button onClick={() => rejectRequest(member.member_id)}>Reject</button>
+                    </li>
+                  ))}
+                </ul>
               </div>
+            </div>
           </div>
           <GroupShowtimes members={members} group={group} />
           <GroupMovies members={members} group={group} />
@@ -265,23 +264,23 @@ export default function GroupProfile() {
       {isGuest && ( // Vieraan näkymä
         <div>
           <div className={styles.deleteAndJoin}>
-          <button onClick={e => { handleClick(e) }}>Request to join in group</button>
-          <p>{statusMessage}</p>
+            <button className={styles.deleteAndJoiButton} onClick={e => { handleClick(e) }}>Request to join in group</button>
+            <p>{statusMessage}</p>
           </div>
           <div className={styles.membersAndRequests}>
-              <div className={styles.members}>
-                <h3>Group members:</h3>
-          <ul>
-            {
-              members.map(member => ( // Listataan ryhmän jäsenet
-                <li key={member.member_name}>
-                  <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
-                  {member.member_name === group.owner_name && <span> (Owner)</span>}
-                </li>
-              ))
-            }
-          </ul>
-          </div>
+            <div className={styles.members}>
+              <h3>Group members:</h3>
+              <ul>
+                {
+                  members.map(member => ( // Listataan ryhmän jäsenet
+                    <li key={member.member_name}>
+                      <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
+                      {member.member_name === group.owner_name && <span> (Owner)</span>}
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
           </div>
 
         </div>
@@ -290,52 +289,52 @@ export default function GroupProfile() {
       {isMember && ( // Ryhmän jäsenen näkymä
         <div>
           <div className={styles.deleteAndJoin}>
-          <button onClick={e => { handleLeaveGroup(e) }}>Leave group</button>
+            <button onClick={e => { handleLeaveGroup(e) }}>Leave group</button>
           </div>
           <div className={styles.membersAndRequests}>
             <div className={styles.members}>
               <h3>Group members:</h3>
-          <ul>
-            {
-              members.map(member => ( // Listataan ryhmän jäsenet
-                <li key={member.member_name}>
-                  <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
-                  {member.member_name === group.owner_name && <span> (Owner)</span>}
-                  {String(member.member_id) === userid && <span> (You)</span>}  
-                </li>
-              ))
-            }
-          </ul>
-          </div>
+              <ul>
+                {
+                  members.map(member => ( // Listataan ryhmän jäsenet
+                    <li key={member.member_name}>
+                      <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
+                      {member.member_name === group.owner_name && <span> (Owner)</span>}
+                      {String(member.member_id) === userid && <span> (You)</span>}
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
           </div>
           <GroupShowtimes members={members} group={group} />
           <GroupMovies members={members} group={group} />
-          
+
         </div>
       )}
 
       {hasJoinRequest && ( // Liittymispyynnön lähettäneen näkymä
         <div>
           <div className={styles.deleteAndJoin}>
-          <button onClick={e => { handleCancelJoinRequest(e) }}>Cancel join request</button>
-          <p>{statusMessage}</p>
+            <button onClick={e => { handleCancelJoinRequest(e) }}>Cancel join request</button>
+            <p>{statusMessage}</p>
           </div>
           <div className={styles.membersAndRequests}>
-              <div className={styles.members}>
-                <h3>Group members:</h3>
-          <ul>
-            {
-              members.map(member => ( // Listataan ryhmän jäsenet
-                <li key={member.member_name}>
-                  <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
-                  {member.member_name === group.owner_name && <span> (Owner)</span>}
-                </li>
-              ))
-            }
-          </ul>
+            <div className={styles.members}>
+              <h3>Group members:</h3>
+              <ul>
+                {
+                  members.map(member => ( // Listataan ryhmän jäsenet
+                    <li key={member.member_name}>
+                      <Link to={`/profile/${member.member_name}`} >{member.member_name}</Link>
+                      {member.member_name === group.owner_name && <span> (Owner)</span>}
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
           </div>
-          </div>
-          
+
         </div>
       )}
 

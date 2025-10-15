@@ -3,6 +3,10 @@
     min-height: calc(100vh - var(--nav-h));
     background: #0b0b0b;
     color: #ffffff;
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-style: normal;
 }
 
 .sharedList {
@@ -33,7 +37,7 @@
   max-width: 500px;
 }
 
-.sharedFavourites_wrapper h1 {
+.sharedFavourites_wrapper h2 {
     margin-top: 48px;
     margin-bottom: 60px;
     color: #130101;

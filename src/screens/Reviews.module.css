@@ -1,8 +1,17 @@
+.wrapper {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    
+    font-style: normal;
+}
+
+
 
 h1 {
     text-align: center;
     margin-top: 60px;
     font-size: 40px;
+    font-weight: 600;
 }
 
 
@@ -21,6 +30,10 @@ h1 {
     text-decoration: none;
     color: black;
    
+}
+
+.hashLink {
+    font-weight: 600;
 }
 
 .review_div {

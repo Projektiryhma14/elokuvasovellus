@@ -6,6 +6,9 @@
   box-sizing: border-box;
   margin: 36px;
   width: 100%;
+  font-family: "Montserrat", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
 }
 
 .inner {
@@ -16,26 +19,8 @@
   max-width: 100%;
   height: auto;
   margin: 30px;
-  /*border-radius: 10px;*/
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-  /*box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;*/
-  /*background-color: rgba(216, 216, 216, 0.37);*/
-
-/*
-list-style: none;
-  margin: 0 auto 24px auto;   /* keskitys ja väli ennen nappeja */
-  /*
-  padding: 0;
-  overflow-y: auto;
-  display: flex;
-
-  justify-content: center;
-  gap: 8px;
-  margin-bottom: 20px;
-  width: 100%;
-  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
-  padding: 30px;
-  */
+  
 }
 
 .list{
@@ -46,21 +31,19 @@ list-style: none;
 
 .profile h2 {
   margin: 40px;
-  font-size: 40px;
-  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 36px;
+  font-weight: 600;
 }
 
 .inner h3 {
   margin: 50px;
-  font-size: 32px;
-  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-size: 28px;
 }
 
 .listItem {
   border-bottom: 1px solid #e0e0e0;
   font-size: 20px;
   padding: 5px 0px 5px;
-  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
 .listItem:last-child {
