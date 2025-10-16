@@ -5,6 +5,12 @@ Welcome to the Movie App project repository.
 This movie app was created by a four-person team and is made for movie fans. It uses open data from TMDB and Finnkino to help you discover films and browse local showtimes. Additionally, you can create groups, share favourites, and write reviews.
 Key features include sign up and login, multi-criteria search, showtimes, groups, shared favourites, and reviews.
 
+The app is hosted on Render and can be accessed through the following addresses:
+
+https://moviegeegs-frontend.onrender.com/ (frontend)
+
+https://moviegeegs-backend.onrender.com/ (backend)
+
 ---
 
 ## Project Features
